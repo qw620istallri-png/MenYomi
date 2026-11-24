@@ -17,11 +17,11 @@ head='''<!doctype html>
 </head><body>
 '''
 open('site/index.html','w',encoding='utf-8').write(head+full+'\n</body></html>\n')
-man={"name":"Menyomi めん読み","short_name":"Menyomi","description":"Lire les menus japonais écrits à la main.","lang":"fr","start_url":"./","scope":"./","display":"standalone","orientation":"any","background_color":"#f7f0e1","theme_color":"#f7f0e1",
+man={"name":"Menyomi めん読み","short_name":"Menyomi","description":"Lire les menus japonais écrits à la main.","lang":"fr","start_url":"./","scope":"./","id":"./","display":"fullscreen","display_override":["fullscreen","standalone"],"orientation":"any","background_color":"#f7f0e1","theme_color":"#f7f0e1",
  "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}]}
 open('site/manifest.webmanifest','w',encoding='utf-8').write(json.dumps(man,ensure_ascii=False,indent=1))
 sw='''// Menyomi offline cache. The version changes with every build so a new page replaces the old one.
-const V='menyomi-%s'; const CORE=['./','index.html','manifest.webmanifest','voice.mp3','icon-192.png','icon-512.png','icon-180.png','icon-32.png'];
+const V='menyomi-%s'; self.addEventListener('message',e=>{ if(e.data==='skip') self.skipWaiting(); }); const CORE=['./','index.html','manifest.webmanifest','voice.mp3','icon-192.png','icon-512.png','icon-180.png','icon-32.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!=='menyomi-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{ const u=new URL(e.request.url); if(e.request.method!=='GET') return;

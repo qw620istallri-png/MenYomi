@@ -5,7 +5,12 @@
  "lang": "fr",
  "start_url": "./",
  "scope": "./",
- "display": "standalone",
+ "id": "./",
+ "display": "fullscreen",
+ "display_override": [
+  "fullscreen",
+  "standalone"
+ ],
  "orientation": "any",
  "background_color": "#f7f0e1",
  "theme_color": "#f7f0e1",
