@@ -340,7 +340,8 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .variants figcaption{font-family:var(--f-mono);font-size:14px;text-transform:uppercase;text-align:center}
 .variants canvas,.variants .printed{width:100%;aspect-ratio:1;border:2px solid var(--rule);display:block}
 .variants .printed{display:grid;place-items:center;font-size:72px;background:#fff;color:#111;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}
-.dlg .close{position:sticky;top:0;float:right;margin:0;z-index:2;border-top:none;border-right:none}
+.dlghead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--sheet);border-bottom:2px solid var(--rule)}
+.dlghead #dlgslot{display:contents}
 /* simulator */
 .simgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
 @media (max-width:900px){.simgrid{grid-template-columns:minmax(0,1fr)}}
@@ -611,7 +612,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 </div>
 
 <div id="onb" role="dialog" aria-modal="true" aria-label="Menyomi"></div>
-<dialog id="dlg"><button class="btn close" id="dlgclose" data-en="Close ✕">Fermer ✕</button><div class="dlg" id="dlgbody"></div></dialog>
+<dialog id="dlg"><div class="dlghead"><button class="btn" id="dlgclose" data-en="Close ✕">Fermer ✕</button><span id="dlgslot"></span></div><div class="dlg" id="dlgbody"></div></dialog>
 <svg id="measure" width="0" height="0" style="position:absolute;left:-9999px" aria-hidden="true"><path id="mpath" d="M0,0"></path></svg>
 
 <script>
@@ -1266,7 +1267,7 @@ function openWord(wd){ const w=WMAP[wd]; if(!w) return; const body=document.getE
     textCanvas(body.querySelector('#dwc'),w[0],{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),tool),size:clamp((v?Math.min(380,innerHeight*0.55):Math.min(520,innerWidth*0.5))/(n*0.95+0.6),34,110),vertical:v,surface:surf,pad:0.3}); };
   draw(); body.querySelector('#dwagain').onclick=draw; if(!dlg.open) dlg.showModal(); body.scrollTop=0; }
 document.getElementById('dlgbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(b){ openWord(b.dataset.w); } });
-const dlg=document.getElementById('dlg'); document.getElementById('dlgclose').onclick=()=>dlg.close(); dlg.addEventListener('click',e=>{if(e.target===dlg||e.target.closest('.dlgend')) dlg.close()});
+const dlg=document.getElementById('dlg'); document.getElementById('dlgclose').onclick=()=>dlg.close(); dlg.addEventListener('close',()=>{ document.getElementById('dlgslot').innerHTML=''; }); dlg.addEventListener('click',e=>{if(e.target===dlg||e.target.closest('.dlgend')) dlg.close()});
 // the phone's back button closes the dialog instead of leaving the page
 { const open=dlg.showModal.bind(dlg); dlg.showModal=()=>{ open(); try{ history.pushState({dlg:1},''); }catch(e){} };
   dlg.addEventListener('close',()=>{ try{ if(history.state&&history.state.dlg) history.back(); }catch(e){} });
@@ -1698,7 +1699,7 @@ function renderSync(host){ if(!host||!document.body.contains(host)) return; cons
   addEventListener('scroll',()=>{ if(!mq.matches) return; const y=scrollY, dy=y-lastY; if(Math.abs(dy)<8) return;
     const atEnd=innerHeight+y>=document.documentElement.scrollHeight-4; B.classList.toggle('navhide',dy>0&&y>60&&!atEnd); lastY=y; },{passive:true});
   addEventListener('hashchange',()=>B.classList.remove('navhide')); })();
-document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbody').innerHTML=`<div class="row"><button class="btn k" id="otour" style="font-size:18px;padding:12px 18px">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button></div><h2>${tr('Progression','Progress')}</h2>
+document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslot').innerHTML=`<button class="btn k" id="otour">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button>`; document.getElementById('dlgbody').innerHTML=`<h2>${tr('Progression','Progress')}</h2>
   <div id="synchost"></div>
   <p style="margin:0">${tr('Sans compte, elle reste dans ce navigateur. Pour la passer à un autre appareil, copiez le code ici et collez-le là-bas.','Without an account it stays in this browser. To move it to another device, copy the code here and paste it there.')}</p>
   <div class="row"><button class="btn k" id="pcopy">${tr('Copier le code','Copy the code')}</button><button class="btn" id="pdl"${document.querySelector('link[rel=manifest]')?'':' hidden'}>${tr('Télécharger','Download')}</button></div>

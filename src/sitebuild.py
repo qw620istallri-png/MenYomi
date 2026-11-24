@@ -4,7 +4,7 @@ ver=hashlib.sha1(full.encode()+open('voice.mp3','rb').read()).hexdigest()[:8]
 import shutil; shutil.copy('voice.mp3','site/voice.mp3'); shutil.copytree('fb','site/fb',dirs_exist_ok=True)
 head='''<!doctype html>
 <html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="theme-color" content="#f7f0e1">
 <meta name="description" content="Lire les menus japonais écrits à la main.">
 <link rel="manifest" href="manifest.webmanifest">
