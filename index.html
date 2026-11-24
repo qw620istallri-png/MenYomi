@@ -41,12 +41,16 @@ body{background:transparent;color:var(--ink);margin:0}
 body{font-family:var(--f-body);font-size:16px;line-height:1.55;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 72px;}
 html{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .42 0 0 0 0 .38 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 #light{position:fixed;inset:0;z-index:-1;pointer-events:none}
-#light .g{position:absolute;inset:0;background:linear-gradient(309deg,var(--glow),var(--glow) 18%,transparent 62%);opacity:.55}
+#light .g{position:absolute;inset:0;background:linear-gradient(309deg,var(--glow),var(--glow) 18%,transparent 62%)}
 #light .b{position:absolute;inset:0;background:linear-gradient(355deg,var(--glow) 0%,transparent 28%);opacity:.45}
 #shade{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:40;opacity:calc(var(--sun) * var(--tab,1));mix-blend-mode:var(--sunblend);transition:opacity 1.2s}
 #veil{position:fixed;inset:0;pointer-events:none;z-index:39;mix-blend-mode:multiply;opacity:0;transition:opacity 2s;background:radial-gradient(110% 80% at 4% 106%,#ffd9a0 0%,rgba(255,217,160,0) 34%),#4d5886}
-html.night{--sunblend:multiply;--sun:.34}
-html.night #veil{opacity:.1}
+html.night{--sunblend:screen;color-scheme:dark}
+html.night #veil{opacity:0}
+html{transition:background-color 1.5s}
+#light .g{opacity:var(--glowA,.55)}
+html.night .board,html.night .stage canvas,html.night .wcanv canvas,html.night .pad{filter:brightness(.9) saturate(.9)}
+html.night #logo{box-shadow:4px 4px 0 var(--blue)}
 #shade canvas{position:absolute;top:-30vh;right:0;width:82vw;height:132vh;transform-origin:top right;transform:matrix3d(.75,-.0625,0,.0008,0,1,0,0,0,0,1,0,0,0,0,1)}
 #sunA{filter:blur(3px);-webkit-mask-image:linear-gradient(252deg,#000 0%,#000 30%,transparent 72%);mask-image:linear-gradient(252deg,#000 0%,#000 30%,transparent 72%)}
 #sunB{filter:blur(12px);-webkit-mask-image:linear-gradient(252deg,transparent 22%,#000 68%);mask-image:linear-gradient(252deg,transparent 22%,#000 68%)}
@@ -1358,10 +1362,29 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
         else items.push({b,t,ox:p[0]-x0+side*6,oy:p[1]-y0,shape:kind,a:base+side*(.6+r()*.8),s:kind==='momiji'?20+r()*11:17+r()*9,ph:r()*6}); } }
     return {kind,br,items}; }
   // sun position: morning light rakes one way, evening the other, noon is short and steep
-  function phase(){ const d=new Date(); const h=window.SUN_HOUR??(d.getHours()+d.getMinutes()/60); const night=h<6.3||h>=20.3;
-    const k=clamp((h-6.3)/14,0,1); const sk=night? .3 : -1.15+2.3*k; const st=night? 1.05 : 0.82+Math.abs(sk)*0.38;
-    const glow= night?'#b7c6ea': h<8.5?'#f8c6a6': h<16.3?'#f5d7a6': h<18.6?'#ffc787':'#ff9f6b'; return {night,sk,st,glow}; }
-  let ph=phase(); let SHADOW='#1a1714'; const applyPhase=()=>{ ph=phase(); if(dayNo()!==DAY){ DAY=dayNo(); DFX=dayFx(); for(const k in cache) delete cache[k]; if(cur){ const k=cur.kind; cur=null; prev=null; window.setShade&&window.setShade(Object.keys(KIND).find(v=>KIND[v]===k)); } } SHADOW=getComputedStyle(root).getPropertyValue('--shadow').trim()||'#1a1714'; root.classList.toggle('night',ph.night); root.style.setProperty('--glow',ph.glow); }; applyPhase(); setInterval(applyPhase,60000);
+  // the room's colours follow the hour: keyframes are blended, so 7 h, noon, golden hour, dusk and night really look different
+  const PAL=[ // hour, paper, sheet, soft, stage, glow, glow strength, shadow colour, shadow strength
+    [0,   '#0d1329','#151c38','#253057','#1b2446','#7f97e8',.55,'#000000',.2],
+    [5.2, '#0d1329','#151c38','#253057','#1b2446','#7f97e8',.55,'#000000',.2],
+    [6.4, '#e9dcd6','#f6ece8','#e0cfc6','#d3c2b6','#ffb8a0',.8,'#3a2c48',.16],
+    [8.6, '#f6efe6','#fdf8f2','#ebe0cf','#dccfb6','#ffd0b0',.6,'#2a2230',.16],
+    [13,  '#f8f2e4','#fffbf2','#ede3cb','#ddd0b2','#fbe6b8',.45,'#1a1714',.19],
+    [16.5,'#f6ecd8','#fff8ea','#ebdcbe','#dbc9a6','#ffcf86',.6,'#2b1d10',.18],
+    [18.6,'#f3dcb8','#fbecd2','#e8cfa6','#d6b98e','#ffa24a',.85,'#4a2a10',.22],
+    [20,  '#d8c0b8','#ead6cf','#cdb3ab','#bba198','#ff7a6a',.75,'#3a2440',.2],
+    [21.3,'#0d1329','#151c38','#253057','#1b2446','#7f97e8',.55,'#000000',.2],
+    [24,  '#0d1329','#151c38','#253057','#1b2446','#7f97e8',.55,'#000000',.2]];
+  const hx=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16)), mix=(a,b,u)=>'#'+hx(a).map((v,i)=>Math.round(v+(hx(b)[i]-v)*u).toString(16).padStart(2,'0')).join('');
+  function phase(){ const d=new Date(); const h=((window.SUN_HOUR??(d.getHours()+d.getMinutes()/60))%24+24)%24; let a=0; while(PAL[a+1][0]<h) a++; const A2=PAL[a], B2=PAL[a+1]; const u=(h-A2[0])/((B2[0]-A2[0])||1), e=u*u*(3-2*u);
+    const c=[1,2,3,4,5].map(i=>mix(A2[i],B2[i],e)); const glowA=A2[6]+(B2[6]-A2[6])*e, shadow=mix(A2[7],B2[7],e), sun=A2[8]+(B2[8]-A2[8])*e;
+    const lum=hx(c[0]).reduce((s2,v,i)=>s2+v*[.2126,.7152,.0722][i],0)/255; const night=lum<.42;
+    const k=clamp((h-6.4)/13.6,0,1); const sk=night? .3 : -1.25+2.5*k; const st=night? 1.05 : 0.78+Math.abs(sk)*0.45;
+    return {night,sk,st,glow:c[4],pal:c,glowA,shadow,sun}; }
+  const NIGHT_INK={'--ink':'#e8ebf8','--rule':'#cfd6f2','--mute':'#9ea8cf','--acc':'#ff6a4d','--acc-ink':'#0d1329','--blue':'#8aa0ff','--ok':'#4fd88f','--bad':'#ff6a55','--warn':'#ffb648'};
+  function paint(){ const [pa,sh,so,stg,gl]=ph.pal; const S2=root.style; S2.setProperty('--paper',pa); S2.setProperty('--sheet',sh); S2.setProperty('--soft',so); S2.setProperty('--stage',stg); S2.setProperty('--glow',gl); S2.setProperty('--glowA',ph.glowA.toFixed(2)); S2.setProperty('--sun',(ph.night?.13:ph.sun).toFixed(3)); S2.setProperty('--shadow',ph.shadow);
+    for(const [k2,v] of Object.entries(NIGHT_INK)) ph.night? S2.setProperty(k2,v) : S2.removeProperty(k2);
+    const m=document.querySelector('meta[name=theme-color]'); if(m) m.content=pa; }
+  let ph=phase(); let SHADOW='#1a1714'; const applyPhase=()=>{ ph=phase(); if(dayNo()!==DAY){ DAY=dayNo(); DFX=dayFx(); for(const k in cache) delete cache[k]; if(cur){ const k=cur.kind; cur=null; prev=null; window.setShade&&window.setShade(Object.keys(KIND).find(v=>KIND[v]===k)); } } if(root.dataset.theme!=='dark') paint(); SHADOW=ph.shadow||'#1a1714'; root.classList.toggle('night',ph.night); }; applyPhase(); setInterval(applyPhase,60000);
   let cur=null, prev=null, t0=0; const cache={};
   const sway=(b,t)=>(Math.sin(t*.00042+b.ph)*.05+Math.sin(t*.0011+b.ph*2)*.015)*(b.amp??1)*DFX.wind;
   let BT=[1,0,0,1,0,0];
@@ -1376,8 +1399,8 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); } }
   function frame(t){ const {st,night}=ph; const sk=ph.sk+DFX.tilt; BT=[KS,0,KS*sk*.55,KS*st,-KS*sk*H*.16,0];
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over'; xa.clearRect(0,0,A.width,A.height);
-    if(night){ xa.fillStyle='#26315f'; xa.fillRect(0,0,A.width,A.height); xa.setTransform(...BT); xa.globalCompositeOperation='destination-out'; xa.fillRect(W*.06,-10,W*.96,H*.74); xa.globalCompositeOperation='source-over'; }
-    const col=night?'#26315f':SHADOW; xa.fillStyle=xa.strokeStyle=col;
+    if(night){ xa.setTransform(...BT); xa.fillStyle='#c4d2ff'; xa.fillRect(W*.06,-10,W*.96,H*.74); xa.globalCompositeOperation='destination-out'; }
+    const col=night?'#000':SHADOW; xa.fillStyle=xa.strokeStyle=col;
     xa.setTransform(...BT); xa.fillRect(W*DFX.mull,-10,6,H+20); xa.fillRect(-20,H*DFX.rail,W+40,6); xa.fillRect(W*.04,-10,4,H+20);
     const k=reduce?1:clamp((t-t0)/1100,0,1); if(prev&&k<1) drawScene(prev,t,1-k); if(cur) drawScene(cur,t,k);
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over';
