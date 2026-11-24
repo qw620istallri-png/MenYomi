@@ -1,6 +1,7 @@
 import json, hashlib
 full=open('kanji-pinceau.html',encoding='utf-8').read()
-ver=hashlib.sha1(full.encode()).hexdigest()[:8]
+ver=hashlib.sha1(full.encode()+open('voice.mp3','rb').read()).hexdigest()[:8]
+import shutil; shutil.copy('voice.mp3','site/voice.mp3')
 head='''<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -20,7 +21,7 @@ man={"name":"Menyomi めん読み","short_name":"Menyomi","description":"Lire le
  "icons":[{"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},{"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"}]}
 open('site/manifest.webmanifest','w',encoding='utf-8').write(json.dumps(man,ensure_ascii=False,indent=1))
 sw='''// Menyomi offline cache. The version changes with every build so a new page replaces the old one.
-const V='menyomi-%s'; const CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','icon-180.png','icon-32.png'];
+const V='menyomi-%s'; const CORE=['./','index.html','manifest.webmanifest','voice.mp3','icon-192.png','icon-512.png','icon-180.png','icon-32.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==V&&k!=='menyomi-fonts').map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('fetch',e=>{ const u=new URL(e.request.url); if(e.request.method!=='GET') return;

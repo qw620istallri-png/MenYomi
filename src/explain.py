@@ -246,3 +246,59 @@ add("""
 板わさ|Tranches de kamaboko (pâté de poisson) avec du wasabi et de la sauce soja.|Slices of kamaboko fish cake with wasabi and soy sauce.
 炙りえいひれ|Nageoire de raie séchée, grillée, à tremper dans la mayonnaise au piment. Parfait avec le saké.|Dried stingray fin, toasted and dipped in chili mayo. Made for sake.
 """)
+
+# Shop signs: what the words of a restaurant's name mean (type word or the shop's own name)
+NX = {}
+for line in """
+居酒屋|« Maison où l’on reste boire » : 居 rester, 酒 alcool, 屋 boutique. Bistrot japonais où l’on boit et partage des petits plats.|“A shop where you stay to drink”: 居 stay, 酒 alcohol, 屋 shop. A Japanese pub where you drink and share small plates.
+酒処|« Lieu du saké » : 処 veut dire endroit. Formule ancienne et chaleureuse pour un bar à saké.|“Place of sake”: 処 means place. An old, warm way to name a sake bar.
+炉端|« Au bord du foyer » : le cuisinier grille devant vous et tend les plats sur une longue pelle en bois.|“By the hearth”: the cook grills in front of you and passes dishes on a long wooden paddle.
+焼鳥|« Oiseau grillé » : brochettes de poulet au charbon. Le mot sert aussi de nom de boutique.|“Grilled bird”: chicken skewers over charcoal. The word doubles as a shop name.
+炭火焼鳥|Yakitori « au feu de charbon » : 炭 charbon, 火 feu. Gage de qualité, souvent du binchōtan.|Yakitori “over charcoal fire”: 炭 charcoal, 火 fire. A sign of quality, often binchōtan.
+鳥|« Oiseau » : ici, le poulet. Nom court typique des petites échoppes de yakitori.|“Bird”: here, chicken. A typical short name for small yakitori stalls.
+麺屋|« Boutique de nouilles » : presque toujours un restaurant de ramen moderne.|“Noodle shop”: nearly always a modern ramen place.
+らーめん|Ramen écrit en hiragana, avec un trait d’allongement : un air artisanal et familier.|Ramen written in hiragana with a long-vowel bar: a homely, artisanal feel.
+中華そば|« Soba chinoises » : l’ancien nom des ramen. Annonce un bouillon de soja à l’ancienne.|“Chinese soba”: the old name for ramen. Promises an old-style soy broth.
+手打ち蕎麦|« Soba coupées à la main » : la pâte est étalée et taillée sur place.|“Hand-cut soba”: the dough is rolled and cut on site.
+そば処|« Lieu de soba », en hiragana pour un ton simple et accueillant.|“Place of soba”, in hiragana for a plain, friendly tone.
+庵|« Ermitage » : suffixe classique des restaurants de soba, qui évoque le calme et la tradition.|“Hermitage”: a classic suffix for soba restaurants, evoking calm and tradition.
+食堂|« Salle à manger » : cantine populaire aux menus simples et pas chers.|“Dining hall”: a cheap, no-frills local canteen.
+定食|« Repas fixe » : un plateau complet avec riz, soupe miso, plat et pickles.|“Set meal”: a full tray with rice, miso soup, a main and pickles.
+鮨|Sushi écrit avec 魚 poisson et 旨 délicieux : graphie élégante des comptoirs haut de gamme.|Sushi written with 魚 fish and 旨 delicious: the elegant spelling of upscale counters.
+寿司処|« Lieu de sushi ». 寿司 est un jeu de kanji porte-bonheur : 寿 longévité, 司 diriger.|“Place of sushi”. 寿司 is a lucky kanji pun: 寿 long life, 司 to govern.
+すし|Sushi en hiragana : ton décontracté, souvent un comptoir simple ou un kaiten.|Sushi in hiragana: casual, often a simple counter or conveyor belt place.
+鮓|Graphie ancienne de sushi, du temps où le poisson était fermenté dans le riz.|An old spelling of sushi, from when fish was fermented in rice.
+丼|« Bol » : un bol de riz garni. Le kanji représente un puits avec quelque chose dedans.|“Bowl”: a topped rice bowl. The kanji shows a well with something in it.
+どんぶり|« Grand bol » écrit en entier, pour une enseigne ronde et populaire.|“Big bowl” spelled out, for a round, homely sign.
+喫茶|« Boire le thé » : le café de quartier rétro, avec sandwichs et café filtre.|“Drinking tea”: the retro neighborhood café with sandwiches and drip coffee.
+珈琲|Café écrit en kanji, choisis pour le son : un style rétro de l’ère Shōwa.|Coffee written in kanji picked for their sound: a retro Shōwa style.
+純喫茶|« Café pur » : à l’origine sans alcool ni hôtesses, aujourd’hui synonyme de café vintage.|“Pure café”: first meant no alcohol or hostesses, now a byword for vintage cafés.
+甘味処|« Lieu des douceurs » : salon de desserts japonais, anmitsu, dango, glace pilée.|“Place of sweets”: a Japanese dessert parlour, anmitsu, dango, shaved ice.
+茶房|« Salle de thé » : salon de thé raffiné, souvent avec des douceurs.|“Tea room”: a refined tea salon, often with sweets.
+茶屋|« Maison de thé » : halte traditionnelle où l’on boit un thé avec des dango.|“Tea house”: a traditional stop for tea and dango.
+お好み焼|« Grillé comme vous l’aimez » : galette de chou garnie, cuite sur plaque.|“Grilled how you like it”: a cabbage pancake with toppings, cooked on a griddle.
+鉄板焼|« Grillé sur plaque de fer » : cuisine sur une plaque chaude devant le client.|“Grilled on an iron plate”: cooking on a hot griddle in front of you.
+酒場|« Lieu à alcool » : bar populaire et bon marché, souvent bruyant et chaleureux.|“Drinking place”: a cheap, lively, popular bar.
+地酒処|« Lieu des sakés locaux » : 地 terre, région. On y boit des sakés des brasseries du coin.|“Place of local sake”: 地 land, region. Pours sake from nearby breweries.
+一休|« Une pause ». C’est aussi Ikkyū, moine zen célèbre pour son humour.|“A short rest”. Also Ikkyū, a Zen monk famous for his wit.
+大黒|Daikoku, dieu de la prospérité et de la cuisine, l’un des sept dieux du bonheur.|Daikoku, god of wealth and the kitchen, one of the Seven Lucky Gods.
+福助|Fukusuke, poupée porte-bonheur qui salue les clients à l’entrée des boutiques.|Fukusuke, a lucky doll who bows to customers at shop doors.
+宝|« Trésor ».|“Treasure”.
+千鳥|« Mille oiseaux » : les pluviers en vol, motif classique des tissus japonais.|“A thousand birds”: plovers in flight, a classic Japanese textile pattern.
+花月|« Fleur et lune » : la beauté des saisons.|“Flower and moon”: the beauty of the seasons.
+日の出|« Lever du soleil » : un départ prospère.|“Sunrise”: a prosperous start.
+富士|Le mont Fuji.|Mount Fuji.
+満月|« Pleine lune ».|“Full moon”.
+鶴亀|La grue et la tortue, symboles de longue vie.|Crane and turtle, symbols of long life.
+竹|« Bambou ». Aussi le rang du milieu dans 松竹梅 (pin, bambou, prunier) sur les menus.|“Bamboo”. Also the middle grade in 松竹梅 (pine, bamboo, plum) on menus.
+桜|« Cerisier ».|“Cherry blossom”.
+縁|« Le lien » : les rencontres dues au destin, et le lien avec les clients.|“The bond”: fated encounters, and the tie with regulars.
+楽|« Plaisir, détente ».|“Pleasure, ease”.
+一番|« Numéro un ».|“Number one”.
+大将|« Le chef » : surnom affectueux du patron derrière le comptoir.|“The boss”: a fond nickname for the owner behind the counter.
+吉田|Nom de famille (« rizière heureuse ») : le patron a donné son nom à la boutique.|A family name (“lucky rice field”): the owner named the shop after himself.
+山本|Nom de famille (« au pied de la montagne ») : le nom du patron.|A family name (“foot of the mountain”): the owner’s name.
+長寿|« Longue vie ».|“Long life”.
+松葉|« Aiguilles de pin » : toujours vertes, symbole de constance.|“Pine needles”: evergreen, a sign of constancy.
+""".strip().splitlines():
+    w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)

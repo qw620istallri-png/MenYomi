@@ -269,7 +269,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .quest b{font-family:var(--f-disp);font-stretch:80%;font-weight:900;font-size:28px;line-height:1.05}
 .quest .sc{font-family:var(--f-mono);font-size:14px}
 .quest .btn{background:transparent;color:var(--paper);border-color:var(--paper)}
-@media (max-width:700px){.quest{grid-template-columns:1fr auto}.quest .q,.quest .qmode,.quest b{grid-column:1/-1}}
+@media (max-width:700px){.quest{grid-template-columns:1fr auto}.quest .q,.quest .qgroups,.quest b{grid-column:1/-1}}
 .qmode{display:flex;border:1.5px solid var(--paper);justify-self:start}
 .qmode button{background:transparent;color:var(--paper);border:none;padding:5px 12px;font-weight:700;cursor:pointer}
 .qmode button[aria-pressed="true"]{background:var(--paper);color:var(--ink)}
@@ -461,6 +461,42 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   .prompt .hint{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 }
 @media (max-width:380px){.mast h1{font-size:28px}.mast h1 .jp{display:none}}
+
+/* ---------- v10: voice, shop names, challenge pools */
+.say{display:inline-grid;place-items:center;width:38px;height:38px;margin-left:10px;vertical-align:middle;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer;padding:0;border-radius:50%;transition:background .15s,transform .1s}
+.say:hover{background:var(--soft)}
+.say:active{transform:scale(.94)}
+.say.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.answer .rd{display:flex;align-items:center;flex-wrap:wrap}
+.sparts{display:grid;gap:10px;margin:12px 0}
+.spart{border-left:4px solid var(--acc);padding:2px 0 2px 12px}
+.spart .sh{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.spart .sh b{font-family:var(--f-jp);font-size:24px;font-weight:600;line-height:1.2}
+.spart .sh .rd2{font-family:var(--f-jp);font-size:16px;color:var(--mute)}
+.spart .say{width:34px;height:34px;margin-left:0}
+.spart p{margin:4px 0 0;font-size:15px;line-height:1.45}
+.qgroups{display:flex;gap:8px;flex-wrap:wrap}
+.qnote{margin:0 0 8px;font-size:15px;font-weight:700;color:var(--ink);border:2px solid var(--rule);background:var(--lime);display:inline-block;padding:2px 8px}
+@media (max-width:700px){.quest .qgroups{grid-column:1/-1}.qmode button{padding:5px 10px}}
+
+@media (max-width:700px){
+  #v-menu .modes{margin:10px 0 8px}
+  #v-menu .modes button{padding:7px 10px;gap:8px}
+  #v-menu .modes .j{font-size:22px}
+  #v-menu .modes b{font-size:19px}
+  #v-menu .modes button>span:last-child>span{display:none}
+  #v-menu .toolbar{display:grid !important;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:0;margin-bottom:8px;align-items:stretch}
+  #v-menu .toolbar>div{display:block;min-width:0;padding:0 6px}
+  #v-menu .toolbar label.lab{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  #v-menu .toolbar select{width:100%;height:100%;padding:8px 6px;font-size:15px}
+  #v-menu .toolbar #mnew{padding:8px 12px;font-size:0;gap:0}
+  #v-menu .toolbar #mnew::after{content:"↻";font-size:20px}
+  #v-menu .quest{padding:8px 12px;gap:4px 10px;margin-bottom:10px}
+  #v-menu .quest b{font-size:24px}
+  #v-menu .toolbar #mnew{grid-column:auto !important;border-left:1px solid var(--rule)}
+  #v-menu .quest{grid-template-columns:minmax(0,1fr) auto auto !important}
+  #v-menu .quest .btn{padding:6px 12px}
+}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -557,6 +593,23 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 const DATA = __DATA__;
 const EN = __EN__;
 const EXPL = __EXPL__;
+const NX = __NX__;
+const VOICE = __VOICE__;
+// pre-rendered VOICEVOX clips packed in voice.mp3 ([offset,length] per word); the browser's Japanese voice fills in when a clip is missing or the file can't load
+const say=(()=>{ let buf=null, ld=null, ctx=null, cur=[]; const dec={};
+  const load=()=> ld||(ld=fetch('voice.mp3').then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b=>buf=b).catch(e=>{ ld=null; throw e; }));
+  const tts=txt=>{ try{ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang='ja-JP'; u.rate=0.9;
+    const v=speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang)); const best=v.find(v=>/Kyoko|O-ren|Nanami|Google/i.test(v.name))||v[0]; if(best) u.voice=best; speechSynthesis.speak(u); }catch(e){} };
+  return async (keys,reading,btn)=>{ keys=keys.filter(Boolean);
+    const AC=window.AudioContext||window.webkitAudioContext; if(AC&&!ctx){ try{ ctx=new AC(); }catch(e){} } if(ctx&&ctx.state==='suspended') ctx.resume();
+    if(btn){ btn.classList.add('on'); setTimeout(()=>btn.classList.remove('on'),900); }
+    if(ctx && keys.length && keys.every(k=>VOICE[k])){ try{ await load(); cur.forEach(s=>{ try{s.stop()}catch(e){} }); cur=[]; let at=ctx.currentTime+0.02;
+        for(const k of keys){ const e=VOICE[k]; const ab=dec[k]||(dec[k]=await ctx.decodeAudioData(buf.slice(e[0],e[0]+e[1]))); const s=ctx.createBufferSource(); s.buffer=ab; s.connect(ctx.destination); s.start(at); at+=ab.duration+0.04; cur.push(s); }
+        return; }catch(e){} }
+    tts(reading||keys.join('')); }; })();
+const SPK='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const sayBtn=(w,rd)=>`<button type="button" class="say" data-say="${esc(w)}" data-rd="${esc(rd||'')}" aria-label="${tr('Écouter','Listen')}" title="${tr('Écouter','Listen')}">${SPK}</button>`;
+document.addEventListener('click',e=>{ const b=e.target.closest('[data-say]'); if(!b) return; e.preventDefault(); e.stopPropagation(); say(b.dataset.say.split('|'),b.dataset.rd,b); },true);
 const xp=w=>{ const e=EXPL[w]; return e?`<p class="xp">${esc(e[LANG==='en'?1:0])}</p>`:''; };
 const LANG=(()=>{ let v=null; try{ v=localStorage.getItem('menyomi.lang'); }catch(e){} if(v==='en'||v==='fr') return v; const l=(navigator.languages&&navigator.languages[0])||navigator.language||'fr'; return /^fr\b/i.test(l)?'fr':'en'; })(); document.documentElement.lang=LANG; const tr=(fr,en)=>LANG==='en'?en:fr;
 if(LANG==='en'){ document.documentElement.lang='en'; document.title='Menyomi';
@@ -960,7 +1013,7 @@ function showCard(){
       <div id="pans"></div>`;
     const reveal=res=>{ el.querySelector('#pform').querySelectorAll('input,button').forEach(x=>x.disabled=true); const a=el.querySelector('#pans');
       a.innerHTML=`${res===true?`<p class="feedback ok" style="margin:0 0 10px">${tr('Juste !','Correct!')}</p>`:res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
+        <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       const r=rng(newSeed()); const m=pick(r,MEDIA); const n=[...key].length; const box=a.querySelector('.stage').clientWidth-52;
       textCanvas(a.querySelector('#pc'),key,{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),m.tool),size:Math.floor(clamp(m.v?Math.min(110,(innerHeight*0.42)/(n*0.95+0.6)):Math.min(120,box/(n*0.95+0.6)),40,120)),vertical:m.v,surface:m.surface,color:m.color,pad:0.32});
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
@@ -985,7 +1038,7 @@ function showCard(){
     el.querySelector('#rprint').onclick=e=>{e.target.outerHTML=`<span style="font-size:30px;font-family:var(--f-body);padding-inline:8px">${esc(key)}</span>`};
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
+        <div class="answer"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
     el.querySelector('#rform').onsubmit=e=>{ e.preventDefault(); const v=el.querySelector('#rin').value; if(!v.trim()&&PHONE()){ reveal(null); return; } const r=checkAnswer(v,key,w[1]); if(r==null){el.querySelector('#rin').focus(); return;} reveal(r); };
     el.querySelector('#reveal').onclick=()=>reveal(null);
@@ -1016,7 +1069,7 @@ function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed())
   textCanvas(el.querySelector('#mc'),key,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35});
   let tries=0, done=false;
   const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
-    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===w[2];
     if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(w[2])}"]`).classList.add('good'); finish(false); } } }); }
@@ -1056,7 +1109,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
     <div class="stage hunt" id="hst"></div><div id="hans"></div>`;
   const wr=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['brush','brush','chisel'])); const surf=pick(r,['kinari','washi','wood','white']);
   const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((innerHeight*0.5)/(n*0.95+0.7),30,60));
-  const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+  const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); b.title=String(i+1); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
     textCanvas(cv,o,{seed:newSeed(),writer:wr,size,vertical:true,surface:surf,pad:0.32,valign:'start',minH:size*(n*0.95+0.75)});
@@ -1181,7 +1234,7 @@ function openKanji(ch){ const body=document.getElementById('dlgbody'); const k=k
 const CAPEN={'pinceau soigné':'neat brush','pinceau pressé':'hurried brush','semi-cursive':'semi-cursive','très cursive':'very cursive','feutre biseauté':'chisel marker','feutre rond':'round marker','craie':'chalk','stylo':'pen'};
 function openWord(wd){ const w=WMAP[wd]; if(!w) return; const body=document.getElementById('dlgbody');
   const where=[...Object.values(TYPES).filter(t=>t.sections.some(q=>q[1].includes(wd)||q[0]===wd)).map(t=>t.jp+' '+t.fr), ...Object.values(REGIONS).filter(r=>r.items.includes(wd)).map(r=>r.jp+' '+r.fr)];
-  body.innerHTML=`<div class="dlg-top"><div class="wcanv"><canvas id="dwc"></canvas></div><div class="dlg-meta"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+  body.innerHTML=`<div class="dlg-top"><div class="wcanv"><canvas id="dwc"></canvas></div><div class="dlg-meta"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
     ${where.length?`<p class="hint" style="margin:4px 0 0">${esc(where.join(' · '))}</p>`:''}<div class="row"><button class="btn" id="dwagain">${tr('Autre main ↻','Another hand ↻')}</button></div></div></div>
     <div><h3>Kanji</h3>${wordChips(w[0])}</div>`;
   const draw=()=>{ const r=rng(newSeed()); const n=[...w[0]].length; const v=n<=5&&r()<0.6; const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
@@ -1200,26 +1253,38 @@ function priceText(p, style){ if(p==='時価') return '時価';
   return p+'円'; }
 function roundPrice(r,a,b){ const v=a+(b-a)*Math.pow(r(),1.3); const st=v<400?10:50; return Math.max(st,Math.round(v/st)*st - (r()<0.3?20:0)); }
 function shopName(r,t){ const pat=pick(r,t.names), n=pick(r,DATA.names); const jp=pat.replace('{n}',n[0]).replace(' ','　');
-  const rd=pat.split(/(\{n\})/).map(x=>x==='{n}'?n[1]:x.trim()?(DATA.namepat[x.trim()]||x.trim()):'').join(''); return {jp:pat.replace('{n}',n[0]).replace(' ',''), rd}; }
+  const rd=pat.split(/(\{n\})/).map(x=>x==='{n}'?n[1]:x.trim()?(DATA.namepat[x.trim()]||x.trim()):'').join('');
+  const parts=pat.split(/(\{n\})/).map(x=>x==='{n}'?[n[0],n[1]]:x.trim()?[x.trim(),DATA.namepat[x.trim()]||'']:null).filter(Boolean);
+  return {jp:pat.replace('{n}',n[0]).replace(' ',''), rd, parts}; }
 const LAYOUTS={
   tanzaku:{wall:'wall',label:'bandes de papier',en:'paper strips'}, wood:{wall:'darkwood',label:'plaques de bois',en:'wooden plaques'}, sheet:{wall:'wall',label:'grande feuille',en:'large sheet'},
   poster:{wall:'wall',label:'affiches',en:'posters'}, slate:{wall:'board',label:'ardoise',en:'slate'}, card:{wall:'wood',label:'carte',en:'menu card'} };
-let MENU=null, mmode='meaning', lastQ='meaning', lastTarget=-1, streak=0, target=null, score={ok:0,n:0}, menuGen=0;
+let MENU=null, mmode='meaning', lastQ='meaning', lastTarget=-1, streak=0, target=null, score={ok:0,n:0}, menuGen=0, qmiss=false;
+let qpool='known'; try{ const v=localStorage.getItem('menyomi.qpool'); if(v==='all'||v==='known') qpool=v; }catch(e){}
+const knownWord=w=>['r:','m:','p:'].some(p=>S.cards[p+w]&&S.cards[p+w].reps>0);
+// a challenge answer counts for the matching card: clue in meaning → m:, clue in reading → r:
+function menuReview(w,ok){ const pref=mmode==='reading'?'r:':'m:'; let id=pref+w; if(!(S.cards[id]&&S.cards[id].reps>0)) id='r:'+w; const c=S.cards[id]; if(!c||!(c.reps>0)) return '';
+  if(!ok){ S.cards[id]=schedule(c,0); store.set(SKEY,S); return tr(`${w} revient dans tes révisions`,`${w} goes back to your reviews`); }
+  if(c.due<=Date.now()){ S.cards[id]=schedule(c,2); if(!S.todayIds.includes(id)) S.todayIds.push(id); store.set(SKEY,S); return tr(`${w} : révision comptée`,`${w}: counted as a review`); }
+  return ''; }
 function fillSelects(){
   const mt=document.getElementById('mtype'); mt.innerHTML=`<option value="">${tr('Au hasard','Random')}</option>`+Object.entries(TYPES).map(([k,t])=>`<option value="${k}">${t.jp} · ${esc(t.fr)}</option>`).join('');
   const mr=document.getElementById('mreg'); mr.innerHTML=`<option value="">${tr('Tout le Japon','All Japan')}</option>`+Object.entries(REGIONS).map(([k,t])=>`<option value="${k}">${t.jp} · ${esc(t.fr)}</option>`).join('');
 }
 function genMenu(){
-  const r=rng(newSeed()); const tk=document.getElementById('mtype').value||pick(r,Object.keys(TYPES)); const t=TYPES[tk];
+  const r=rng(newSeed()); const want=mmode!=='explore'&&qpool==='known';
+  const kc=k=>TYPES[k].sections.reduce((a,s)=>a+s[1].filter(knownWord).length,0);
+  let tk=document.getElementById('mtype').value; if(!tk){ const ks=Object.keys(TYPES); if(want&&ks.some(k=>kc(k))){ const ws=ks.map(k=>1+kc(k)*3); let x=r()*ws.reduce((a,b)=>a+b,0); tk=ks.find((k,i)=>(x-=ws[i])<0)||ks[0]; } else tk=pick(r,ks); } const t=TYPES[tk];
+  const pref=list=>{ if(!want) return shuffle(r,list); const sh=shuffle(r,list); const a=sh.filter(knownWord), b=sh.filter(w=>!knownWord(w)); return [...a.slice(0,Math.ceil(a.length)),...b]; };
   const rk=document.getElementById('mreg').value||(r()<0.55?pick(r,Object.keys(REGIONS)):''); const reg=rk?REGIONS[rk]:null;
   const layout=pick(r,t.layouts); const vertical=['tanzaku','wood','sheet'].includes(layout);
   const tool = layout==='slate'?'chalk' : layout==='poster'?pick(r,['chisel','chisel','marker']) : layout==='card'?'pen' : pick(r,['brush','brush','brush','chisel']);
   const writer=makeWriter(r,pick(r,['kaisho','hurry','hurry','gyosho','gyosho']),tool);
   const pstyle = vertical? pick(r,['digits','digits','trad']) : 'arabic';
   const sections=[]; const maxItems = layout==='card'||layout==='slate'? 9 : vertical? 14 : 12; let count=0;
-  if(reg){ const its=shuffle(r,reg.items).slice(0,vertical?4:3); sections.push({h:pick(r,['名物',reg.jp+'名物','当店自慢']),items:its.map(w=>({w,price:roundPrice(r,480,1680)})),accent:true}); count+=its.length; }
+  if(reg){ const its=pref(reg.items).slice(0,vertical?4:3); sections.push({h:pick(r,['名物',reg.jp+'名物','当店自慢']),items:its.map(w=>({w,price:roundPrice(r,480,1680)})),accent:true}); count+=its.length; }
   for(const [h,list,[a,b]] of t.sections){ if(count>=maxItems) break; const n=Math.min(list.length, Math.max(2,Math.round((maxItems-count)/ (t.sections.length>2?2.2:1.4))));
-    const its=shuffle(r,list).slice(0,n).filter(w=>WMAP[w]); sections.push({h, items:its.map(w=>({w, price: (tk==='sushi'&&r()<0.18)?'時価':roundPrice(r,a,b)}))}); count+=its.length; }
+    const its=pref(list).slice(0,n).filter(w=>WMAP[w]); sections.push({h, items:its.map(w=>({w, price: (tk==='sushi'&&r()<0.18)?'時価':roundPrice(r,a,b)}))}); count+=its.length; }
   MENU={tk,t,rk,reg,layout,vertical,tool,writer,pstyle,sections,shop:shopName(r,t),seed:r()*1e9|0, tax:r()<0.6};
   renderMenu(); newQuest();
 }
@@ -1279,8 +1344,9 @@ async function renderMenu(){
 function clickItem(it,btn){
   if(mmode==='explore' || it.isHeader){ const was=btn.classList.contains('sel'); clearSel(); if(!was){ btn.classList.add('sel'); document.getElementById('board').classList.add('hassel'); showInfo(it,undefined,btn); } return; }
   if(target==null) return; score.n++;
-  if(it===MENU.flat[target]){ score.ok++; streak++; btn.classList.add('good'); showInfo(it,true,btn); target=null; setTimeout(newQuest,1700); }
-  else { streak=0; btn.classList.remove('bad'); void btn.offsetWidth; btn.classList.add('bad'); showInfo(it,false,btn); }
+  const tw=MENU.flat[target].w;
+  if(it===MENU.flat[target]){ score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; setTimeout(newQuest,note?2400:1700); }
+  else { streak=0; const note=qmiss?'':menuReview(tw,false); qmiss=true; btn.classList.remove('bad'); void btn.offsetWidth; btn.classList.add('bad'); showInfo(it,false,btn,note); }
   updScore(); }
 function clearSel(){ document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('sel')); const bd=document.getElementById('board'); if(bd) bd.classList.remove('hassel'); hidePop(); }
 function hidePop(){ const p=document.getElementById('minfo'); if(p){ p.hidden=true; p.innerHTML=''; } const bd=document.getElementById('board'); if(bd) bd.style.paddingBottom=''; }
@@ -1297,24 +1363,29 @@ function priceBlock(it,m){ if(it.price==null) return '';
   if(it.price==='時価') return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">時価</span><span>じか · <span class="mono">jika</span> · ${tr('prix du marché du jour','today’s market price')}</span></div>`;
   const nr=numReading(it.price); const written=priceText(it.price,m.vertical?m.pstyle:'arabic');
   return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">${it.price} ¥</span>${written!==it.price+'円'?`<span>${tr('écrit','written')} <b style="font-family:var(--f-jp);font-weight:600">${esc(written)}</b></span>`:''}<span>${esc(nr.kana)}</span><span class="mono" style="text-transform:none;color:var(--mute)">${esc(nr.romaji)}</span></div>`; }
-function showInfo(it,ok,btn){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
-  showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}
-    <div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+function showInfo(it,ok,btn,note){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
+  showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}${note?`<p class="qnote">${esc(note)}</p>`:''}
+    <div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
     ${priceBlock(it,m)}
     ${sec?`<p class="hint" style="margin:10px 0 0">${tr('Rubrique','Section')} ${esc(sec[0])} · ${esc(toRomaji(sec[1]))} · ${esc(sec[2])}</p>`:''}
     <div style="height:12px"></div>${wordChips(w[0]+(typeof it.price==='number'&&m.vertical?priceText(it.price,m.pstyle):''))}`, btn||it.btn); }
-function showSign(btn){ const s=MENU.shop; clearSel(); showPop(`<p class="lab" style="margin:0">${tr('Enseigne','Shop sign')}</p><div class="w">${esc(s.jp)}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(s.rd)}</div><div class="ro">${esc(toRomaji(s.rd))}</div><div class="mn">${esc(MENU.t.fr)}${MENU.reg?' · '+esc(MENU.reg.fr):''}</div></div><div style="height:12px"></div>${wordChips(s.jp)}`, btn); }
+function showSign(btn){ const s=MENU.shop; clearSel(); const L=LANG==='en'?1:0;
+  const parts=(s.parts||[]).map(([w,r])=>{ const x=NX[w]; return `<div class="spart"><div class="sh"><b>${esc(w)}</b><span class="rd2">${esc(r)}</span>${sayBtn(w,r)}</div>${x?`<p>${esc(x[L])}</p>`:''}</div>`; }).join('');
+  showPop(`<p class="lab" style="margin:0">${tr('Enseigne','Shop sign')}</p><div class="w">${esc(s.jp)}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(s.rd)}${sayBtn((s.parts||[]).map(p=>p[0]).join('|'),s.rd)}</div><div class="ro">${esc(toRomaji(s.rd))}</div><div class="mn">${esc(MENU.t.jp)} · ${esc(MENU.t.fr)}${MENU.reg?' · '+esc(MENU.reg.fr):''}</div></div><div class="sparts">${parts}</div>${wordChips(s.jp)}`, btn); }
 function updScore(){ const s=document.querySelector('#mquest .sc'); if(s) s.innerHTML=`${score.ok} / ${score.n}${streak>1?` · <span class="streak">${tr('série','streak')} ${streak}</span>`:''}`; }
 function newQuest(){ const q=document.getElementById('mquest'); target=null; document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('good','bad','sel')); clearSel();
   document.querySelectorAll('.modes button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.m==='explore')===(mmode==='explore'))));
   if(mmode==='explore'||!MENU||!MENU.flat.length){ q.innerHTML=''; return; }
-  let t=0; for(let k=0;k<6;k++){ t=Math.floor(Math.random()*MENU.flat.length); if(t!==lastTarget) break; } lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
+  qmiss=false; const idx=MENU.flat.map((x,i)=>i); const kn=idx.filter(i=>knownWord(MENU.flat[i].w)); const pool=qpool==='known'&&kn.length? kn : idx;
+  let t=0; for(let k=0;k<6;k++){ t=pool[Math.floor(Math.random()*pool.length)]; if(t!==lastTarget||pool.length<2) break; } lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
   const main = mmode==='meaning'? w[2] : w[1]; const hidden = mmode==='meaning'? `${w[1]} · ${toRomaji(w[1])}` : w[2];
-  q.innerHTML=`<div class="quest"><div class="qmode" role="group" aria-label="${tr('Indice donné','Clue')}"><button data-q="meaning" aria-pressed="${mmode==='meaning'}">${tr('Sens','Meaning')}</button><button data-q="reading" aria-pressed="${mmode==='reading'}">${tr('Lecture','Reading')}</button></div>
+  const nk=MENU.flat.filter(x=>knownWord(x.w)).length;
+  q.innerHTML=`<div class="quest"><div class="qgroups"><div class="qmode" role="group" aria-label="${tr('Indice donné','Clue')}"><button data-q="meaning" aria-pressed="${mmode==='meaning'}">${tr('Sens','Meaning')}</button><button data-q="reading" aria-pressed="${mmode==='reading'}">${tr('Lecture','Reading')}</button></div><div class="qmode" role="group" aria-label="${tr('Mots demandés','Words asked')}"><button data-p="known" aria-pressed="${qpool==='known'}" title="${tr('Mots déjà appris sur ce menu','Words you have learned on this menu')}">${tr('Mes mots','My words')} ${nk}</button><button data-p="all" aria-pressed="${qpool==='all'}">${tr('Tous','All')}</button></div></div>
     <b>${esc(main)}${mmode==='reading'?` <span class="mono" style="font-size:16px;text-transform:none;opacity:.8">${esc(toRomaji(w[1]))}</span>`:''}</b>
     <button class="spoiler" id="qsp" title="${tr('Afficher l’indice','Show the hint')}">${esc(hidden)}</button><span class="sc"></span><button class="btn" id="qskip">${tr('Passer','Skip')}</button></div>`;
   updScore(); q.querySelector('#qskip').onclick=()=>{ streak=0; newQuest(); }; q.querySelector('#qsp').onclick=e=>e.currentTarget.classList.toggle('on');
-  q.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ mmode=lastQ=b.dataset.q; newQuest(); }); }
+  q.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ mmode=lastQ=b.dataset.q; newQuest(); });
+  q.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ qpool=b.dataset.p; try{ localStorage.setItem('menyomi.qpool',qpool); }catch(e){} if(qpool==='known'&&!nk) genMenu(); else newQuest(); }); }
 document.querySelector('.modes').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; mmode=b.dataset.m==='explore'?'explore':lastQ; score={ok:0,n:0}; streak=0; newQuest(); });
 document.getElementById('mnew').onclick=genMenu; document.getElementById('mtype').onchange=genMenu; document.getElementById('mreg').onchange=genMenu;
 addEventListener('keydown',e=>{ if(e.key==='Escape') clearSel(); });
@@ -1357,7 +1428,7 @@ function runSim(anim){ if(simTok) simTok.stop=true; const text=simText, tool=sto
   simTok=res.token||null; showSimWord(text); document.getElementById('sinfo').textContent=`${res.sim.dur.toFixed(1)} s`; }
 
 function showSimWord(text){ const el=document.getElementById('sword'); const w=WMAP[text];
-  if(w){ el.innerHTML=`<div class="top"><div class="w">${esc(w[0])}</div><div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div></div><div class="mn" style="font-size:20px;font-weight:500">${esc(w[2])}</div>${xp(w[0])}${wordChips(w[0])}`; return; }
+  if(w){ el.innerHTML=`<div class="top"><div class="w">${esc(w[0])}</div><div class="answer"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div></div><div class="mn" style="font-size:20px;font-weight:500">${esc(w[2])}</div>${xp(w[0])}${wordChips(w[0])}`; return; }
   const ch=[...text]; if(ch.length===1&&isKanji(text)){ const k=kInfo(text); const ro=x=>esc(toRomaji(String(x).replace(/[—().\-]/g,'')));
     el.innerHTML=`<div class="top"><div class="w">${esc(text)}</div><div class="answer"><div class="mn">${esc(k.mean)}</div><div class="ro">${k.strokes} ${tr('traits','strokes')}${k.jlpt?' · JLPT N'+k.jlpt:''}</div></div></div><dl class="rdg"><dt>On</dt><dd>${esc(k.on)}<small>${ro(k.on)}</small></dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${ro(k.kun)}</small></dd></dl>${wordChips(text)}`; return; }
   el.innerHTML=wordChips(text); }
@@ -1555,7 +1626,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbod
   <p class="hint" id="pmsg" style="margin:0" aria-live="polite"></p>
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
-  <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
+  <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voice')} : VOICEVOX:冥鳴ひまり</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
   `; bindProgress(document.getElementById('dlgbody')); document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -1580,7 +1651,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
   }
   if(n===1){ if(onbPad&&onbPad.ro) onbPad.ro.disconnect(); onbPad=null;
     o.innerHTML=head+`<div class="ostage in vfirst s1"><div><p class="okick">覚える</p><h2>${tr('Ton kanji <em>sur un menu</em>','Your kanji <em>on a menu</em>')}</h2>
-      <div class="oans" id="oans"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+      <div class="oans" id="oans"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
       <div class="oparts">${wordChips(w[0]).replace(/^<div class="chips">|<\/div>$/g,'')}</div>
       <div class="orow"><button class="btn k" id="onext">${tr('Le trouver sur un menu →','Find it on a menu →')}</button></div></div></div>
       <div class="owrite"><canvas id="ocv"></canvas></div></div>`;
