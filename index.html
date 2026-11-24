@@ -518,6 +518,14 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .syncbox .bad,.hint.bad{color:var(--bad)}
 .gbtn{background:#fff;color:#1f1f1f;gap:10px}
 .gbtn:disabled{opacity:.6}
+
+@media (max-width:700px){
+  nav.tabs{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+  body.kbd nav.tabs,body.navhide nav.tabs{transform:translateY(calc(100% + 12px))}
+  body.kbd{padding-bottom:12px}
+  body.kbd #onb,body.kbd .grades{scroll-margin-bottom:12px}
+}
+@media (prefers-reduced-motion:reduce){nav.tabs{transition:none}}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -1747,6 +1755,16 @@ function renderSync(host){ if(!host||!document.body.contains(host)) return; cons
     host.querySelector('#gout').onclick=()=>SYNC.signOut(); host.querySelector('#gsyncnow').onclick=()=>SYNC.pull(); return; }
   host.innerHTML=`<div class="syncbox"><button class="btn gbtn" id="gin">${GLOGO}<span>${tr('Se connecter avec Google','Sign in with Google')}</span></button></div>${!onSite?`<p class="hint" style="margin:6px 0 0">${tr('Dans cet aperçu, Google bloque souvent la connexion. Elle marche sur','In this preview Google often blocks sign-in. It works on')} <a href="${SITE_URL}" target="_blank" rel="noopener">${tr('le site','the site')}</a>.</p>`:''}<p class="hint bad" id="gerr" style="margin:6px 0 0">${esc(errMsg(SYNC.err))}</p>`;
   host.querySelector('#gin').onclick=async e=>{ const b=e.currentTarget; b.disabled=true; try{ await SYNC.signIn(); }catch(er){ const m=host.querySelector('#gerr'); if(m) m.textContent=errMsg(String(er&&er.code||er)||'x'); } b.disabled=false; }; }
+
+// phone tab bar steps aside while typing (keyboard open) and while scrolling down
+(function(){ const mq=matchMedia('(max-width:700px)'); const B=document.body; let lastY=scrollY, base=window.visualViewport?visualViewport.height:innerHeight;
+  const typing=()=>{ const a=document.activeElement; return !!a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!/^(button|checkbox|radio|range|submit)$/i.test(a.type))||a.isContentEditable); };
+  const upd=()=>{ if(!mq.matches){ B.classList.remove('kbd','navhide'); return; } const vv=window.visualViewport; const kb=typing()||(vv&&vv.height<base*0.78); B.classList.toggle('kbd',kb); };
+  document.addEventListener('focusin',upd); document.addEventListener('focusout',()=>setTimeout(upd,60));
+  if(window.visualViewport) visualViewport.addEventListener('resize',()=>{ if(!typing()&&visualViewport.height>base) base=visualViewport.height; upd(); });
+  addEventListener('scroll',()=>{ if(!mq.matches) return; const y=scrollY, dy=y-lastY; if(Math.abs(dy)<8) return;
+    const atEnd=innerHeight+y>=document.documentElement.scrollHeight-4; B.classList.toggle('navhide',dy>0&&y>60&&!atEnd); lastY=y; },{passive:true});
+  addEventListener('hashchange',()=>B.classList.remove('navhide')); })();
 document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbody').innerHTML=`<div class="row"><button class="btn k" id="otour" style="font-size:18px;padding:12px 18px">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button></div><h2>${tr('Progression','Progress')}</h2>
   <div id="synchost"></div>
   <p style="margin:0">${tr('Sans compte, elle reste dans ce navigateur. Pour la passer à un autre appareil, copiez le code ici et collez-le là-bas.','Without an account it stays in this browser. To move it to another device, copy the code here and paste it there.')}</p>
