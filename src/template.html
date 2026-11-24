@@ -43,6 +43,11 @@ html.night #logo{box-shadow:4px 4px 0 var(--blue)}
 #sunB{filter:blur(12px);-webkit-mask-image:linear-gradient(252deg,transparent 22%,#000 68%);mask-image:linear-gradient(252deg,transparent 22%,#000 68%)}
 @media (max-width:700px){#shade canvas{width:130vw}}
 .wrap{max-width:1320px;margin:0 auto;position:relative}
+@media (min-width:1700px) and (min-height:900px){.wrap,#dlg{zoom:1.12}}
+@media (min-width:1900px) and (min-height:1000px){.wrap,#dlg{zoom:1.25}}
+@media (min-width:2200px) and (min-height:1150px){.wrap,#dlg{zoom:1.42}}
+@media (min-width:2500px) and (min-height:1300px){.wrap,#dlg{zoom:1.55}}
+@media (min-width:701px){#apad.padhost{flex-basis:clamp(380px,calc(100vh - 350px),620px);width:clamp(380px,calc(100vh - 350px),620px)}}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .mono{font-family:var(--f-mono);font-size:14px;letter-spacing:.02em;text-transform:uppercase}
@@ -243,6 +248,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .modes button:hover{background:var(--soft)}
 .modes button[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
 .asub button{padding:8px 14px;gap:10px}.asub .j{font-size:24px}.asub b{font-size:20px}
+@media (min-width:1000px){.mbar{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.3fr);margin-bottom:14px;align-items:stretch}.mbar>*{margin:0 !important}.mbar .toolbar{border-left:none}.mbar .modes button{padding:8px 14px;gap:10px}.mbar .modes .j{font-size:28px}.mbar .modes b{font-size:20px}.mbar .modes button>span:last-child>span{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}.mbar .modes button>span:last-child{min-width:0}.mbar .toolbar .btn{padding-inline:16px;white-space:nowrap}}
 @media (max-width:520px){.modes .j{font-size:28px}.modes b{font-size:20px}.modes button{padding:10px 12px;gap:10px}}
 .board{border:2px solid var(--rule);padding:24px 18px 26px;min-height:380px;position:relative;overflow-x:auto}
 .board .sign{display:flex;justify-content:center;margin:0 auto 18px}
@@ -589,6 +595,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 </section>
 
 <section class="view" id="v-menu">
+  <div class="mbar">
   <div class="modes" role="group" aria-label="Mode">
     <button data-m="quest" aria-pressed="true"><span class="j">探す</span><span><b data-en="Challenge">Défi</b><span data-en="find the dish">trouver le plat</span></span></button>
     <button data-m="explore" aria-pressed="false"><span class="j">見る</span><span><b data-en="Explore">Explorer</b><span data-en="read freely">lire librement</span></span></button>
@@ -597,6 +604,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
     <div><label class="lab" for="mtype">Restaurant</label><select id="mtype"></select></div>
     <div><label class="lab" for="mreg" data-en="Region">Région</label><select id="mreg"></select></div>
     <button class="btn r" id="mnew" data-en="New menu ↻">Nouveau menu ↻</button>
+  </div>
   </div>
   <div id="mquest"></div>
   <div class="board" id="board"></div>
@@ -723,7 +731,8 @@ const gauss = r => (r()+r()+r()-1.5)*1.15;
 const pick = (r,a) => a[Math.floor(r()*a.length)];
 const shuffle = (r,a) => {a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1)); [a[i],a[j]]=[a[j],a[i]]} return a};
 const newSeed = () => (Math.random()*2**31)|0;
-const DPR = Math.min(2, window.devicePixelRatio||1);
+const WZ = (()=>{ try{ return parseFloat(getComputedStyle(document.querySelector(".wrap")).zoom)||1 }catch(e){ return 1 } })();
+const DPR = Math.min(2.5, (window.devicePixelRatio||1)*WZ);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const nextFrame = () => new Promise(r=>requestAnimationFrame(()=>r()));
 const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}, set(k,v,quiet){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} if(k==='kanjipinceau.v2'&&!quiet&&window.SYNC) SYNC.queue();}};
@@ -928,7 +937,7 @@ function simulate(items, W, r){
 // ---------- tools: draw opaque marks onto a layer
 class Tool{
   constructor(ctx, kind, R, r, opt={}){ this.ctx=ctx; this.kind=kind; this.R=R; this.r=r; this.down=false; this.last=null; ctx.fillStyle='#000'; ctx.strokeStyle='#000';
-    this.sm=opt.smooth??0.35; this.entry=opt.entry??true;
+    this.sm=opt.smooth??0.35; this.entry=opt.entry??true; this.dryK=opt.dry??1;
     this.fine=!!opt.fine; this.nb = kind==='brush'? (this.fine? clamp(Math.round(R/0.7),16,110) : clamp(Math.round(R/1.2),8,28)) : kind==='chisel'? clamp(Math.round(R/1.5),6,16) : 0; }
   begin(x,y,p,v){ this.down=true; this.ink=1; this.w=this.R*p; this.last=[x,y]; const r=this.r;
     this.bristles=Array.from({length:this.nb},(_,i)=>{const a=r()*6.28, d=Math.sqrt(r()); return {x:Math.cos(a)*d,y:Math.sin(a)*d*0.75,load:0.75+r()*0.25,on:true,f:(i/(Math.max(1,this.nb-1)))-0.5}});
@@ -938,7 +947,7 @@ class Tool{
     const tw=this.R*p;
     for(let i=1;i<=n;i++){ this.w+= (tw-this.w)*this.sm; const px=lx+(x-lx)*i/n, py=ly+(y-ly)*i/n;
       if(this.kind==='brush') this.dab(px,py,this.w,v); else this.seg(lx+(x-lx)*(i-1)/n,ly+(y-ly)*(i-1)/n,px,py,p,v);
-      this.ink=Math.max(0.04,this.ink-step/(this.R*(this.kind==='brush'?55:300))*(0.6+Math.min(3,v/(this.R*60))*0.5)); }
+      this.ink=Math.max(0.04,this.ink-step*this.dryK/(this.R*(this.kind==='brush'?55:300))*(0.6+Math.min(3,v/(this.R*60))*0.5)); }
     this.last=[x,y]; }
   end(){ this.down=false; }
   dab(x,y,w,v){ const c=this.ctx, r=this.r;
@@ -1214,6 +1223,26 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
       else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); if(tries>=2){ done=true; host.children[opts.indexOf(key)].classList.add('good'); finish(false); } } }; }); }
 
 // ---------- writing pad (user brush uses the same Tool)
+// live brush ribbon: the stroke is redrawn as one filled outline whose width follows pressure (or, for a finger, speed) and direction,
+// with the brush landing at an angle, a pooled stop or a tapered flick at the end, and dry streaks on long strokes
+function ribbon(c,raw,R,seed){ if(!raw.length) return; const gap=Math.max(1,R*0.12), P=[];
+  for(const q of raw){ const l=P[P.length-1]; if(!l||Math.hypot(q.x-l.x,q.y-l.y)>=gap) P.push({x:q.x,y:q.y,p:q.p}); else l.p=Math.max(l.p,q.p); }
+  if(P.length<2){ const q=P[0]; c.beginPath(); c.ellipse(q.x,q.y,R*0.56*q.p,R*0.44*q.p,-0.7,0,7); c.fill(); return; }
+  for(let n=0;n<2;n++) for(let k=1;k<P.length-1;k++){ P[k].x=(P[k-1].x+P[k].x*2+P[k+1].x)/4; P[k].y=(P[k-1].y+P[k].y*2+P[k+1].y)/4; }
+  let w=null, L=0; P.forEach((q,k)=>{ const a=P[Math.max(0,k-2)], b=P[Math.min(P.length-1,k+2)]; const dx=b.x-a.x, dy=b.y-a.y, l=Math.hypot(dx,dy)||1;
+    q.nx=-dy/l; q.ny=dx/l; const tw=R*Math.pow(Math.max(0.02,q.p),1.25)*(0.74+0.42*Math.abs(dy)/l); w= w==null? tw*1.1 : w+(tw-w)*0.35; q.w=w;
+    if(k) L+=Math.hypot(q.x-P[k-1].x,q.y-P[k-1].y); q.s=L; });
+  const rr=rng(seed), ph=rr()*6, wob=k=>1+0.02*Math.sin(k*0.23+ph)+0.01*Math.sin(k*0.9+ph*2);
+  c.beginPath(); P.forEach((q,k)=>{ const h=q.w*0.5*wob(k); k?c.lineTo(q.x+q.nx*h,q.y+q.ny*h):c.moveTo(q.x+q.nx*h,q.y+q.ny*h); });
+  for(let k=P.length-1;k>=0;k--){ const q=P[k], h=q.w*0.5*wob(k+40); c.lineTo(q.x-q.nx*h,q.y-q.ny*h); } c.closePath(); c.fill();
+  const a=P[0], b2=P[Math.min(P.length-1,3)], ang=Math.atan2(b2.y-a.y,b2.x-a.x), w0=Math.max(P[Math.min(P.length-1,4)].w,R*0.55);
+  c.beginPath(); c.ellipse(a.x+Math.cos(ang)*w0*0.18,a.y+Math.sin(ang)*w0*0.18,w0*0.56,w0*0.44,-0.7,0,7); c.fill();
+  const e=P[P.length-1]; if(e.w>R*0.35){ c.beginPath(); c.arc(e.x,e.y,e.w*0.5,0,7); c.fill(); }
+  const dryFrom=R*8; if(L>dryFrom){ c.save(); c.globalCompositeOperation='destination-out'; c.lineCap='round';
+    for(let b=0;b<5;b++){ const off=(rr()-0.5)*0.8, lw=Math.max(0.8,R*0.024*(0.6+rr())); c.lineWidth=lw; c.beginPath(); let on=false;
+      P.forEach(q=>{ const d=(q.s-dryFrom)/(L-dryFrom+1), x=q.x+q.nx*q.w*0.5*off, y=q.y+q.ny*q.w*0.5*off;
+        if(d>0.2&&rr()<0.93){ c.globalAlpha=Math.min(0.55,d*0.65); on?c.lineTo(x,y):c.moveTo(x,y); on=true; } else on=false; }); c.stroke(); }
+    c.restore(); } }
 class Pad{
   constructor(host,ch,opt={}){ this.ch=ch; this.onFull=opt.onFull||null; this.ghostOn=opt.ghost??true; host.innerHTML=''; const d=document.createElement('div'); d.className='pad'; host.appendChild(d); this.el=d;
     ['paper','guide','ink','wet','over'].forEach(n=>{const c=document.createElement('canvas'); c.className=n; d.appendChild(c); this[n]=c;});
@@ -1267,9 +1296,7 @@ class Pad{
   down(e){ e.preventDefault(); this.el.setPointerCapture(e.pointerId); this.over.getContext('2d').clearRect(0,0,this.size,this.size);
     const [x,y]=this.xy(e); this.drawing=true; this.lt=e.timeStamp; this.pos=[x,y]; this.last=[x,y]; this.v=0; this.vx=0; this.vy=0; this.pen=e.pointerType==='pen';
     const wx=this.wet.getContext('2d'); wx.clearRect(0,0,this.size,this.size); wx.fillStyle='#16120d';
-    this.tool=new Tool(wx,'brush',this.size*0.062,Math.random,{smooth:0.05,entry:false}); this.p=0.85; this.tool.begin(x,y,this.p,0);
-    // soft entry press, slightly bigger than the stroke, like the brush touching down
-    wx.beginPath(); wx.ellipse(x,y,this.size*0.062*0.5,this.size*0.062*0.4,-0.6,0,7); wx.fill();
+    this.R=this.size*0.064; this.p=this.pen&&e.pressure>0?0.3+e.pressure*1.1:1.05; this.vq=[]; this.seed=newSeed(); this.raw=[{x,y,p:this.p}]; this.render();
     this.cur=[[x/this.size*109,y/this.size*109]]; }
   move(e){ if(!this.drawing) return; const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
     for(const ev of (evs.length?evs:[e])){ const raw=this.xy(ev);
@@ -1277,14 +1304,21 @@ class Pad{
       const k=this.pen?0.55:0.32; const x=this.pos[0]+(raw[0]-this.pos[0])*k, y=this.pos[1]+(raw[1]-this.pos[1])*k; this.pos=[x,y]; this.feedTo(x,y,ev.timeStamp,ev.pressure); } }
   feedTo(x,y,ts,pressure){ const dt=Math.max(1,ts-this.lt); const dx=x-this.last[0], dy=y-this.last[1], d=Math.hypot(dx,dy); if(d<0.5) return;
     const v=d/DPR/dt; this.v=this.v*0.8+v*0.2; this.vx=this.vx*0.7+dx/dt*0.3; this.vy=this.vy*0.7+dy/dt*0.3;
-    let tp=clamp(1.3-this.v*0.42,0.42,1.3); if(this.pen&&pressure>0) tp=(0.3+pressure*1.3)*clamp(1.1-this.v*0.12,0.7,1.1);
-    this.p+=(tp-this.p)*0.12; this.tool.feed(x,y,this.p,this.v*1000*DPR); this.last=[x,y]; this.lt=ts; this.cur.push([x/this.size*109,y/this.size*109]); }
+    // a finger or a mouse gives no pressure: speed stands in for it (slow = the brush sinks, fast = it lifts), scaled to the pad's size,
+    // and the brush, held slanted, leaves vertical strokes a little fuller than horizontal ones
+    const vn=this.v*300/(this.el.getBoundingClientRect().width||300);     let tp=clamp(1.3-vn*0.6,0.3,1.3); if(this.pen&&pressure>0) tp=(0.3+pressure*1.3)*clamp(1.1-this.v*0.12,0.7,1.1);
+    this.vq=(this.vq||[]).concat(vn).slice(-4);
+    this.p+=(tp-this.p)*(this.pen?0.18:0.22); this.raw.push({x,y,p:this.p}); this.last=[x,y]; this.lt=ts; this.cur.push([x/this.size*109,y/this.size*109]); this.render(); }
+  render(){ const wx=this.wet.getContext('2d'); wx.clearRect(0,0,this.size,this.size); wx.fillStyle='#16120d'; ribbon(wx,this.raw,this.R,this.seed); }
   up(e){ if(!this.drawing) return; this.drawing=false;
     if(e){ const raw=this.xy(e); for(let i=1;i<=4;i++){ const x=this.pos[0]+(raw[0]-this.pos[0])*i/4, y=this.pos[1]+(raw[1]-this.pos[1])*i/4; this.feedTo(x,y,this.lt+4,e.pressure); } }
-    const sp=Math.hypot(this.vx,this.vy)/DPR;
-    if(sp>0.6 && this.cur.length>3){ const len=Math.min(this.size*0.1,sp*this.size*0.035), ux=this.vx/(sp*DPR), uy=this.vy/(sp*DPR); const n=12; const w0=this.p;
-      for(let i=1;i<=n;i++){ const t=i/n; this.tool.feed(this.last[0]+ux*len*t,this.last[1]+uy*len*t,w0*Math.pow(1-t,1.4)+0.02,this.v*1000*DPR); } }
-    this.tool.end(); const ix=this.ink.getContext('2d'); this.snaps.push(ix.getImageData(0,0,this.size,this.size)); if(this.snaps.length>40) this.snaps.shift();
+    const sp=Math.hypot(this.vx,this.vy)/DPR; const vend=(this.vq||[0]).reduce((a,b)=>a+b,0)/((this.vq||[0]).length||1);
+    if(vend<0.2 && this.cur.length>3){ const l=this.raw[this.raw.length-1]; this.raw.push({x:l.x,y:l.y,p:Math.min(1.45,this.p*1.18+0.1)}); } // tome: the brush stops and presses
+    else if((sp>0.55||vend>0.5) && this.cur.length>3){ // harai: the brush leaves the paper while still moving, the stroke thins to a point
+      const len=Math.min(this.size*0.09,Math.max(sp,vend)*this.size*0.04), ux=this.vx/(Math.hypot(this.vx,this.vy)||1), uy=this.vy/(Math.hypot(this.vx,this.vy)||1); const n=10, w0=this.p;
+      for(let i=1;i<=n;i++){ const t2=i/n; this.raw.push({x:this.last[0]+ux*len*t2,y:this.last[1]+uy*len*t2,p:w0*Math.pow(1-t2,1.3)+0.03}); } }
+    this.render();
+    const ix=this.ink.getContext('2d'); this.snaps.push(ix.getImageData(0,0,this.size,this.size)); if(this.snaps.length>40) this.snaps.shift();
     ix.save(); ix.shadowColor='rgba(22,18,13,.3)'; ix.shadowBlur=this.size*0.004; ix.globalAlpha=0.95; ix.drawImage(this.wet,0,0); ix.restore(); this.wet.getContext('2d').clearRect(0,0,this.size,this.size);
     this.strokes.push(this.cur.length>1?this.cur:[this.cur[0],[this.cur[0][0]+0.5,this.cur[0][1]+0.5]]);
     const gl=glyph(this.ch); if(this.onFull&&gl&&this.strokes.length===gl.strokes.length){ clearTimeout(this._full); this._full=setTimeout(()=>{ if(!this.drawing&&gl&&this.strokes.length===gl.strokes.length) this.onFull(); },420); } }
@@ -1466,7 +1500,8 @@ function hidePop(){ const p=document.getElementById('minfo'); if(p){ p.hidden=tr
 function showPop(html,anchor){ const b=document.getElementById('board'), p=document.getElementById('minfo'); if(!p||!anchor) return;
   b.style.paddingBottom=''; p.innerHTML=`<button class="x" aria-label="${tr('Fermer','Close')}">✕</button>`+html; p.hidden=false; p.style.left='0px'; p.style.top='0px';
   p.querySelector('.x').onclick=()=>clearSel();
-  const br=b.getBoundingClientRect(), ar=anchor.getBoundingClientRect(); const pw=p.offsetWidth, ph=p.offsetHeight;
+  const br0=b.getBoundingClientRect(), ar0=anchor.getBoundingClientRect(); const pw=p.offsetWidth, ph=p.offsetHeight;
+  const z=(br0.width/(b.offsetWidth||br0.width))||1, br={left:br0.left/z,top:br0.top/z}, ar={left:ar0.left/z,top:ar0.top/z,width:ar0.width/z,bottom:ar0.bottom/z};
   const ax=ar.left-br.left+b.scrollLeft+ar.width/2; const left=clamp(ax-pw/2, b.scrollLeft+8, Math.max(b.scrollLeft+8, b.scrollLeft+b.clientWidth-pw-8));
   const below=ar.bottom-br.top+b.scrollTop+14, above=ar.top-br.top+b.scrollTop-ph-14; const content=b.scrollHeight; let top=below, up=false;
   if(below+ph+12>content && above>8){ top=above; up=true; } else { const need=below+ph+20-content; if(need>0) b.style.paddingBottom=(parseFloat(getComputedStyle(b).paddingBottom)+need)+'px'; }
