@@ -54,6 +54,52 @@ nav.tabs{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border-botto
 nav.tabs a{display:grid;gap:2px;padding:10px 14px 10px;text-decoration:none;border-right:1px solid var(--rule);min-width:0}
 nav.tabs a:last-child{border-right:none}
 [hidden]{display:none !important}
+/* ---------- first-run tour */
+#onb{position:fixed;inset:0;z-index:35;background:var(--paper);overflow:auto;display:none;padding:18px clamp(16px,4vw,48px) 40px}
+#onb.on{display:block}
+body.touring nav.tabs{display:none}
+@media (max-width:440px){#onb .obrand .jp{display:none}#onb .otop{gap:10px}}
+#onb .otop{display:flex;align-items:center;gap:14px;flex-wrap:wrap;max-width:980px;margin:0 auto 18px;border-bottom:2px solid var(--rule);padding-bottom:12px}
+#onb .obrand{font-family:var(--f-disp);font-stretch:72%;font-weight:900;font-size:26px;letter-spacing:.01em;text-transform:uppercase}
+#onb .obrand .jp{font-family:var(--f-jp);font-weight:600;color:var(--acc);font-size:18px;margin-left:6px;text-transform:none}
+#onb .osteps{display:flex;gap:6px;margin-left:auto}
+#onb .osteps span{display:grid;place-items:center;min-width:44px;height:40px;padding:0 10px;border:2px solid var(--rule);font-family:var(--f-jp);font-size:20px;font-weight:600;background:var(--sheet);transition:background .4s,color .4s}
+#onb .osteps span.on{background:var(--acc);color:#fff;border-color:var(--rule)}
+#onb .osteps span.done{background:var(--ink);color:var(--paper)}
+#onb .oskip{font-size:16px}
+#onb .ostage{max-width:980px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:clamp(18px,4vw,44px);align-items:center;min-height:calc(100vh - 150px)}
+#onb .ostage.in>*{animation:oin .7s cubic-bezier(.2,.8,.2,1) both}
+#onb .ostage.in>*:nth-child(2){animation-delay:.12s}
+@keyframes oin{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+#onb .okick{font-family:var(--f-jp);font-size:64px;line-height:1;color:var(--acc);font-weight:600;margin:0}
+#onb h2{font-family:var(--f-disp);font-stretch:72%;font-weight:900;font-size:clamp(34px,5.4vw,62px);line-height:.98;text-transform:uppercase;margin:8px 0 14px;letter-spacing:-.01em}
+#onb h2 em{font-style:normal;background:var(--lime);padding:0 .12em;box-shadow:4px 4px 0 var(--rule)}
+#onb .olead{font-size:19px;line-height:1.45;margin:0 0 18px;max-width:34ch}
+#onb .ochip{display:inline-flex;align-items:baseline;gap:10px;border:2px solid var(--rule);background:var(--sheet);padding:6px 12px;box-shadow:4px 4px 0 var(--blue)}
+#onb .ochip b{font-family:var(--f-jp);font-size:34px;font-weight:600;line-height:1}
+#onb .ochip span{font-size:17px}
+#onb .orow{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+#onb .opad{width:min(100%,46vh,460px);margin-inline:auto;border:2px solid var(--rule);box-shadow:8px 8px 0 var(--ink);background:var(--sheet)}
+#onb .opad .pad{width:100%}
+#onb .owrite{display:grid;place-items:center;border:2px solid var(--rule);box-shadow:8px 8px 0 var(--ink);background:var(--stage);padding:18px;min-height:340px;position:relative}
+#onb .owrite canvas{max-width:100%;height:auto}
+#onb .oans{opacity:0;transform:translateY(12px);transition:opacity .6s,transform .6s}
+#onb .oans.show{opacity:1;transform:none}
+#onb .oparts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+#onb .oparts .chip{cursor:default}
+#onb .omenu{display:flex;flex-direction:row-reverse;gap:14px;justify-content:center;align-items:flex-start;border:2px solid var(--rule);box-shadow:8px 8px 0 var(--ink);padding:24px 16px;background:#4a2f1b;position:relative}
+#onb .omenu .itm{border:none;padding:0;background:none;cursor:pointer;transition:transform .15s,box-shadow .2s}
+#onb .omenu .itm:hover{transform:translateY(-4px)}
+#onb .omenu .itm canvas{display:block}
+#onb .omenu .itm.good{box-shadow:0 0 0 4px #0b7a46,0 0 0 11px rgba(11,122,70,.35);transform:scale(1.05)}
+#onb .omenu .itm.bad{box-shadow:0 0 0 4px var(--bad);opacity:.55;animation:shake .35s}
+#onb .ostamp{position:absolute;left:0;top:0;width:104px;height:104px;z-index:4;display:grid;place-items:center;border:5px solid #d23b22;color:#d23b22;background:rgba(255,246,230,.9);font-family:var(--f-jp);font-weight:700;font-size:44px;line-height:1;writing-mode:vertical-rl;border-radius:6px;transform:rotate(-12deg) scale(2.4);opacity:0;pointer-events:none}
+#onb .ostamp.go{animation:stamp .5s cubic-bezier(.3,1.6,.5,1) forwards}
+@keyframes stamp{0%{opacity:0;transform:rotate(-12deg) scale(2.4)}60%{opacity:1;transform:rotate(-12deg) scale(.92)}100%{opacity:1;transform:rotate(-12deg) scale(1)}}
+#onb .ohint{font-size:16px;color:var(--mute);margin:10px 0 0;min-height:24px}
+@media (max-width:760px){#onb .ostage{grid-template-columns:minmax(0,1fr);min-height:0;gap:22px}#onb .okick{font-size:48px}#onb .osteps span{min-width:38px;height:36px;font-size:18px}#onb .opad{width:min(100%,62vh)}#onb .omenu{gap:8px;padding:16px 8px}#onb .ostage.vfirst>div:last-child{order:-1}}
+@media (prefers-reduced-motion:reduce){#onb .ostage.in>*{animation:none}#onb .ostamp.go{animation:none;opacity:1;transform:rotate(-12deg)}}
+
 nav.tabs a .j{font-family:var(--f-jp);font-weight:600;font-size:30px;line-height:1.15;letter-spacing:.04em}
 nav.tabs a .f{font-family:var(--f-mono);font-size:14px;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 nav.tabs a .s{display:none}
@@ -105,6 +151,8 @@ label.lab,.lab{font-family:var(--f-mono);font-size:14px;text-transform:uppercase
 .answer .rd{font-size:28px;font-weight:700;letter-spacing:.03em}
 .answer .ro{font-family:var(--f-mono);font-size:16px;color:var(--mute)}
 .answer .mn{font-size:20px;font-weight:500}
+.xp{font-size:17px;line-height:1.5;margin:10px 0 0;max-width:62ch;text-wrap:pretty}
+.pop .xp{font-size:16px;margin-top:8px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:stretch;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer;text-align:left;padding:0}
 .chip .k{font-family:var(--f-jp);font-weight:600;font-size:32px;line-height:1;width:56px;display:grid;place-items:center;border-right:2px solid var(--rule);background:var(--paper)}
@@ -368,12 +416,15 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 
 </div>
 
+<div id="onb" role="dialog" aria-modal="true" aria-label="Menyomi"></div>
 <dialog id="dlg"><button class="btn close" id="dlgclose" data-en="Close ✕">Fermer ✕</button><div class="dlg" id="dlgbody"></div></dialog>
 <svg id="measure" width="0" height="0" style="position:absolute;left:-9999px" aria-hidden="true"><path id="mpath" d="M0,0"></path></svg>
 
 <script>
 const DATA = __DATA__;
 const EN = __EN__;
+const EXPL = __EXPL__;
+const xp=w=>{ const e=EXPL[w]; return e?`<p class="xp">${esc(e[LANG==='en'?1:0])}</p>`:''; };
 const LANG=(()=>{try{return localStorage.getItem('menyomi.lang')==='en'?'en':'fr'}catch(e){return 'fr'}})(); const tr=(fr,en)=>LANG==='en'?en:fr;
 if(LANG==='en'){ document.documentElement.lang='en'; document.title='Menyomi';
   document.querySelectorAll('[data-en]').forEach(e=>e.textContent=e.dataset.en); document.querySelectorAll('[data-en-ph]').forEach(e=>e.placeholder=e.dataset.enPh); document.querySelectorAll('[data-en-al]').forEach(e=>e.setAttribute('aria-label',e.dataset.enAl));
@@ -766,7 +817,7 @@ function showCard(){
       <div id="pans"></div>`;
     const reveal=res=>{ el.querySelector('#pform').querySelectorAll('input,button').forEach(x=>x.disabled=true); const a=el.querySelector('#pans');
       a.innerHTML=`${res===true?`<p class="feedback ok" style="margin:0 0 10px">${tr('Juste !','Correct!')}</p>`:res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div><div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:res===false?0:null)}`;
+        <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:res===false?0:null)}`;
       const r=rng(newSeed()); const m=pick(r,MEDIA); const n=[...key].length; const box=a.querySelector('.stage').clientWidth-52;
       textCanvas(a.querySelector('#pc'),key,{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),m.tool),size:Math.floor(clamp(m.v?Math.min(110,(innerHeight*0.42)/(n*0.95+0.6)):Math.min(120,box/(n*0.95+0.6)),40,120)),vertical:m.v,surface:m.surface,color:m.color,pad:0.32});
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
@@ -791,7 +842,7 @@ function showCard(){
     el.querySelector('#rprint').onclick=e=>{e.target.outerHTML=`<span style="font-size:30px;font-family:var(--f-body);padding-inline:8px">${esc(key)}</span>`};
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div><div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:res===false?0:null)}`;
+        <div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:res===false?0:null)}`;
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
     el.querySelector('#rform').onsubmit=e=>{ e.preventDefault(); const r=checkAnswer(el.querySelector('#rin').value,key,w[1]); if(r==null){el.querySelector('#rin').focus(); return;} reveal(r); };
     el.querySelector('#reveal').onclick=()=>reveal(null);
@@ -818,7 +869,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
     <div class="stage hunt" id="hst"></div><div id="hans"></div>`;
   const wr=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['brush','brush','chisel'])); const surf=pick(r,['kinari','washi','wood','white']);
   const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((innerHeight*0.5)/(n*0.95+0.7),30,60));
-  const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div><div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+  const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
   opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
     textCanvas(cv,o,{seed:newSeed(),writer:wr,size,vertical:true,surface:surf,pad:0.32,valign:'start',minH:size*(n*0.95+0.75)});
@@ -920,7 +971,7 @@ function openKanji(ch){ const body=document.getElementById('dlgbody'); const k=k
 const CAPEN={'pinceau soigné':'neat brush','pinceau pressé':'hurried brush','semi-cursive':'semi-cursive','très cursive':'very cursive','feutre biseauté':'chisel marker','feutre rond':'round marker','craie':'chalk','stylo':'pen'};
 function openWord(wd){ const w=WMAP[wd]; if(!w) return; const body=document.getElementById('dlgbody');
   const where=[...Object.values(TYPES).filter(t=>t.sections.some(q=>q[1].includes(wd)||q[0]===wd)).map(t=>t.jp+' '+t.fr), ...Object.values(REGIONS).filter(r=>r.items.includes(wd)).map(r=>r.jp+' '+r.fr)];
-  body.innerHTML=`<div class="dlg-top"><div class="wcanv"><canvas id="dwc"></canvas></div><div class="dlg-meta"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>
+  body.innerHTML=`<div class="dlg-top"><div class="wcanv"><canvas id="dwc"></canvas></div><div class="dlg-meta"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
     ${where.length?`<p class="hint" style="margin:4px 0 0">${esc(where.join(' · '))}</p>`:''}<div class="row"><button class="btn" id="dwagain">${tr('Autre main ↻','Another hand ↻')}</button></div></div></div>
     <div><h3>Kanji</h3>${wordChips(w[0])}</div>`;
   const draw=()=>{ const r=rng(newSeed()); const n=[...w[0]].length; const v=n<=5&&r()<0.6; const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
@@ -1038,7 +1089,7 @@ function priceBlock(it,m){ if(it.price==null) return '';
   return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">${it.price} ¥</span>${written!==it.price+'円'?`<span>${tr('écrit','written')} <b style="font-family:var(--f-jp);font-weight:600">${esc(written)}</b></span>`:''}<span>${esc(nr.kana)}</span><span class="mono" style="text-transform:none;color:var(--mute)">${esc(nr.romaji)}</span></div>`; }
 function showInfo(it,ok,btn){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
   showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}
-    <div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>
+    <div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
     ${priceBlock(it,m)}
     ${sec?`<p class="hint" style="margin:10px 0 0">${tr('Rubrique','Section')} ${esc(sec[0])} · ${esc(toRomaji(sec[1]))} · ${esc(sec[2])}</p>`:''}
     <div style="height:12px"></div>${wordChips(w[0]+(typeof it.price==='number'&&m.vertical?priceText(it.price,m.pstyle):''))}`, btn||it.btn); }
@@ -1096,7 +1147,7 @@ function runSim(anim){ if(simTok) simTok.stop=true; const text=simText, tool=sto
   simTok=res.token||null; showSimWord(text); document.getElementById('sinfo').textContent=`${res.sim.dur.toFixed(1)} s`; }
 
 function showSimWord(text){ const el=document.getElementById('sword'); const w=WMAP[text];
-  if(w){ el.innerHTML=`<div class="top"><div class="w">${esc(w[0])}</div><div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div></div><div class="mn" style="font-size:20px;font-weight:500">${esc(w[2])}</div>${wordChips(w[0])}`; return; }
+  if(w){ el.innerHTML=`<div class="top"><div class="w">${esc(w[0])}</div><div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div></div><div class="mn" style="font-size:20px;font-weight:500">${esc(w[2])}</div>${xp(w[0])}${wordChips(w[0])}`; return; }
   const ch=[...text]; if(ch.length===1&&isKanji(text)){ const k=kInfo(text); const ro=x=>esc(toRomaji(String(x).replace(/[—().\-]/g,'')));
     el.innerHTML=`<div class="top"><div class="w">${esc(text)}</div><div class="answer"><div class="mn">${esc(k.mean)}</div><div class="ro">${k.strokes} ${tr('traits','strokes')}${k.jlpt?' · JLPT N'+k.jlpt:''}</div></div></div><dl class="rdg"><dt>On</dt><dd>${esc(k.on)}<small>${ro(k.on)}</small></dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${ro(k.kun)}</small></dd></dl>${wordChips(text)}`; return; }
   el.innerHTML=wordChips(text); }
@@ -1124,7 +1175,7 @@ document.getElementById('vtabs').addEventListener('click',e=>{ const b=e.target.
 document.getElementById('vsearch').oninput=renderVocab;
 document.getElementById('vbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(!b) return;
   const open=b.getAttribute('aria-expanded')==='true'; document.querySelectorAll('#vbody .vx').forEach(x=>x.remove()); document.querySelectorAll('#vbody .vrow').forEach(x=>x.setAttribute('aria-expanded','false')); if(open) return;
-  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button></div></div>'; b.after(x);
+  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button></div></div>'; b.after(x);
   const draw=()=>{ const r=rng(newSeed()); const v=pick(r,['kaisho','hurry','gyosho']); const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
     textCanvas(x.querySelector('canvas'),w[0],{seed:newSeed(),writer:makeWriter(r,v,tool),size:clamp((x.clientWidth-40)/([...w[0]].length+0.8),40,84),surface:surf,pad:0.3}); };
   x.querySelector('.btn').onclick=draw; draw(); });
@@ -1143,7 +1194,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
   document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+v?'page':'false'));
   if(v==='revisions') showCard(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
-  if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', v==='menu'?0.62:1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
+  if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', ({menu:.62,main:1.75,atelier:1.15,kanji:1.1})[v]||1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
 
 // ---------- window light: a shadow scene per tab behind a window frame; the slant follows the hour; at night the page dims and the window becomes a patch of moonlight
 (function shade(){ const A=document.getElementById('sunA'), B=document.getElementById('sunB'); const xa=A.getContext('2d'), xb=B.getContext('2d'); const root=document.documentElement;
@@ -1151,6 +1202,9 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   const fitRes=()=>{ const cw=A.getBoundingClientRect().width||innerWidth*.82; KS=clamp(cw/W/1.3,1,2.6)*Math.min(1.5,DPR>1?1.15:1); A.width=Math.round(W*KS); A.height=Math.round(H*KS); };
   fitRes(); addEventListener('resize',()=>{ clearTimeout(fitRes._t); fitRes._t=setTimeout(()=>{ fitRes(); if(reduce) frame(performance.now()); },300); });
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // each day draws a slightly different garden: new seed, wind and window position
+  const dayNo=()=>window.SUN_DAY??Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
+  let DAY=dayNo(); const dayFx=()=>{ const r=rng(DAY*7919+13); return {wind:.65+r()*.9, mull:.38+r()*.12, rail:.34+r()*.12, tilt:(r()-.5)*.16}; }; let DFX=dayFx();
   const KIND={revisions:'momiji',menu:'sudare',atelier:'bamboo',main:'pine',kanji:'ginkgo',vocab:'sakura'};
   const shapes={
     momiji(x){ const L=[[-1.5,.5],[-.78,.82],[0,1],[.78,.82],[1.5,.5]]; x.moveTo(0,0); x.lineTo(Math.cos(-2.1)*.16,Math.sin(-2.1)*.16);
@@ -1175,20 +1229,37 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     return {img:c,w:c.width/sc,h:c.height/sc}; }
   function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];
     if(kind==='sudare') return {kind,br,items};
+    // a limb with sub-branches and twigs; leaves are added by the caller on the twigs
+    const limb=(x0,y0,ang,len,w,par,pt,bend)=>{ const pts=[]; for(let i=0;i<=10;i++){ const t=i/10, a=ang+bend*t; pts.push([x0+Math.cos(ang+bend*t*.5)*len*t, y0+Math.sin(ang+bend*t*.5)*len*t, t]); } br.push({pts,ph:r()*6,w,par,pt}); return br.length-1; };
+    const at=(b,t)=>{ const P=br[b].pts; const f=t*10, i=Math.min(9,Math.floor(f)), u=f-i; return [P[i][0]+(P[i+1][0]-P[i][0])*u, P[i][1]+(P[i+1][1]-P[i][1])*u]; };
+    const dirAt=(b,t)=>{ const P=br[b].pts, i=Math.min(9,Math.floor(t*10)); return Math.atan2(P[i+1][1]-P[i][1],P[i+1][0]-P[i][0]); };
+    if(kind==='momiji'){ const roots=[[W+8,H*.08,Math.PI*.86,W*1.15,7,.35],[W*.82,-8,Math.PI*.63,H*.72,5.5,-.3],[W+8,H*.58,Math.PI*1.06,W*.85,6,-.25],[W*.3,-8,Math.PI*.52,H*.34,4,.3]];
+      for(const [x0,y0,ang,len,w,bd] of roots){ const L=limb(x0,y0,ang+(r()-.5)*.12,len*(.9+r()*.2),w,null,0,bd+(r()-.5)*.3);
+        for(let k=0;k<6;k++){ const t=.18+k*.135+(r()-.5)*.05; const [bx,by]=at(L,t); const side=k%2?-1:1; const sa=dirAt(L,t)+side*(.5+r()*.55); const S=limb(bx,by,sa,len*(.2+r()*.14),w*.42,L,t,(r()-.5)*.7);
+          for(let q=0;q<3;q++){ const tq=.3+q*.3; const [tx,ty]=at(S,tq); const ta=dirAt(S,tq)+(q%2?-1:1)*(.45+r()*.55); const T=limb(tx,ty,ta,12+r()*14,1.2,S,tq,(r()-.5)*.7);
+            const [ex,ey]=at(T,1); const n=4+Math.floor(r()*4); for(let j=0;j<n;j++){ const la=ta+(j-(n-1)/2)*.62+(r()-.5)*.3; items.push({b:T,t:1,ox:ex-tx+Math.cos(la)*6,oy:ey-ty+Math.sin(la)*6,shape:'momiji',a:la,s:11+r()*9,ph:r()*6}); } }
+          const [ex,ey]=at(S,1); for(let j=0;j<5;j++){ const la=sa+(j-2)*.65; items.push({b:S,t:1,ox:ex-bx+Math.cos(la)*6,oy:ey-by+Math.sin(la)*6,shape:'momiji',a:la,s:12+r()*9,ph:r()*6}); } } }
+      return {kind,br,items}; }
+    if(kind==='ginkgo'){ const roots=[[W+10,H*.04,Math.PI*.82,W*1.05,6,.25],[W+10,H*.6,Math.PI*1.02,W*.95,5,-.15],[-10,H*.86,-Math.PI*.1,W*.8,4.5,-.2]];
+      const cluster=(S,bx,by)=>{ const [ex,ey]=at(S,1); const n=2+Math.floor(r()*3); const c=Math.PI/2+(r()-.5)*2; for(let j=0;j<n;j++){ const la=c+(j-(n-1)/2)*1.05+(r()-.5)*.3, sz=12+r()*7; items.push({b:S,t:1,ox:ex-bx+Math.cos(la)*sz*.45,oy:ey-by+Math.sin(la)*sz*.45,shape:'ginkgo',a:la,s:sz,ph:r()*6}); } };
+      const spurs=(B,len)=>{ for(let t=.1;t<.98;t+=.13+r()*.1){ const [bx,by]=at(B,t); const d=dirAt(B,t); const sa=d+(r()<.5?1:-1)*(1+r()*.6); const S=limb(bx,by,sa,4+r()*7,1.4,B,t,0); cluster(S,bx,by); } };
+      for(const [x0,y0,ang,len,w,bd] of roots){ const L=limb(x0,y0,ang+(r()-.5)*.12,len,w,null,0,bd); spurs(L,len);
+        for(let k=0;k<3;k++){ const t=.25+k*.25+(r()-.5)*.08; const [bx,by]=at(L,t); const sa=dirAt(L,t)+(k%2?-1:1)*(.55+r()*.4); const S=limb(bx,by,sa,len*(.28+r()*.15),w*.45,L,t,(r()-.5)*.5); spurs(S,len*.3); } }
+      return {kind,br,items}; }
     if(kind==='bamboo'){ for(let c=0;c<5;c++){ const x0=W*(.18+c*.2+(r()-.5)*.08), y0=H+30, ang=-Math.PI/2-.06+(r()-.5)*.22, len=H*(1.05+r()*.2);
         const pts=[]; for(let i=0;i<=12;i++){ const t=i/12; pts.push([x0+Math.cos(ang)*len*t, y0+Math.sin(ang)*len*t, t]); }
         br.push({pts,ph:r()*6,w:6+r()*5,amp:.3,nodes:true}); const b=br.length-1;
-        for(let k=0;k<6+Math.floor(r()*3);k++){ const t=.25+.75*r(); const p=pts[Math.min(12,Math.round(t*12))]; const side=r()<.5?-1:1; const ta=ang+side*(.75+r()*.45); const tl=22+r()*34;
+        for(let k=0;k<10+Math.floor(r()*4);k++){ const t=.15+.85*r(); const p=pts[Math.min(12,Math.round(t*12))]; const side=r()<.5?-1:1; const ta=ang+side*(.75+r()*.45); const tl=22+r()*34;
           items.push({b,t,ox:p[0]-x0,oy:p[1]-y0,shape:'twig',a:ta,s:tl,ph:r()*6,line:true,lw:1.5});
-          const ex=p[0]+Math.cos(ta)*tl-x0, ey=p[1]+Math.sin(ta)*tl-y0; const nl=4+Math.floor(r()*4);
+          const ex=p[0]+Math.cos(ta)*tl-x0, ey=p[1]+Math.sin(ta)*tl-y0; const nl=5+Math.floor(r()*5);
           for(let q=0;q<nl;q++) items.push({b,t:Math.min(1,t+.08),ox:ex,oy:ey,shape:'bamboo',a:ta+side*.35+(q-(nl-1)/2)*.34+.25,s:30+r()*18,ph:r()*6}); } }
       return {kind,br,items}; }
-    if(kind==='pine'){ const LIM=[[W+12,H*.62,-.085,-.035,12],[W*.98,-10,-.055,.05,7],[-12,H*.9,.07,-.03,9]]; for(let tr2=0;tr2<3;tr2++){ let [x,y,dx,dy,lw]=LIM[tr2]; const pts=[];
+    if(kind==='pine'){ const LIM=[[W+12,H*.62,-.085,-.035,14],[W*.98,-10,-.055,.05,9],[-12,H*.9,.07,-.03,11]]; for(let tr2=0;tr2<3;tr2++){ let [x,y,dx,dy,lw]=LIM[tr2]; const pts=[];
         for(let i=0;i<=10;i++){ pts.push([x,y,i/10]); x+=W*dx+Math.sign(dx)*r()*W*.03; y+=H*dy+(r()-.5)*H*(tr2===1?.04:.05); }
         br.push({pts,ph:r()*6,w:lw,amp:.22}); const tb=br.length-1;
         for(let k=2;k<=10;k+=2){ const [bx,by]=pts[k]; const up=r()<.65?-1:1; const ang=-Math.PI*(.5+ (r()-.5)*.6)*(up<0?1:-1); const len=26+r()*30;
           const sp=[]; for(let i=0;i<=4;i++){ const t=i/4; sp.push([bx+Math.cos(ang)*len*t+(r()-.5)*4, by+Math.sin(ang)*len*t*.6, t]); }
-          br.push({pts:sp,ph:r()*6,w:3.4,amp:.5}); const sb=br.length-1; const pr=padSprite(r,30+r()*26,14+r()*9);
+          br.push({pts:sp,ph:r()*6,w:3.4,amp:.5}); const sb=br.length-1; const pr=padSprite(r,40+r()*30,17+r()*10);
           items.push({b:sb,t:1,ox:sp[4][0]-bx,oy:sp[4][1]-by-6,shape:'sprite',spr:pr,a:(r()-.5)*.3,s:1,ph:r()*6}); } }
       return {kind,br,items}; }
     const nb={momiji:5,bamboo:6,pine:5,ginkgo:5,sakura:5}[kind];
@@ -1207,28 +1278,29 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   function phase(){ const d=new Date(); const h=window.SUN_HOUR??(d.getHours()+d.getMinutes()/60); const night=h<6.3||h>=20.3;
     const k=clamp((h-6.3)/14,0,1); const sk=night? .3 : -1.15+2.3*k; const st=night? 1.05 : 0.82+Math.abs(sk)*0.38;
     const glow= night?'#b7c6ea': h<8.5?'#f8c6a6': h<16.3?'#f5d7a6': h<18.6?'#ffc787':'#ff9f6b'; return {night,sk,st,glow}; }
-  let ph=phase(); let SHADOW='#1a1714'; const applyPhase=()=>{ ph=phase(); SHADOW=getComputedStyle(root).getPropertyValue('--shadow').trim()||'#1a1714'; root.classList.toggle('night',ph.night); root.style.setProperty('--glow',ph.glow); }; applyPhase(); setInterval(applyPhase,60000);
+  let ph=phase(); let SHADOW='#1a1714'; const applyPhase=()=>{ ph=phase(); if(dayNo()!==DAY){ DAY=dayNo(); DFX=dayFx(); for(const k in cache) delete cache[k]; if(cur){ const k=cur.kind; cur=null; prev=null; window.setShade&&window.setShade(Object.keys(KIND).find(v=>KIND[v]===k)); } } SHADOW=getComputedStyle(root).getPropertyValue('--shadow').trim()||'#1a1714'; root.classList.toggle('night',ph.night); root.style.setProperty('--glow',ph.glow); }; applyPhase(); setInterval(applyPhase,60000);
   let cur=null, prev=null, t0=0; const cache={};
-  const sway=(b,t)=>(Math.sin(t*.00042+b.ph)*.05+Math.sin(t*.0011+b.ph*2)*.015)*(b.amp??1);
+  const sway=(b,t)=>(Math.sin(t*.00042+b.ph)*.05+Math.sin(t*.0011+b.ph*2)*.015)*(b.amp??1)*DFX.wind;
   let BT=[1,0,0,1,0,0];
   function drawScene(sc,t,alpha){ const x=xa; x.globalAlpha=alpha;
     if(sc.kind==='sudare'){ x.setTransform(...BT); const sw=Math.sin(t*.0004)*4; for(let y=10;y<H*.62;y+=9) x.fillRect(-10,y+sw*(y/H),W+20,4.6); x.fillRect(-10,H*.62+sw*.6,W+20,16); for(const cx of [W*.3,W*.75]) x.fillRect(cx+sw*.5,0,2,H*.66); return; }
     x.setTransform(...BT);
+    for(const b of sc.br){ const [x0,y0]=b.pts[0]; if(b.par==null){ b._r=0; b._x=x0; b._y=y0; } else { const P=sc.br[b.par]; const ap=P._r+sway(P,t)*b.pt*1.5; const dx=x0-P.pts[0][0], dy=y0-P.pts[0][1]; b._r=ap; b._x=P._x+dx*Math.cos(ap)-dy*Math.sin(ap); b._y=P._y+dx*Math.sin(ap)+dy*Math.cos(ap); } }
     sc.br.forEach(b=>{ const a0=sway(b,t); const [x0,y0]=b.pts[0]; x.lineWidth=b.w; x.lineCap='round'; x.lineJoin='round'; x.beginPath(); const nodes=[];
-      b.pts.forEach(([px,py,tt],i)=>{ const a=a0*tt*1.5, dx=px-x0, dy=py-y0; const qx=x0+dx*Math.cos(a)-dy*Math.sin(a), qy=y0+dx*Math.sin(a)+dy*Math.cos(a); i?x.lineTo(qx,qy):x.moveTo(qx,qy); if(b.nodes&&i&&i<b.pts.length-1) nodes.push([qx,qy]); }); x.stroke(); for(const [qx,qy] of nodes){ x.beginPath(); x.ellipse(qx,qy,b.w*.85,b.w*.32,0,0,6.3); x.fill(); } });
-    for(const it of sc.items){ const b=sc.br[it.b]; const x0=b.pts[0][0], y0=b.pts[0][1]; const a=sway(b,t)*it.t*1.5; const px=x0+it.ox*Math.cos(a)-it.oy*Math.sin(a), py=y0+it.ox*Math.sin(a)+it.oy*Math.cos(a);
+      b.pts.forEach(([px,py,tt],i)=>{ const a=b._r+a0*tt*1.5, dx=px-x0, dy=py-y0; const qx=b._x+dx*Math.cos(a)-dy*Math.sin(a), qy=b._y+dx*Math.sin(a)+dy*Math.cos(a); i?x.lineTo(qx,qy):x.moveTo(qx,qy); if(b.nodes&&i&&i<b.pts.length-1) nodes.push([qx,qy]); }); x.stroke(); for(const [qx,qy] of nodes){ x.beginPath(); x.ellipse(qx,qy,b.w*.85,b.w*.32,0,0,6.3); x.fill(); } });
+    for(const it of sc.items){ const b=sc.br[it.b]; const x0=b.pts[0][0], y0=b.pts[0][1]; const a=b._r+sway(b,t)*it.t*1.5; const px=b._x+it.ox*Math.cos(a)-it.oy*Math.sin(a), py=b._y+it.ox*Math.sin(a)+it.oy*Math.cos(a);
       const fl=Math.sin(t*.0016+it.ph)*(it.shape==='sprite'||it.shape==='twig'?.04:.22); x.setTransform(...BT); x.translate(px,py); x.rotate(it.a+fl+a); x.scale(it.s,it.s);
       if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); } }
-  function frame(t){ const {sk,st,night}=ph; BT=[KS,0,KS*sk*.55,KS*st,-KS*sk*H*.16,0];
+  function frame(t){ const {st,night}=ph; const sk=ph.sk+DFX.tilt; BT=[KS,0,KS*sk*.55,KS*st,-KS*sk*H*.16,0];
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over'; xa.clearRect(0,0,A.width,A.height);
     if(night){ xa.fillStyle='#26315f'; xa.fillRect(0,0,A.width,A.height); xa.setTransform(...BT); xa.globalCompositeOperation='destination-out'; xa.fillRect(W*.06,-10,W*.96,H*.74); xa.globalCompositeOperation='source-over'; }
     const col=night?'#26315f':SHADOW; xa.fillStyle=xa.strokeStyle=col;
-    xa.setTransform(...BT); xa.fillRect(W*.44,-10,6,H+20); xa.fillRect(-20,H*.4,W+40,6); xa.fillRect(W*.04,-10,4,H+20);
+    xa.setTransform(...BT); xa.fillRect(W*DFX.mull,-10,6,H+20); xa.fillRect(-20,H*DFX.rail,W+40,6); xa.fillRect(W*.04,-10,4,H+20);
     const k=reduce?1:clamp((t-t0)/1100,0,1); if(prev&&k<1) drawScene(prev,t,1-k); if(cur) drawScene(cur,t,k);
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over';
     xb.clearRect(0,0,W,H); xb.drawImage(A,0,0,W,H); }
   let last=0; function loop(t){ requestAnimationFrame(loop); if(document.hidden||t-last<66) return; last=t; frame(t); }
-  window.setShade=v=>{ const kind=KIND[v]||'momiji'; if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7)); t0=performance.now(); if(reduce) frame(performance.now()); };
+  window.setShade=v=>{ const kind=KIND[v]||'momiji'; if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
   if(!reduce) requestAnimationFrame(loop);
 })();
 (function logo(){ const c=document.getElementById('logo'); const ch=KVG['麺']?'麺':'食';
@@ -1252,11 +1324,61 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbod
   <textarea class="field" id="ppaste" rows="3" placeholder="${tr('Collez un code ici…','Paste a code here…')}" style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
   <div class="row"><button class="btn" id="pimp">${tr('Importer','Import')}</button><label class="btn ghost" style="cursor:pointer">${tr('ou un fichier…','or a file…')}<input type="file" id="pfile" accept=".json,.txt,application/json" hidden></label></div>
   <p class="hint" id="pmsg" style="margin:0" aria-live="polite"></p>
-  <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
+  <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>Charles « istallri »</b></p><div class="row"><button class="btn" id="otour">${tr('Revoir la visite','Replay the tour')}</button></div><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  `; bindProgress(document.getElementById('dlgbody')); dlg.showModal(); };
+  `; bindProgress(document.getElementById('dlgbody')); document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
+
+// ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
+const ONB={ch:'牛', word:'牛丼', others:['親子丼','カツ丼','天丼']};
+function onbSeen(){ try{ return localStorage.getItem('menyomi.onb')==='1'; }catch(e){ return true; } }
+function onbDone(){ try{ localStorage.setItem('menyomi.onb','1'); }catch(e){} document.getElementById('onb').classList.remove('on'); document.body.style.overflow=''; document.body.classList.remove('touring'); if(onbPad&&onbPad.ro) onbPad.ro.disconnect(); onbPad=null; }
+let onbPad=null;
+function openTour(){ const o=document.getElementById('onb'); o.classList.add('on'); document.body.style.overflow='hidden'; document.body.classList.add('touring'); o.scrollTop=0; tourStep(0); }
+function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.word]; const k=kInfo(ONB.ch);
+  const steps=[['一',tr('Écrire','Write')],['二',tr('Retenir','Learn')],['三',tr('Trouver','Find')]];
+  const head=`<div class="otop"><span class="obrand">Menyomi<span class="jp">めん読み</span></span><div class="osteps">${steps.map((s2,i)=>`<span class="${i<n?'done':i===n?'on':''}" title="${s2[1]}">${s2[0]}</span>`).join('')}</div><button class="btn ghost oskip" id="oskip">${tr('Passer','Skip')}</button></div>`;
+  if(n===0){
+    o.innerHTML=head+`<div class="ostage in"><div><p class="okick">書く</p><h2>${tr('Écris ton <em>premier</em> kanji','Write your <em>first</em> kanji')}</h2>
+      <p class="olead">${tr('Suis le modèle au doigt ou à la souris, trait par trait.','Trace the model with your finger or mouse, stroke by stroke.')}</p>
+      <span class="ochip"><b>${ONB.ch}</b><span>${esc(k.mean)} · ${k.strokes} ${tr('traits','strokes')}</span></span>
+      <div class="orow"><button class="btn" id="oorder">${tr('Voir l’ordre ▶','Show the order ▶')}</button><button class="btn ghost" id="oclear">${tr('Effacer','Clear')}</button><button class="btn k" id="onext" disabled>${tr('C’est écrit →','Done →')}</button></div><p class="ohint" id="ohint" aria-live="polite"></p></div>
+      <div class="opad" id="opad"></div></div>`;
+    onbPad=new Pad(o.querySelector('#opad'),ONB.ch,{ghost:true}); setTimeout(()=>onbPad&&onbPad.animate(),700);
+    const upd=()=>{ const c=onbPad?onbPad.strokes.length:0; o.querySelector('#onext').disabled=c<Math.min(3,k.strokes||3); o.querySelector('#ohint').textContent=c?`${c} / ${k.strokes} ${tr('traits','strokes')}`:''; };
+    onbPad.el.addEventListener('pointerup',()=>setTimeout(upd,30));
+    o.querySelector('#oorder').onclick=()=>onbPad.animate(); o.querySelector('#oclear').onclick=()=>{ onbPad.clear(); upd(); };
+    o.querySelector('#onext').onclick=()=>{ onbPad.check(); setTimeout(()=>tourStep(1),900); };
+  }
+  if(n===1){ if(onbPad&&onbPad.ro) onbPad.ro.disconnect(); onbPad=null;
+    o.innerHTML=head+`<div class="ostage in vfirst"><div><p class="okick">覚える</p><h2>${tr('Ton kanji <em>sur un menu</em>','Your kanji <em>on a menu</em>')}</h2>
+      <div class="oans" id="oans"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+      <div class="oparts">${wordChips(w[0]).replace(/^<div class="chips">|<\/div>$/g,'')}</div>
+      <div class="orow"><button class="btn k" id="onext">${tr('Le trouver sur un menu →','Find it on a menu →')}</button></div></div></div>
+      <div class="owrite"><canvas id="ocv"></canvas></div></div>`;
+    const r=rng(4242), box=Math.min(o.querySelector('.owrite').clientWidth-40,520); const size=Math.floor(clamp(Math.min(150,(innerHeight*.5)/(2*.95+.6)),70,150));
+    const show=()=>o.querySelector('#oans').classList.add('show');
+    textCanvas(o.querySelector('#ocv'),w[0],{seed:4242,writer:makeWriter(r,'gyosho','brush'),size:Math.min(size,Math.floor(box/(2*.95+.6))*2),vertical:true,surface:'kinari',pad:0.3,anim:!matchMedia('(prefers-reduced-motion: reduce)').matches,speedup:0.9});
+    setTimeout(show,2600); o.querySelector('#onext').onclick=()=>tourStep(2);
+  }
+  if(n===2){
+    o.innerHTML=head+`<div class="ostage in vfirst"><div><p class="okick">見つける</p><h2>${tr('Où est le <em>bol de bœuf</em> ?','Where is the <em>beef bowl</em>?')}</h2>
+      <p class="olead">${tr('Touche le bon plat sur le menu du comptoir.','Tap the right dish on the counter menu.')}</p><p class="ohint" id="ohint" aria-live="polite"></p>
+      <div class="orow" id="oend" hidden><button class="btn k" id="ostart">${tr('Commencer les révisions →','Start reviewing →')}</button><a class="btn" href="#menu" id="omenu">${tr('Voir un vrai menu','See a full menu')}</a></div></div>
+      <div class="omenu" id="ombd"><div class="ostamp" id="ostamp">合格</div></div></div>`;
+    const host=o.querySelector('#ombd'); const r=rng(777); const opts=shuffle(r,[ONB.word,...ONB.others]); const wr=makeWriter(r,'hurry','brush'); const sz=Math.round(clamp(Math.min((innerHeight*.56)/(3*.95+.7),(host.clientWidth-36-14*3)/4/1.7),26,76));
+    let tries=0, done=false;
+    opts.forEach(t=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat','Dish')); b.dataset.t=t; const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
+      textCanvas(cv,t,{seed:900+tries++,writer:wr,size:sz,vertical:true,surface:'wood',pad:0.32,valign:'start',minH:sz*(3*.95+.75)});
+      b.onclick=()=>{ if(done) return; if(t===ONB.word){ done=true; b.classList.add('good'); const st=o.querySelector('#ostamp'); st.style.left=(b.offsetLeft+b.offsetWidth-56)+'px'; st.style.top=(b.offsetTop+b.offsetHeight-70)+'px'; st.classList.add('go');
+          o.querySelector('#ohint').textContent=tr('Bien vu : 牛丼, gyūdon. Ton premier plat lu !','Well spotted: 牛丼, gyūdon. Your first dish read!'); o.querySelector('#oend').hidden=false;
+          o.querySelectorAll('.osteps span').forEach(x=>x.className='done'); }
+        else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); o.querySelector('#ohint').textContent=tr('Pas celui-là. Cherche le 牛 que tu viens d’écrire.','Not that one. Look for the 牛 you just wrote.'); } }; });
+    o.querySelector('#ostart').onclick=()=>{ onbDone(); location.hash='#revisions'; route(); };
+    o.querySelector('#omenu').onclick=()=>onbDone();
+  }
+  o.querySelector('#oskip').onclick=onbDone; o.scrollTop=0; }
 addEventListener('hashchange',route);
 if('serviceWorker' in navigator && document.querySelector('link[rel=manifest]')) navigator.serviceWorker.register('sw.js').catch(()=>{});
-Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,2000))]).then(route);
+Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,2000))]).then(()=>{ route(); if(!onbSeen() && !Object.keys(S.cards).length) openTour(); });
 </script>
