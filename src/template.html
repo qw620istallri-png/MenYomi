@@ -141,6 +141,25 @@ label.lab,.lab{font-family:var(--f-mono);font-size:14px;text-transform:uppercase
 .stat:last-child{border-right:none}
 .stat b{font-family:var(--f-disp);font-stretch:75%;font-weight:900;font-size:30px;letter-spacing:0}
 .stat:first-child b{color:var(--acc)}
+.skills{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:2px solid var(--rule);margin-bottom:16px;background:var(--sheet)}
+.skills .sk{padding:8px 12px 10px;border-right:1px solid var(--rule);display:grid;gap:4px;min-width:0}
+.skills .sk:last-child{border-right:none}
+.skills .sk .t{display:flex;align-items:baseline;gap:8px;font-family:var(--f-mono);font-size:14px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.skills .sk .t .j{font-family:var(--f-jp);font-size:20px;font-weight:600;text-transform:none}
+.skills .sk .n{font-family:var(--f-mono);font-size:14px;color:var(--mute)}
+.skills .bar{height:8px;background:var(--soft);position:relative;overflow:hidden}
+.skills .bar i{position:absolute;inset:0 auto 0 0;background:var(--c,var(--acc))}
+@media (max-width:700px){.skills{grid-template-columns:repeat(2,minmax(0,1fr))}.skills .sk:nth-child(2){border-right:none}.skills .sk:nth-child(-n+2){border-bottom:1px solid var(--rule)}}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.choices button{display:flex;gap:12px;align-items:center;text-align:left;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);padding:12px 14px;font-size:18px;font-weight:600;cursor:pointer;min-height:64px}
+.choices button:hover{background:var(--soft)}
+.choices button.good{background:#bff0d1;color:#0b3a22;border-color:#0b7a46;box-shadow:0 0 0 3px #0b7a46}
+.choices button.bad{background:#ffd2c9;color:#5a1208;border-color:var(--bad);animation:shake .35s}
+.choices button:disabled{cursor:default}
+kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border:2px solid currentColor;font-family:var(--f-mono);font-size:14px;font-weight:600;line-height:1;opacity:.75;flex:none}
+@media (pointer:coarse){kbd.k{display:none}}
+.grades button kbd.k{min-width:24px;height:24px;justify-self:start;margin-bottom:2px}
+@media (max-width:560px){.choices{grid-template-columns:minmax(0,1fr)}}
 /* review */
 .card{display:grid;gap:16px}
 .cardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
@@ -358,6 +377,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   <div class="vhead"><div class="stats" id="stats"></div>
     <div class="row" id="rctl"></div>
     <div class="row"><label class="lab" for="newper" data-en="New / day">Nouvelles / jour</label><select id="newper"><option>5</option><option selected>10</option><option>20</option><option>30</option></select></div></div>
+  <div class="skills" id="skills"></div>
   <div class="panel card" id="card"></div>
 </section>
 
@@ -777,9 +797,10 @@ if(S.day!==today()){S.day=today(); S.newToday=0; S.extraNew=0; S.todayIds=[]}
 S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null;
 const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','饂飩','寿司'];
 function buildCards(){ const ids=[], seen=new Set(); const order=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w))];
-  order.forEach(w=>{ if(!/[一-鿿]/.test(w)) return; ids.push('r:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
+  order.forEach(w=>{ if(!/[一-鿿]/.test(w)) return; ids.push('r:'+w); ids.push('m:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
 const CARDS=buildCards();
-const canIntro=id=>id[0]!=='p'||((S.cards['r:'+id.slice(2)]||{}).reps>0);
+// meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
+const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m') return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
 function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; SESSION=null; } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
   if(due.length) return due[0]; if(S.newToday<S.newPer+S.extraNew){const n=CARDS.find(id=>!S.cards[id]&&canIntro(id)); if(n) return n;}
   const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon[0]||null; }
@@ -792,8 +813,8 @@ function grade(id,g){ if(SESSION){ SESSION.q.shift(); if(g===0) SESSION.q.push(i
   if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(!S.todayIds.includes(id)) S.todayIds.push(id); store.set(SKEY,S); showCard(); }
 function redoToday(){ SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
 function nextSet(){ S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
-function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}>${l}<small>${SESSION?(g===0?tr('encore une fois','once more'):tr('entraînement','practice')):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
-function renderStats(){ const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const learned=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
+function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?tr('encore une fois','once more'):tr('entraînement','practice')):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
+function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const learned=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
   const nw=Math.max(0,Math.min(S.newPer+S.extraNew-S.newToday, CARDS.filter(id=>!S.cards[id]&&canIntro(id)).length)); const t=S.todayIds.length;
   document.getElementById('stats').innerHTML= SESSION? `<span class="stat"><b>${SESSION.q.length}</b>${tr('à refaire','to redo')}</span><span class="stat">${tr('entraînement','practice')}</span>`
     : `<span class="stat"><b>${due}</b>${tr('à revoir','due')}</span><span class="stat"><b>${nw}</b>${tr('nouvelles','new')}</span><span class="stat"><b>${learned}</b>/ ${CARDS.length} ${tr('apprises','learned')}</span>`;
@@ -810,20 +831,21 @@ let curAnim=null;
 const HANDS={kaisho:'soignée',hurry:'pressée',gyosho:'semi-cursive',sosho:'très cursive'}, HANDS_EN={kaisho:'neat',hurry:'hurried',gyosho:'semi-cursive',sosho:'very cursive'};
 const MEDIA_EN=['paper, brush','paper strip, brush','wooden plaque, brush','yellow poster, chisel marker','poster, red marker','slate, chalk','card, pen','paper, chisel marker'];
 function showCard(){
-  renderStats(); if(curAnim) curAnim.stop=true;
+  renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard();
   if(!id){ const t=S.todayIds.length; el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2><div class="row" style="margin-top:12px">${t?`<button class="btn" id="dredo">${tr('Refaire ceux du jour','Redo today’s')} (${t})</button>`:''}<button class="btn k" id="dnext">${tr('Set suivant','Next set')} +${S.newPer}</button><a class="btn r" href="#menu">${tr('Défi menu','Menu challenge')}</a></div>`;
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
-  if(kind==='r' && !isNew && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
+  if(kind==='m' && !isNew && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
+  if(kind==='m'){ showMeaning(el,id,key,isNew); return; }
   if(kind==='p'){ const w=WMAP[key];
     el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Inversée','Reverse')}</span></div>
       <div class="quest" style="margin:0;grid-template-columns:auto minmax(0,1fr)"><span class="q">${tr('Comment dit-on','How do you say')}</span><b>${esc(w[2])}</b></div>
-      <form class="answerbar" id="pform" autocomplete="off"><input id="pin" lang="ja" placeholder="${tr('romaji ou kana','romaji or kana')}" aria-label="${tr('Votre réponse','Your answer')}"><button class="btn k" type="submit">${tr('Vérifier','Check')}</button><button class="btn ghost" type="button" id="preveal">${tr('Je ne sais pas','I don’t know')}</button></form>
+      <form class="answerbar" id="pform" autocomplete="off"><input id="pin" lang="ja" placeholder="${tr('romaji, kana ou kanji','romaji, kana or kanji')}" aria-label="${tr('Votre réponse','Your answer')}"><button class="btn k" type="submit">${tr('Vérifier','Check')}</button><button class="btn ghost" type="button" id="preveal">${tr('Je ne sais pas','I don’t know')}</button></form>
       <div id="pans"></div>`;
     const reveal=res=>{ el.querySelector('#pform').querySelectorAll('input,button').forEach(x=>x.disabled=true); const a=el.querySelector('#pans');
       a.innerHTML=`${res===true?`<p class="feedback ok" style="margin:0 0 10px">${tr('Juste !','Correct!')}</p>`:res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:res===false?0:null)}`;
+        <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       const r=rng(newSeed()); const m=pick(r,MEDIA); const n=[...key].length; const box=a.querySelector('.stage').clientWidth-52;
       textCanvas(a.querySelector('#pc'),key,{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),m.tool),size:Math.floor(clamp(m.v?Math.min(110,(innerHeight*0.42)/(n*0.95+0.6)):Math.min(120,box/(n*0.95+0.6)),40,120)),vertical:m.v,surface:m.surface,color:m.color,pad:0.32});
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
@@ -848,7 +870,7 @@ function showCard(){
     el.querySelector('#rprint').onclick=e=>{e.target.outerHTML=`<span style="font-size:30px;font-family:var(--f-body);padding-inline:8px">${esc(key)}</span>`};
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:res===false?0:null)}`;
+        <div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
     el.querySelector('#rform').onsubmit=e=>{ e.preventDefault(); const r=checkAnswer(el.querySelector('#rin').value,key,w[1]); if(r==null){el.querySelector('#rin').focus(); return;} reveal(r); };
     el.querySelector('#reveal').onclick=()=>reveal(null);
@@ -857,14 +879,56 @@ function showCard(){
     el.innerHTML=`<div class="cardhead"><span class="pill b">${isNew?tr('Nouveau · ','New · '):''}${tr('Écriture','Writing')}</span><span class="mono" style="color:var(--mute)">${k.strokes} ${tr('traits','strokes')}</span></div>
       <div class="prompt"><b>${esc(k.mean)}</b><span>${esc(k.on)} · ${esc(k.kun)}</span>${ex?`<span class="hint">${esc(ex[0].replaceAll(key,'＿'))} · ${esc(ex[1])} · ${esc(ex[2])}</span>`:''}</div>
       <div class="padbox"><div id="rpad" class="padhost"></div><div class="padside">
-        <div class="row"><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo">${tr('Annuler','Undo')}</button><button class="btn" id="wclear">${tr('Effacer','Clear')}</button></div>
+        <div class="row"><button class="btn" id="worder">${tr('Ordre des traits ▶','Stroke order ▶')}</button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo">${tr('Annuler','Undo')}</button><button class="btn" id="wclear">${tr('Effacer','Clear')}</button></div>
         <button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
-    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew});
-    el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
+    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
+    el.querySelector('#worder').onclick=()=>pad.animate(); el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
     el.querySelector('#wcheck').onclick=()=>{ const res=pad.check(); el.querySelector('#wres').innerHTML=res.html; el.querySelector('#wgr').innerHTML=wordChips(key)+'<div style="height:12px"></div>'+gradeButtons(id,res.suggest);
       el.querySelectorAll('#wgr .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
   }
 }
+
+// ---------- meaning card: the handwritten word, four meanings to choose from
+function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed());
+  const pool=[...new Set([...huntPool(key),...WORDS.map(x=>x[0])])].filter(x=>WMAP[x]&&WMAP[x][2]!==w[2]); const ds=[]; const seenM=new Set([w[2]]);
+  for(const x of shuffle(r,pool)){ const m=WMAP[x][2]; if(!seenM.has(m)){ seenM.add(m); ds.push(m); } if(ds.length>=3) break; }
+  const opts=shuffle(r,[w[2],...ds]);
+  el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Sens','Meaning')}</span><span class="mono" id="mhand" style="color:var(--mute)"></span></div>
+    <div class="stage" id="mst" style="min-height:0;padding-block:22px"><canvas id="mc"></canvas></div>
+    <div class="quest" style="margin:14px 0 12px;grid-template-columns:minmax(0,1fr)"><span class="q">${tr('Que veut dire ce mot ?','What does this word mean?')}</span></div>
+    <div class="choices" id="mch">${opts.map((m,i)=>`<button type="button" data-i="${i}"><kbd class="k">${i+1}</kbd><span>${esc(m)}</span></button>`).join('')}</div><div id="mans" style="margin-top:16px"></div>`;
+  const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','gyosho']); const box=el.querySelector('#mst').clientWidth-52; const n=[...key].length;
+  const size=Math.floor(clamp(m.v? Math.min(120,(innerHeight*0.36)/(n*0.95+0.6)) : Math.min(160,box/(n*0.95+0.6)),44,160));
+  textCanvas(el.querySelector('#mc'),key,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35});
+  let tries=0, done=false;
+  const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
+    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+    el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
+  el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===w[2];
+    if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(w[2])}"]`).classList.add('good'); finish(false); } } }); }
+
+// how far each skill has come: reading, meaning, recalling the word, writing
+function renderSkills(){ const host=document.getElementById('skills'); if(!host) return; const now=Date.now();
+  const K=[['r','読',tr('Lire','Read'),'var(--acc)'],['m','意',tr('Comprendre','Understand'),'var(--ok)'],['p','言',tr('Retrouver','Recall'),'var(--warn)'],['w','書',tr('Écrire','Write'),'var(--blue)']];
+  host.innerHTML=K.map(([k,j,l,c])=>{ const all=CARDS.filter(id=>id[0]===k); const got=all.filter(id=>S.cards[id]&&S.cards[id].reps>0).length; const due=all.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const pc=all.length?got/all.length:0;
+    return `<div class="sk" title="${esc(l)}"><span class="t"><span class="j">${j}</span>${esc(l)}</span><span class="bar" style="--c:${c}"><i style="width:${(pc*100).toFixed(1)}%"></i></span><span class="n">${got} / ${all.length}${due?` · ${due} ${tr('à revoir','due')}`:''}</span></div>`; }).join(''); }
+
+// keyboard: Enter moves to the next step, 1–4 (or & é " ' on AZERTY) pick a choice or a grade
+const KEYMAP={'1':0,'2':1,'3':2,'4':3,'5':4,'&':0,'é':1,'"':2,"'":3,'(':4};
+let cardShownAt=0;
+addEventListener('keydown',e=>{ if(e.ctrlKey||e.metaKey||e.altKey||e.isComposing) return; if(document.getElementById('dlg').open||document.getElementById('onb').classList.contains('on')) return;
+  const v=document.getElementById('v-revisions'); if(!v||v.hidden||getComputedStyle(v).display==='none') return; const card=document.getElementById('card');
+  const t=e.target; const typing=t&&t.tagName==='INPUT'&&!t.disabled; if(t&&(t.tagName==='SELECT'||t.tagName==='TEXTAREA')) return;
+  const grades=[...card.querySelectorAll('.grades button')];
+  if(e.key==='Enter'){ if(performance.now()-cardShownAt<450){ e.preventDefault(); return; }
+    if(grades.length){ e.preventDefault(); (card.querySelector('.grades .sug')||grades[2]).click(); return; }
+    if(typing){ if(!t.value.trim()){ e.preventDefault(); const dk=card.querySelector('#reveal,#preveal'); if(dk) dk.click(); } return; }
+    const chk=card.querySelector('#wcheck'); if(chk){ e.preventDefault(); chk.click(); return; }
+    const inp=card.querySelector('.answerbar input:not(:disabled)'); if(inp){ e.preventDefault(); inp.focus(); } return; }
+  if(typing) return; const i=KEYMAP[e.key]; if(i==null) return;
+  if(grades.length){ if(grades[i]){ e.preventDefault(); grades[i].click(); } return; }
+  const ch=[...card.querySelectorAll('#mch button:not(:disabled)')].length? [...card.querySelectorAll('#mch button')] : [...card.querySelectorAll('#hst .itm')];
+  if(ch[i]){ e.preventDefault(); ch[i].click(); } });
 
 // ---------- review variant: find the dish among handwritten strips
 function huntPool(key){ const pool=new Set(); Object.values(TYPES).forEach(t=>{ if(t.sections.some(s=>s[1].includes(key))) t.sections.forEach(s=>s[1].forEach(w=>pool.add(w))); });
@@ -877,7 +941,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
   const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((innerHeight*0.5)/(n*0.95+0.7),30,60));
   const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
-  opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
+  opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); b.title=String(i+1); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
     textCanvas(cv,o,{seed:newSeed(),writer:wr,size,vertical:true,surface:surf,pad:0.32,valign:'start',minH:size*(n*0.95+0.75)});
     b.onclick=()=>{ if(done) return; tries++; if(o===key){ done=true; b.classList.add('good'); finish(tries===1); }
       else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); if(tries>=2){ done=true; host.children[opts.indexOf(key)].classList.add('good'); finish(false); } } }; }); }
@@ -1342,14 +1406,14 @@ function bindProgress(body){ const out=body.querySelector('#pcode'), msg=body.qu
   body.querySelector('#pfile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>stage(readCode(t))); };
   body.querySelector('#pimp').onclick=e=>{ if(!pending){ stage(readCode(body.querySelector('#ppaste').value)); return; }
     S=Object.assign({cards:{},day:'',newToday:0,newPer:10,todayIds:[],extraNew:0},pending); store.set(SKEY,S); pending=null; e.target.classList.remove('r'); e.target.textContent=tr('Importé ✓','Imported ✓'); renderStats(); if(location.hash==='#revisions'||!location.hash) showCard(); }; }
-document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbody').innerHTML=`<h2>${tr('Progression','Progress')}</h2>
+document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbody').innerHTML=`<div class="row"><button class="btn k" id="otour" style="font-size:18px;padding:12px 18px">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button></div><h2>${tr('Progression','Progress')}</h2>
   <p style="margin:0">${tr('Elle reste dans ce navigateur. Pour passer d’un appareil à l’autre, copiez le code ici et collez-le là-bas.','It stays in this browser. To move between devices, copy the code here and paste it there.')}</p>
   <div class="row"><button class="btn k" id="pcopy">${tr('Copier le code','Copy the code')}</button><button class="btn" id="pdl"${document.querySelector('link[rel=manifest]')?'':' hidden'}>${tr('Télécharger','Download')}</button></div>
   <textarea class="field" id="pcode" rows="3" readonly hidden style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
   <textarea class="field" id="ppaste" rows="3" placeholder="${tr('Collez un code ici…','Paste a code here…')}" style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
   <div class="row"><button class="btn" id="pimp">${tr('Importer','Import')}</button><label class="btn ghost" style="cursor:pointer">${tr('ou un fichier…','or a file…')}<input type="file" id="pfile" accept=".json,.txt,application/json" hidden></label></div>
   <p class="hint" id="pmsg" style="margin:0" aria-live="polite"></p>
-  <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>Charles « istallri »</b></p><div class="row"><button class="btn" id="otour">${tr('Revoir la visite','Replay the tour')}</button></div><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
+  <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
   `; bindProgress(document.getElementById('dlgbody')); document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
