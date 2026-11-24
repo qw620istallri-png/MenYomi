@@ -481,6 +481,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 /* ---------- v10: voice, shop names, challenge pools */
 .instbox{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:6px} .instbox .btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none}
 @media (display-mode: fullscreen){header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}}
+html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 .say{display:inline-grid;place-items:center;width:38px;height:38px;margin-left:10px;vertical-align:middle;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer;padding:0;border-radius:50%;transition:background .15s,transform .1s}
 .say:hover{background:var(--soft)}
 .say:active{transform:scale(.94)}
@@ -1848,7 +1849,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 19:11 · 3cca08</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 19:15 · 621f3f</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -1913,6 +1914,9 @@ function renderInstall(host){ if(STANDALONE()){ host.innerHTML=''; return; } con
   else inner=`<p class="hint" style="margin:0">${tr('Menu ⋮ du navigateur puis « Installer l’application »','Browser menu ⋮ then “Install app”')}</p>`;
   host.innerHTML=`<div class="instbox">${inner}</div>`;
   const b=host.querySelector('#instbtn'); if(b) b.onclick=async()=>{ const e=INSTALL; if(!e) return; INSTALL=null; try{ e.prompt(); await e.userChoice; }catch(err){} renderInstall(host); }; }
+// installed before the manifest asked for fullscreen: the system bars keep the install-time colour, so go fullscreen on the first tap
+if(matchMedia('(display-mode: standalone)').matches && document.documentElement.requestFullscreen && matchMedia('(pointer: coarse)').matches){
+  addEventListener('click',()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); },true); }
 if('serviceWorker' in navigator && document.querySelector('link[rel=manifest]')){
   const hadCtl=!!navigator.serviceWorker.controller; let pend=false;
   navigator.serviceWorker.register('sw.js').then(reg=>{ const chk=()=>reg.update().catch(()=>{}); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) chk(); }); setInterval(chk,20*60e3); }).catch(()=>{});
