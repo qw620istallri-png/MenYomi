@@ -1450,6 +1450,8 @@ function newQuest(){ const q=document.getElementById('mquest'); target=null; doc
 document.querySelector('.modes').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; mmode=b.dataset.m==='explore'?'explore':lastQ; score={ok:0,n:0}; streak=0; newQuest(); });
 document.getElementById('mnew').onclick=genMenu; document.getElementById('mtype').onchange=genMenu; document.getElementById('mreg').onchange=genMenu;
 addEventListener('keydown',e=>{ if(e.key==='Escape') clearSel(); });
+// a tap anywhere outside the dish card closes it (tapping another dish opens that one instead)
+document.addEventListener('click',e=>{ const p=document.getElementById('minfo'); if(!p||p.hidden) return; if(e.target.closest('#minfo,.board .itm,#signbtn,dialog')) return; clearSel(); });
 let menuResize=null, menuW=innerWidth; addEventListener('resize',()=>{ clearTimeout(menuResize); menuResize=setTimeout(()=>{ if(Math.abs(innerWidth-menuW)<2) return; menuW=innerWidth; if(MENU && document.getElementById('v-menu').classList.contains('on')) renderMenu(); },400); });
 
 // ---------- atelier
