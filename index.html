@@ -1318,7 +1318,7 @@ function ribbon(c,raw,R,seed){ if(!raw.length) return; const gap=Math.max(1,R*0.
   const rr=rng(seed), ph=rr()*6, wob=k=>1+0.02*Math.sin(k*0.23+ph)+0.01*Math.sin(k*0.9+ph*2);
   c.beginPath(); P.forEach((q,k)=>{ const h=q.w*0.5*wob(k); k?c.lineTo(q.x+q.nx*h,q.y+q.ny*h):c.moveTo(q.x+q.nx*h,q.y+q.ny*h); });
   for(let k=P.length-1;k>=0;k--){ const q=P[k], h=q.w*0.5*wob(k+40); c.lineTo(q.x-q.nx*h,q.y-q.ny*h); } c.closePath(); c.fill();
-  const a=P[0], b2=P[Math.min(P.length-1,3)], ang=Math.atan2(b2.y-a.y,b2.x-a.x), w0=Math.max(P[Math.min(P.length-1,4)].w,R*0.55);
+  const a=P[0], b2=P[Math.min(P.length-1,3)], ang=Math.atan2(b2.y-a.y,b2.x-a.x), w0=Math.max(P[Math.min(P.length-1,4)].w,R*0.48);
   c.beginPath(); c.ellipse(a.x+Math.cos(ang)*w0*0.18,a.y+Math.sin(ang)*w0*0.18,w0*0.56,w0*0.44,-0.7,0,7); c.fill();
   const e=P[P.length-1]; if(e.w>R*0.35){ c.beginPath(); c.arc(e.x,e.y,e.w*0.5,0,7); c.fill(); }
   const dryFrom=R*8; if(L>dryFrom){ c.save(); c.globalCompositeOperation='destination-out'; c.lineCap='round';
@@ -1379,7 +1379,7 @@ class Pad{
   down(e){ e.preventDefault(); this.el.setPointerCapture(e.pointerId); this.over.getContext('2d').clearRect(0,0,this.size,this.size);
     const [x,y]=this.xy(e); this.drawing=true; this.lt=e.timeStamp; this.pos=[x,y]; this.last=[x,y]; this.v=0; this.vx=0; this.vy=0; this.pen=e.pointerType==='pen';
     const wx=this.wet.getContext('2d'); wx.clearRect(0,0,this.size,this.size); wx.fillStyle='#16120d';
-    this.R=this.size*0.064; this.p=this.pen&&e.pressure>0?0.3+e.pressure*1.1:1.05; this.vq=[]; this.seed=newSeed(); this.raw=[{x,y,p:this.p}]; this.render();
+    this.R=this.size*(this.pen?0.062:0.05); this.p=this.pen&&e.pressure>0?0.3+e.pressure*1.1:0.95; this.vq=[]; this.seed=newSeed(); this.raw=[{x,y,p:this.p}]; this.render();
     this.cur=[[x/this.size*109,y/this.size*109]]; }
   move(e){ if(!this.drawing) return; const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
     for(const ev of (evs.length?evs:[e])){ const raw=this.xy(ev);
@@ -1389,14 +1389,14 @@ class Pad{
     const v=d/DPR/dt; this.v=this.v*0.8+v*0.2; this.vx=this.vx*0.7+dx/dt*0.3; this.vy=this.vy*0.7+dy/dt*0.3;
     // a finger or a mouse gives no pressure: speed stands in for it (slow = the brush sinks, fast = it lifts), scaled to the pad's size,
     // and the brush, held slanted, leaves vertical strokes a little fuller than horizontal ones
-    const vn=this.v*300/(this.el.getBoundingClientRect().width||300);     let tp=clamp(1.3-vn*0.6,0.3,1.3); if(this.pen&&pressure>0) tp=(0.3+pressure*1.3)*clamp(1.1-this.v*0.12,0.7,1.1);
+    const vn=this.v*300/(this.el.getBoundingClientRect().width||300);     let tp=clamp(1.18-vn*0.6,0.3,1.18); if(this.pen&&pressure>0) tp=(0.3+pressure*1.3)*clamp(1.1-this.v*0.12,0.7,1.1);
     this.vq=(this.vq||[]).concat(vn).slice(-4);
     this.p+=(tp-this.p)*(this.pen?0.18:0.22); this.raw.push({x,y,p:this.p}); this.last=[x,y]; this.lt=ts; this.cur.push([x/this.size*109,y/this.size*109]); this.render(); }
   render(){ const wx=this.wet.getContext('2d'); wx.clearRect(0,0,this.size,this.size); wx.fillStyle='#16120d'; ribbon(wx,this.raw,this.R,this.seed); }
   up(e){ if(!this.drawing) return; this.drawing=false;
     if(e){ const raw=this.xy(e); for(let i=1;i<=4;i++){ const x=this.pos[0]+(raw[0]-this.pos[0])*i/4, y=this.pos[1]+(raw[1]-this.pos[1])*i/4; this.feedTo(x,y,this.lt+4,e.pressure); } }
     const sp=Math.hypot(this.vx,this.vy)/DPR; const vend=(this.vq||[0]).reduce((a,b)=>a+b,0)/((this.vq||[0]).length||1);
-    if(vend<0.2 && this.cur.length>3){ const l=this.raw[this.raw.length-1]; this.raw.push({x:l.x,y:l.y,p:Math.min(1.45,this.p*1.18+0.1)}); } // tome: the brush stops and presses
+    if(vend<0.2 && this.cur.length>3){ const l=this.raw[this.raw.length-1]; this.raw.push({x:l.x,y:l.y,p:Math.min(1.3,this.p*1.12+0.06)}); } // tome: the brush stops and presses
     else if((sp>0.55||vend>0.5) && this.cur.length>3){ // harai: the brush leaves the paper while still moving, the stroke thins to a point
       const len=Math.min(this.size*0.09,Math.max(sp,vend)*this.size*0.04), ux=this.vx/(Math.hypot(this.vx,this.vy)||1), uy=this.vy/(Math.hypot(this.vx,this.vy)||1); const n=10, w0=this.p;
       for(let i=1;i<=n;i++){ const t2=i/n; this.raw.push({x:this.last[0]+ux*len*t2,y:this.last[1]+uy*len*t2,p:w0*Math.pow(1-t2,1.3)+0.03}); } }
@@ -1944,7 +1944,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 22:49 · 4b0643</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 23:30 · 5d584e</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -1998,7 +1998,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.24 · 22:49 · 4b0643';
+const BUILD='2026.11.24 · 23:30 · 5d584e';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
