@@ -1133,16 +1133,16 @@ const PHONE=()=>matchMedia('(max-width:700px)').matches;
 // a right answer moves on by itself with the suggested grade; a tap on the card keeps it on screen
 let autoT=null; function cancelAuto(){ clearTimeout(autoT); autoT=null; document.querySelectorAll('#card .grades .auto').forEach(b=>b.classList.remove('auto')); }
 document.getElementById('card').addEventListener('pointerdown',e=>{ if(autoT&&!e.target.closest('.grades button')) cancelAuto(); });
-// feedback sounds, synthesised: a small temple bell (rin) when right, a soft wooden knock (mokugyo) when wrong
+// feedback sounds, synthesised: a small temple bell (rin) when right, a deep bamboo knock when wrong
 const SOUND_ON=()=>{ try{ return localStorage.getItem('menyomi.snd')!=='0'; }catch(e){ return true; } };
 let FXC=null; function playFx(ok,ctx){ const c=ctx||(FXC||(FXC=new (window.AudioContext||window.webkitAudioContext)())); if(!ctx&&c.state==='suspended') c.resume().catch(()=>{}); const t0=c.currentTime+0.01;
   const out=c.createGain(); out.gain.value=0.22; out.connect(c.destination);
   if(ok){ // rin: inharmonic bowl partials, two light strikes a fifth apart
     [[0,1046.5],[0.11,1568]].forEach(([dt,f],k)=>{ [[1,1,2.2],[2.76,.32,1.1],[5.4,.12,.5],[8.9,.05,.25]].forEach(([r,a,d])=>{ const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.value=f*r*(1+(k?.002:-.001)); g.gain.setValueAtTime(0,t0+dt); g.gain.linearRampToValueAtTime(a*(k?.75:1),t0+dt+.004); g.gain.exponentialRampToValueAtTime(.0001,t0+dt+d); o.connect(g).connect(out); o.start(t0+dt); o.stop(t0+dt+d+.05); }); }); }
-  else { // mokugyo: hollow wood, a damped low tone plus a filtered tap
-    const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(420,t0); o.frequency.exponentialRampToValueAtTime(300,t0+.12); g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(.9,t0+.003); g.gain.exponentialRampToValueAtTime(.0001,t0+.22); o.connect(g).connect(out); o.start(t0); o.stop(t0+.25);
-    const n=c.createBuffer(1,c.sampleRate*.05|0,c.sampleRate), d=n.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,3);
-    const s=c.createBufferSource(), bp=c.createBiquadFilter(), gn=c.createGain(); s.buffer=n; bp.type='bandpass'; bp.frequency.value=900; bp.Q.value=4; gn.gain.value=.5; s.connect(bp).connect(gn).connect(out); s.start(t0); }
+  else { // deep bamboo tube: odd modes of a closed-open segment, excited by a short filtered click
+    const f=330; [[1,1,.45],[3.05,.35,.2],[5.2,.12,.1]].forEach(([r,a,d])=>{ const o=c.createOscillator(), g=c.createGain(); o.type='sine'; o.frequency.setValueAtTime(f*r*1.03,t0); o.frequency.exponentialRampToValueAtTime(f*r,t0+.03); g.gain.setValueAtTime(0,t0); g.gain.linearRampToValueAtTime(a*1.4,t0+.0015); g.gain.exponentialRampToValueAtTime(.0001,t0+d); o.connect(g).connect(out); o.start(t0); o.stop(t0+d+.05); });
+    const n=c.createBuffer(1,c.sampleRate*.03|0,c.sampleRate), d=n.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/d.length,6);
+    const s=c.createBufferSource(), bp=c.createBiquadFilter(), gn=c.createGain(); s.buffer=n; bp.type='bandpass'; bp.frequency.value=1400; bp.Q.value=1.6; gn.gain.value=.85; s.connect(bp).connect(gn).connect(out); s.start(t0); }
 }
 // short buzz on phones: one tap for right, a double knock for wrong; plus the sound unless muted
 const buzz=ok=>{ try{ if(navigator.vibrate&&matchMedia('(pointer:coarse)').matches) navigator.vibrate(ok?18:[28,70,28]); }catch(e){} try{ if(SOUND_ON()) playFx(ok); }catch(e){} };
@@ -1909,7 +1909,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 20:39 · 10bf48</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 20:51 · cbf7a5</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -1963,7 +1963,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.24 · 20:39 · 10bf48';
+const BUILD='2026.11.24 · 20:51 · cbf7a5';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
