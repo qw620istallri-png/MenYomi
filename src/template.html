@@ -50,6 +50,7 @@ a{color:inherit}
 header.top{display:grid;grid-template-columns:auto 1fr auto;gap:0 20px;align-items:end;border-bottom:2px solid var(--rule);padding-block:20px 12px}
 #logo{width:76px;height:76px;display:block;border:2px solid var(--rule);background:var(--acc);box-shadow:4px 4px 0 var(--blue)}
 .mast h1{font-family:var(--f-disp);font-stretch:72%;font-weight:900;font-size:clamp(38px,5.6vw,70px);line-height:.9;letter-spacing:-.01em;margin:0;text-transform:uppercase;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.mast h1 a.home{color:inherit;text-decoration:none;display:inherit;align-items:inherit;gap:inherit;flex-wrap:inherit;white-space:inherit;min-width:0} #logo{cursor:pointer}
 .mast h1 .jp{font-family:var(--f-jp);font-weight:600;font-size:.42em;letter-spacing:.06em;color:var(--acc);text-transform:none}
 .hctl{display:flex;gap:6px;align-self:center}
 .hctl .btn{padding:7px 12px;font-family:var(--f-mono);font-weight:600}
@@ -528,6 +529,18 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .grades button.auto::after{content:"";position:absolute;left:0;bottom:0;height:5px;width:100%;background:var(--ink);transform-origin:left;animation:autofill 1.4s linear forwards}
 @keyframes autofill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media (prefers-reduced-motion:reduce){.grades button.auto::after{animation-duration:.01s}}
+
+@media (max-width:700px){
+  #card.wcard{padding:8px 4px 10px;min-height:calc(100vh - 8px);min-height:calc(100dvh - 8px);scroll-margin-top:4px;align-content:start;gap:8px}
+  #card.wcard .cardhead{display:none}
+  #card.wcard .prompt{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 10px;padding-inline:6px}
+  #card.wcard .prompt b{font-size:24px}
+  #card.wcard .prompt .kr{font-size:16px;color:var(--mute)}
+  #card.wcard .prompt .hint{flex-basis:100%;font-size:14px}
+  #card.wcard .padbox{gap:8px}
+  #card.wcard #rpad.padhost{width:min(100%,calc(100vh - 190px));width:min(100%,calc(100dvh - 190px))}
+  #card.wcard .padside{padding-inline:4px}
+}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -536,7 +549,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 <div class="wrap">
 <header class="top">
   <canvas id="logo" width="152" height="152" aria-hidden="true"></canvas>
-  <div class="mast"><h1>Menyomi <span class="jp">めん読み</span></h1></div>
+  <div class="mast"><h1><a class="home" href="#revisions" aria-label="Menyomi">Menyomi <span class="jp">めん読み</span></a></h1></div>
   <div class="hctl"><button class="btn" id="langbtn" lang="en">EN</button><button class="btn" id="credbtn" aria-label="Crédits" data-en-al="Credits">i</button></div>
 </header>
 <nav class="tabs" aria-label="Sections">
@@ -1035,8 +1048,8 @@ let curAnim=null;
 const HANDS={kaisho:'soignée',hurry:'pressée',gyosho:'semi-cursive',sosho:'très cursive'}, HANDS_EN={kaisho:'neat',hurry:'hurried',gyosho:'semi-cursive',sosho:'very cursive'};
 const MEDIA_EN=['paper, brush','paper strip, brush','wooden plaque, brush','yellow poster, chisel marker','poster, red marker','slate, chalk','card, pen','paper, chisel marker'];
 function showCard(){
-  renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
-  const el=document.getElementById('card'); const id=nextCard();
+  renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
+  const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard');
   if(!id){ const t=S.todayIds.length; el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2><div class="row" style="margin-top:12px">${t?`<button class="btn" id="dredo">${tr('Refaire ceux du jour','Redo today’s')} (${t})</button>`:''}<button class="btn k" id="dnext">${tr('Set suivant','Next set')} +${S.newPer}</button><a class="btn r" href="#menu">${tr('Défi menu','Menu challenge')}</a></div>`;
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
@@ -1081,9 +1094,10 @@ function showCard(){
   } else {
     const k=kInfo(key); const ex=WORDS.find(w=>w[0].includes(key)&&w[0].length>1);
     el.innerHTML=`<div class="cardhead"><span class="pill b">${isNew?tr('Nouveau · ','New · '):''}${tr('Écriture','Writing')}</span><span class="mono" style="color:var(--mute)">${k.strokes} ${tr('traits','strokes')}</span></div>
-      <div class="prompt"><b>${esc(k.mean)}</b><span>${esc(k.on)} · ${esc(k.kun)}</span>${ex?`<span class="hint">${esc(ex[0].replaceAll(key,'＿'))} · ${esc(ex[1])} · ${esc(ex[2])}</span>`:''}</div>
+      <div class="prompt"><b>${esc(k.mean)}</b><span class="kr">${esc(k.on)} · ${esc(k.kun)}</span>${ex?`<span class="hint">${esc(ex[0].replaceAll(key,'＿'))} · ${esc(ex[1])} · ${esc(ex[2])}</span>`:''}</div>
       <div class="padbox"><div id="rpad" class="padhost"></div><div class="padside">
         <div class="wtools"><button class="btn" id="worder"><span class="dt">${tr('Ordre des traits ▶','Stroke order ▶')}</span><span class="ph">${tr('Ordre ▶','Order ▶')}</span></button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo" aria-label="${tr('Annuler le dernier trait','Undo last stroke')}" title="${tr('Annuler (clic droit)','Undo (right-click)')}">↶</button><button class="btn" id="wclear" aria-label="${tr('Effacer','Clear')}" title="${tr('Effacer','Clear')}">✕</button><button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button></div><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
+    el.classList.add('wcard'); if(PHONE()) requestAnimationFrame(()=>el.scrollIntoView({block:'start',behavior:'auto'}));
     const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
     el.querySelector('#worder').onclick=()=>pad.animate(); el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
     el.querySelector('#wcheck').onclick=()=>{ const res=pad.check(); el.querySelector('#wres').innerHTML=res.html; el.querySelector('#wgr').innerHTML=wordChips(key)+'<div style="height:12px"></div>'+gradeButtons(id,res.suggest);
@@ -1513,6 +1527,8 @@ function renderKList(){ const q=document.getElementById('ksearch').value.trim().
 document.getElementById('ksearch').oninput=renderKList;
 
 // ---------- routing
+document.querySelector('.mast a.home').addEventListener('click',e=>{ e.preventDefault(); if(location.hash!=='#revisions') location.hash='revisions'; else route(); scrollTo({top:0,behavior:'smooth'}); });
+document.getElementById('logo').addEventListener('click',()=>document.querySelector('.mast a.home').click());
 const VIEWS=['revisions','menu','atelier','main','kanji','vocab']; let menuDone=false, simDone=false;
 function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'revisions';
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
