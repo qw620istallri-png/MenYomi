@@ -192,6 +192,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .grades button::before{content:"";height:5px;margin:-10px -8px 6px;background:var(--c)}
 .grades button[data-g="0"]{--c:var(--bad)}.grades button[data-g="1"]{--c:var(--warn)}.grades button[data-g="2"]{--c:var(--ok)}.grades button[data-g="3"]{--c:var(--blue)}
 .grades button:hover{background:var(--soft)}
+.gonext{background:var(--lime)!important;color:#121212!important}
 .grades button.sug{background:var(--lime);color:#121212}.grades button.sug small{color:#333}
 .prompt{font-size:18px;display:grid;gap:2px}
 .prompt b{font-family:var(--f-disp);font-stretch:80%;font-size:34px;font-weight:900;line-height:1.05}
@@ -650,7 +651,8 @@ const say=(()=>{ let buf=null, ld=null, ctx=null, cur=[]; const dec={};
     const AC=window.AudioContext||window.webkitAudioContext; if(AC&&!ctx){ try{ ctx=new AC(); }catch(e){} } if(ctx&&ctx.state==='suspended') ctx.resume();
     if(btn){ btn.classList.add('on'); setTimeout(()=>btn.classList.remove('on'),900); }
     if(ctx && keys.length && keys.every(k=>VOICE[k])){ try{ await load(); cur.forEach(s=>{ try{s.stop()}catch(e){} }); cur=[]; let at=ctx.currentTime+0.02;
-        for(const k of keys){ const e=VOICE[k]; const ab=dec[k]||(dec[k]=await ctx.decodeAudioData(buf.slice(e[0],e[0]+e[1]))); const s=ctx.createBufferSource(); s.buffer=ab; s.connect(ctx.destination); s.start(at); at+=ab.duration+0.18; cur.push(s); }
+        const vi=Math.random()<.5?0:1; // two voices, one drawn per listen
+        for(const k of keys){ const e=VOICE[k], o=e[vi*2]??e[0], n=e[vi*2+1]??e[1], dk=k+'#'+vi; const ab=dec[dk]||(dec[dk]=await ctx.decodeAudioData(buf.slice(o,o+n))); const s=ctx.createBufferSource(); s.buffer=ab; s.connect(ctx.destination); s.start(at); at+=ab.duration+0.18; cur.push(s); }
         return; }catch(e){} }
     tts(reading||keys.join('')); }; })();
 const SPK='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -1026,6 +1028,8 @@ const PHONE=()=>matchMedia('(max-width:700px)').matches;
 let autoT=null; function cancelAuto(){ clearTimeout(autoT); autoT=null; document.querySelectorAll('#card .grades .auto').forEach(b=>b.classList.remove('auto')); }
 document.getElementById('card').addEventListener('pointerdown',e=>{ if(autoT&&!e.target.closest('.grades button')) cancelAuto(); });
 function toGrades(){ cancelAuto(); const s=document.querySelector('#card .grades .sug'); const g0=s?+s.dataset.g:0;
+  // phone: the check button turns into "Next", which takes the suggested grade
+  if(PHONE()&&s){ const b=document.querySelector('#card form.answerbar button[type=submit], #card #wcheck'); if(b){ b.disabled=false; b.classList.add('gonext'); b.innerHTML=tr('Suivant →','Next →'); b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); if(document.body.contains(s)) s.click(); }; } }
   if(s&&g0>=2){ const tok=cardShownAt; s.classList.add('auto'); autoT=setTimeout(()=>{ autoT=null; if(cardShownAt===tok&&document.body.contains(s)&&!dlg.open) s.click(); },1400); return; }
   if(!PHONE()) return; const g=document.querySelector('#card .grades'); if(g) setTimeout(()=>g.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}),80); }
 function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?(SESSION.test?tr('remise en révision','back to reviews'):tr('encore une fois','once more')):(SESSION.test?tr('test','test'):tr('entraînement','practice'))):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
@@ -1760,7 +1764,8 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <p class="hint" id="pmsg" style="margin:0" aria-live="polite"></p>
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
-  <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voice')} : VOICEVOX:冥鳴ひまり</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
+  <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version __BUILD__</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu

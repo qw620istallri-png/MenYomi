@@ -7,7 +7,7 @@ items={}
 for w in data['words']: items.setdefault(w[0],w[1])
 for n in data['names']: items.setdefault(n[0],n[1])
 for k,v in data['namepat'].items(): items.setdefault(k,v)
-syn=make(['1.vvm'])
+syn=make([os.environ.get('VVM','1.vvm')])
 VO={}
 for row,v in zip(['アカサタナハマヤラワガザダバパァャ','イキシチニヒミリギジヂビピィ','ウクスツヌフムユルグズヅブプゥュヴ','エケセテネヘメレゲゼデベペェ','オコソトノホモヨロヲゴゾドボポォョ'],'アイウエオ'):
     for c in row: VO[c]=v
@@ -45,7 +45,7 @@ for i,(t,rd) in enumerate(items.items()):
             aq.accent_phrases=syn.create_accent_phrases_from_kana(kana,SID); fixed.append((t,rd,kana))
         else:
             aq.accent_phrases=syn.create_accent_phrases(kata(rd),SID); fallback.append((t,rd,moras(aq.accent_phrases)))
-    aq.speed_scale=0.82; aq.pre_phoneme_length=0.04; aq.post_phoneme_length=0.12
+    aq.speed_scale=float(os.environ.get('SPEED','0.82')); aq.pre_phoneme_length=0.04; aq.post_phoneme_length=0.12
     open(f'{OUT}/wav/{i}.wav','wb').write(syn.synthesis(aq,SID))
 json.dump(list(items.keys()),open(OUT+'/keys.json','w',encoding='utf-8'),ensure_ascii=False)
 print(len(items),'clips'); print('fixed',len(fixed)); [print(' ',*f) for f in fixed]; print('fallback',len(fallback)); [print(' ',*f) for f in fallback]
