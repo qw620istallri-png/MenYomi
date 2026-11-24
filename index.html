@@ -536,6 +536,11 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 
 .dlgend{justify-self:start;margin-top:6px}
 @media (max-width:700px){.dlgend{justify-self:stretch;justify-content:center;padding:12px}}
+
+.grades button.auto{position:relative;overflow:hidden}
+.grades button.auto::after{content:"";position:absolute;left:0;bottom:0;height:5px;width:100%;background:var(--ink);transform-origin:left;animation:autofill 1.4s linear forwards}
+@keyframes autofill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (prefers-reduced-motion:reduce){.grades button.auto::after{animation-duration:.01s}}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -1079,13 +1084,18 @@ function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const
   else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=now+c.ivl*DAY; } }
   c.at=now; return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
-function grade(id,g){ if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
+function grade(id,g){ cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
     SESSION.q.shift(); if(g===0) SESSION.q.push(id); showCard(); return; }
   if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(!S.todayIds.includes(id)) S.todayIds.push(id); store.set(SKEY,S); showCard(); }
 function redoToday(){ TESTRES=null; SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
 function nextSet(){ TESTRES=null; S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
 const PHONE=()=>matchMedia('(max-width:700px)').matches;
-function toGrades(){ if(!PHONE()) return; const g=document.querySelector('#card .grades'); if(g) setTimeout(()=>g.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}),80); }
+// a right answer moves on by itself with the suggested grade; a tap on the card keeps it on screen
+let autoT=null; function cancelAuto(){ clearTimeout(autoT); autoT=null; document.querySelectorAll('#card .grades .auto').forEach(b=>b.classList.remove('auto')); }
+document.getElementById('card').addEventListener('pointerdown',e=>{ if(autoT&&!e.target.closest('.grades button')) cancelAuto(); });
+function toGrades(){ cancelAuto(); const s=document.querySelector('#card .grades .sug'); const g0=s?+s.dataset.g:0;
+  if(s&&g0>=2){ const tok=cardShownAt; s.classList.add('auto'); autoT=setTimeout(()=>{ autoT=null; if(cardShownAt===tok&&document.body.contains(s)&&!dlg.open) s.click(); },1400); return; }
+  if(!PHONE()) return; const g=document.querySelector('#card .grades'); if(g) setTimeout(()=>g.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}),80); }
 function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?(SESSION.test?tr('remise en révision','back to reviews'):tr('encore une fois','once more')):(SESSION.test?tr('test','test'):tr('entraînement','practice'))):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
 function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const learned=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
   const nw=Math.max(0,Math.min(S.newPer+S.extraNew-S.newToday, CARDS.filter(id=>!S.cards[id]&&canIntro(id)).length)); const t=S.todayIds.length;
