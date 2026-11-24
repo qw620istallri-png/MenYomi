@@ -526,6 +526,12 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   body.kbd #onb,body.kbd .grades{scroll-margin-bottom:12px}
 }
 @media (prefers-reduced-motion:reduce){nav.tabs{transition:none}}
+
+#mquest{position:sticky;top:0;z-index:20}
+#mquest .quest{box-shadow:0 6px 16px rgba(30,20,5,.25)}
+.quest .btn.go{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.qnext{float:right;margin:0 0 8px 12px}
+@media (max-width:700px){.qnext{float:none;display:flex;width:100%;justify-content:center;margin:0 0 10px}}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -1444,10 +1450,11 @@ function clickItem(it,btn){
   if(mmode==='explore' || it.isHeader){ const was=btn.classList.contains('sel'); clearSel(); if(!was){ btn.classList.add('sel'); document.getElementById('board').classList.add('hassel'); showInfo(it,undefined,btn); } return; }
   if(target==null) return; score.n++;
   const tw=MENU.flat[target].w;
-  if(it===MENU.flat[target]){ score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; setTimeout(newQuest,note?2400:1700); }
+  if(it===MENU.flat[target]){ score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
   else { streak=0; const note=qmiss?'':menuReview(tw,false); qmiss=true; btn.classList.remove('bad'); void btn.offsetWidth; btn.classList.add('bad'); showInfo(it,false,btn,note); }
   updScore(); }
 function clearSel(){ document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('sel')); const bd=document.getElementById('board'); if(bd) bd.classList.remove('hassel'); hidePop(); }
+document.addEventListener('click',e=>{ if(e.target.closest('.qnext')) newQuest(); });
 function hidePop(){ const p=document.getElementById('minfo'); if(p){ p.hidden=true; p.innerHTML=''; } const bd=document.getElementById('board'); if(bd) bd.style.paddingBottom=''; }
 function showPop(html,anchor){ const b=document.getElementById('board'), p=document.getElementById('minfo'); if(!p||!anchor) return;
   b.style.paddingBottom=''; p.innerHTML=`<button class="x" aria-label="${tr('Fermer','Close')}">✕</button>`+html; p.hidden=false; p.style.left='0px'; p.style.top='0px';
@@ -1464,7 +1471,7 @@ function priceBlock(it,m){ if(it.price==null) return '';
   return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">${it.price} ¥</span>${written!==it.price+'円'?`<span>${tr('écrit','written')} <b style="font-family:var(--f-jp);font-weight:600">${esc(written)}</b></span>`:''}<span>${esc(nr.kana)}</span><span class="mono" style="text-transform:none;color:var(--mute)">${esc(nr.romaji)}</span></div>`; }
 function showInfo(it,ok,btn,note){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
   showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}${note?`<p class="qnote">${esc(note)}</p>`:''}
-    <div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}<div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
     ${priceBlock(it,m)}
     ${sec?`<p class="hint" style="margin:10px 0 0">${tr('Rubrique','Section')} ${esc(sec[0])} · ${esc(toRomaji(sec[1]))} · ${esc(sec[2])}</p>`:''}
     <div style="height:12px"></div>${wordChips(w[0]+(typeof it.price==='number'&&m.vertical?priceText(it.price,m.pstyle):''))}`, btn||it.btn); }
@@ -1488,7 +1495,7 @@ function newQuest(){ const q=document.getElementById('mquest'); target=null; doc
 document.querySelector('.modes').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; mmode=b.dataset.m==='explore'?'explore':lastQ; score={ok:0,n:0}; streak=0; newQuest(); });
 document.getElementById('mnew').onclick=genMenu; document.getElementById('mtype').onchange=genMenu; document.getElementById('mreg').onchange=genMenu;
 addEventListener('keydown',e=>{ if(e.key==='Escape') clearSel(); });
-let menuResize=null; addEventListener('resize',()=>{ clearTimeout(menuResize); menuResize=setTimeout(()=>{ if(MENU && document.getElementById('v-menu').classList.contains('on')) renderMenu(); },400); });
+let menuResize=null, menuW=innerWidth; addEventListener('resize',()=>{ clearTimeout(menuResize); menuResize=setTimeout(()=>{ if(Math.abs(innerWidth-menuW)<2) return; menuW=innerWidth; if(MENU && document.getElementById('v-menu').classList.contains('on')) renderMenu(); },400); });
 
 // ---------- atelier
 let atelierChar='焼', apad=null; const WRITABLE=[...new Set([...CARDS.filter(id=>id[0]==='w').map(id=>id.slice(2)), ...Object.keys(KVG).filter(c=>isKanji(c)&&c!=='〇')])];
