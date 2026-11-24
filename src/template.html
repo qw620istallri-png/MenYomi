@@ -161,7 +161,8 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .grades button kbd.k{min-width:24px;height:24px;justify-self:start;margin-bottom:2px}
 @media (max-width:560px){.choices{grid-template-columns:minmax(0,1fr)}}
 /* review */
-.card{display:grid;gap:16px}
+.card{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}
+.card>*{min-width:0}
 .cardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .stage{display:flex;justify-content:center;align-items:center;min-height:min(58vh,560px);border:2px solid var(--rule);padding:24px;overflow:auto;background:var(--stage);position:relative;box-shadow:inset 0 2px 18px rgba(60,40,10,.18)}
 .stage::before,.stage::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--ink);pointer-events:none}
@@ -881,7 +882,7 @@ function showCard(){
       <div class="padbox"><div id="rpad" class="padhost"></div><div class="padside">
         <div class="row"><button class="btn" id="worder">${tr('Ordre des traits ▶','Stroke order ▶')}</button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo">${tr('Annuler','Undo')}</button><button class="btn" id="wclear">${tr('Effacer','Clear')}</button></div>
         <button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
-    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
+    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
     el.querySelector('#worder').onclick=()=>pad.animate(); el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
     el.querySelector('#wcheck').onclick=()=>{ const res=pad.check(); el.querySelector('#wres').innerHTML=res.html; el.querySelector('#wgr').innerHTML=wordChips(key)+'<div style="height:12px"></div>'+gradeButtons(id,res.suggest);
       el.querySelectorAll('#wgr .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
@@ -951,7 +952,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
 
 // ---------- writing pad (user brush uses the same Tool)
 class Pad{
-  constructor(host,ch,opt={}){ this.ch=ch; this.ghostOn=opt.ghost??true; host.innerHTML=''; const d=document.createElement('div'); d.className='pad'; host.appendChild(d); this.el=d;
+  constructor(host,ch,opt={}){ this.ch=ch; this.onFull=opt.onFull||null; this.ghostOn=opt.ghost??true; host.innerHTML=''; const d=document.createElement('div'); d.className='pad'; host.appendChild(d); this.el=d;
     ['paper','guide','ink','wet','over'].forEach(n=>{const c=document.createElement('canvas'); c.className=n; d.appendChild(c); this[n]=c;});
     this.strokes=[]; this.snaps=[]; this.resize();
     this.ro=new ResizeObserver(()=>{ if(Math.round(this.el.clientWidth*DPR)!==this.size) this.resize(); }); this.ro.observe(d);
@@ -1000,7 +1001,8 @@ class Pad{
       for(let i=1;i<=n;i++){ const t=i/n; this.tool.feed(this.last[0]+ux*len*t,this.last[1]+uy*len*t,w0*Math.pow(1-t,1.4)+0.02,this.v*1000*DPR); } }
     this.tool.end(); const ix=this.ink.getContext('2d'); this.snaps.push(ix.getImageData(0,0,this.size,this.size)); if(this.snaps.length>40) this.snaps.shift();
     ix.save(); ix.shadowColor='rgba(22,18,13,.3)'; ix.shadowBlur=this.size*0.004; ix.globalAlpha=0.95; ix.drawImage(this.wet,0,0); ix.restore(); this.wet.getContext('2d').clearRect(0,0,this.size,this.size);
-    this.strokes.push(this.cur.length>1?this.cur:[this.cur[0],[this.cur[0][0]+0.5,this.cur[0][1]+0.5]]); }
+    this.strokes.push(this.cur.length>1?this.cur:[this.cur[0],[this.cur[0][0]+0.5,this.cur[0][1]+0.5]]);
+    const gl=glyph(this.ch); if(this.onFull&&gl&&this.strokes.length===gl.strokes.length){ clearTimeout(this._full); this._full=setTimeout(()=>{ if(!this.drawing&&gl&&this.strokes.length===gl.strokes.length) this.onFull(); },420); } }
   check(){ const g=glyph(this.ch); const ref=g.strokes.map(st=>st.map(p=>[p[0]*0.9+5.45,p[1]*0.9+5.45]));
     const res=(a,n)=>{const c=[0];for(let i=1;i<a.length;i++)c.push(c[i-1]+Math.hypot(a[i][0]-a[i-1][0],a[i][1]-a[i-1][1]));const L=c[c.length-1]||1;const o=[];let j=0;for(let k=0;k<n;k++){const t=L*k/(n-1);while(j<c.length-2&&c[j+1]<t)j++;const f=(t-c[j])/((c[j+1]-c[j])||1);o.push([a[j][0]+(a[j+1][0]-a[j][0])*f,a[j][1]+(a[j+1][1]-a[j][1])*f])}return o};
     const md=(a,b)=>a.reduce((s,p,i)=>s+Math.hypot(p[0]-b[i][0],p[1]-b[i][1]),0)/a.length;
@@ -1188,7 +1190,7 @@ let atelierChar='焼', apad=null; const WRITABLE=[...new Set([...CARDS.filter(id
 function renderAtelier(){ const p=document.getElementById('apick');
   p.innerHTML=`<label class="lab" for="asel">Kanji</label><select id="asel" style="min-width:min(100%,280px)">${WRITABLE.map(c=>`<option value="${c}"${c===atelierChar?' selected':''}>${c} · ${esc(kInfo(c).mean)}</option>`).join('')}</select><button class="btn" id="arand">${tr('Au hasard','Random')}</button>`;
   p.querySelector('#asel').onchange=e=>{atelierChar=e.target.value; setA()}; p.querySelector('#arand').onclick=()=>{atelierChar=WRITABLE[Math.floor(Math.random()*WRITABLE.length)]; renderAtelier()};
-  if(!apad) apad=new Pad(document.getElementById('apad'),atelierChar,{ghost:true}); setA(); }
+  if(!apad) apad=new Pad(document.getElementById('apad'),atelierChar,{ghost:true,onFull:()=>document.getElementById('acheck').click()}); setA(); }
 function setA(){ apad.setChar(atelierChar); const k=kInfo(atelierChar);
   document.getElementById('ainfo').innerHTML=`<button class="chip" data-k="${atelierChar}"><span class="k">${atelierChar}</span><span class="m">${esc(k.mean)}</span></button><p style="margin:6px 0 0">${esc(k.on)} · ${esc(k.kun)}</p><p class="mono" style="margin:2px 0 0;color:var(--mute)">${k.strokes} ${tr('traits','strokes')}${k.jlpt?' · JLPT N'+k.jlpt:''}</p>`; document.getElementById('ares').innerHTML=''; }
 document.getElementById('aghost').onclick=e=>{apad.ghostOn=!apad.ghostOn; apad.drawGuide(); e.target.textContent=tr('Modèle : ','Guide: ')+(apad.ghostOn?tr('visible','on'):tr('masqué','off'))};
@@ -1435,7 +1437,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
       <span class="ochip"><b>${ONB.ch}</b><span>${esc(k.mean)} · ${k.strokes} ${tr('traits','strokes')}</span></span>
       <div class="orow"><button class="btn" id="oorder">${tr('Voir l’ordre ▶','Show the order ▶')}</button><button class="btn ghost" id="oclear">${tr('Effacer','Clear')}</button></div><div class="orow"><button class="btn k obig" id="onext" disabled>${tr('C’est écrit →','Done →')}</button></div><p class="ohint" id="ohint" aria-live="polite"></p></div>
       <div class="opad" id="opad"></div></div>`;
-    onbPad=new Pad(o.querySelector('#opad'),ONB.ch,{ghost:true}); setTimeout(()=>onbPad&&onbPad.animate(),700);
+    onbPad=new Pad(o.querySelector('#opad'),ONB.ch,{ghost:true,onFull:()=>{ const b=o.querySelector('#onext'); if(b){ b.disabled=false; b.click(); } }}); setTimeout(()=>onbPad&&onbPad.animate(),700);
     const upd=()=>{ const c=onbPad?onbPad.strokes.length:0; o.querySelector('#onext').disabled=c<Math.min(3,k.strokes||3); o.querySelector('#ohint').textContent=c?`${c} / ${k.strokes} ${tr('traits','strokes')}`:''; };
     onbPad.el.addEventListener('pointerup',()=>setTimeout(upd,30));
     o.querySelector('#oorder').onclick=()=>onbPad.animate(); o.querySelector('#oclear').onclick=()=>{ onbPad.clear(); upd(); };
