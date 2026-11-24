@@ -376,8 +376,8 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 <section class="view" id="v-revisions">
   <div class="vhead"><div class="stats" id="stats"></div>
     <div class="row" id="rctl"></div>
-    <div class="row"><label class="lab" for="newper" data-en="New / day">Nouvelles / jour</label><select id="newper"><option>5</option><option selected>10</option><option>20</option><option>30</option></select></div></div>
-  <div class="skills" id="skills"></div>
+    <div class="row"><label class="lab" for="newper" data-en="New / day">Nouvelles / jour</label><select id="newper"><option>5</option><option selected>10</option><option>20</option><option>30</option></select><button class="btn" id="skbtn" aria-expanded="false" aria-controls="skills" data-en="Progress">Progression</button></div></div>
+  <div class="skills" id="skills" hidden></div>
   <div class="panel card" id="card"></div>
 </section>
 
@@ -908,11 +908,14 @@ function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed())
     if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(w[2])}"]`).classList.add('good'); finish(false); } } }); }
 
 // how far each skill has come: reading, meaning, recalling the word, writing
-function renderSkills(){ const host=document.getElementById('skills'); if(!host) return; const now=Date.now();
+function renderSkills(){ const host=document.getElementById('skills'); if(!host||host.hidden) return; const now=Date.now();
   const K=[['r','読',tr('Lire','Read'),'var(--acc)'],['m','意',tr('Comprendre','Understand'),'var(--ok)'],['p','言',tr('Retrouver','Recall'),'var(--warn)'],['w','書',tr('Écrire','Write'),'var(--blue)']];
   host.innerHTML=K.map(([k,j,l,c])=>{ const all=CARDS.filter(id=>id[0]===k); const got=all.filter(id=>S.cards[id]&&S.cards[id].reps>0).length; const due=all.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const pc=all.length?got/all.length:0;
     return `<div class="sk" title="${esc(l)}"><span class="t"><span class="j">${j}</span>${esc(l)}</span><span class="bar" style="--c:${c}"><i style="width:${(pc*100).toFixed(1)}%"></i></span><span class="n">${got} / ${all.length}${due?` · ${due} ${tr('à revoir','due')}`:''}</span></div>`; }).join(''); }
 
+(function(){ const b=document.getElementById('skbtn'), h=document.getElementById('skills'); let on=false; try{ on=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
+  const set=v=>{ on=v; h.hidden=!v; b.setAttribute('aria-expanded',String(v)); b.classList.toggle('k',v); try{ localStorage.setItem('menyomi.skills',v?'1':'0'); }catch(e){} if(v) renderSkills(); };
+  set(on); b.onclick=()=>set(!on); })();
 // keyboard: Enter moves to the next step, 1–4 (or & é " ' on AZERTY) pick a choice or a grade
 const KEYMAP={'1':0,'2':1,'3':2,'4':3,'5':4,'&':0,'é':1,'"':2,"'":3,'(':4};
 let cardShownAt=0;
