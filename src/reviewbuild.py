@@ -1,7 +1,7 @@
 # builds scenes-review.html: the app page with everything hidden except the window shadows; tap/arrows cycle scenes, swipe or up/down change the hour
 src=open('kanji-pinceau.html',encoding='utf-8').read()
 css='<style>body>*:not(#shade):not(#veil):not(#light){display:none!important}html,body{min-height:100%;height:100%;overflow:hidden;touch-action:none;cursor:pointer}</style>'
-js='''<script>(function(){ const P=window.SHADE_POOL||[]; let i=0, hi=2; window.setShade=()=>{}; const HRS=[6.2,8,13,16.5,18.4,19.6,23];
+js='''<script>(function(){ const P=window.SHADE_POOL||[]; let i=0, hi=3; window.setShade=()=>{}; const SI=window.SUNINFO(), R0=SI.rise, S0=SI.set, D0=S0-R0; const HRS=[R0-.3,R0+.1,R0+.8,R0+D0*.25,SI.noon,S0-D0*.25,S0-.8,S0-.2,S0+.6,S0+3].map(h=>(h+24)%24);
  try{ localStorage.setItem('menyomi.onb','1'); }catch(e){}
  const show=()=>{ window.setShadeKind(P[i]); }; const go=d=>{ i=(i+d+P.length)%P.length; show(); }; const hr=d=>{ hi=(hi+d+HRS.length)%HRS.length; window.shadeHour(HRS[hi]); };
  setTimeout(()=>{ window.shadeHour(HRS[hi]); show(); },60);

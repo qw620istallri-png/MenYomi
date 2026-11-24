@@ -1647,7 +1647,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   const dayNo=()=>window.SUN_DAY??Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
   let DAY=dayNo(); const dayFx=()=>{ const r=rng(DAY*7919+13); return {wind:.65+r()*.9, mull:.38+r()*.12, rail:.34+r()*.12, tilt:(r()-.5)*.16}; }; let DFX=dayFx();
   // the scenes slide one screen along every day: today's Menus scene is tomorrow's Révisions scene
-  const POOL=['momiji','sudare','bamboo','shoji','pine','fuji','ginkgo','noren','hanabira','furin','sakura','ame','suzume','kumo'], TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
+  const POOL=['momiji','sudare','bamboo','shoji','pine','fuji','ginkgo','noren','hanabira','furin','sakura','ame'], TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
   const kindFor=v=>POOL[(((TABI[v]??0)+DAY)%POOL.length+POOL.length)%POOL.length]; let curTab='revisions';
   const shapes={
     momiji(x){ const L=[[-1.5,.5],[-.78,.82],[0,1],[.78,.82],[1.5,.5]]; x.moveTo(0,0); x.lineTo(Math.cos(-2.1)*.16,Math.sin(-2.1)*.16);
@@ -1772,7 +1772,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     const c=[1,2,3,4,5].map(i=>mix(A2[i],B2[i],e)); const glowA=A2[6]+(B2[6]-A2[6])*e, shadow=mix(A2[7],B2[7],e), sun2=A2[8]+(B2[8]-A2[8])*e;
     const lum=hx(c[0]).reduce((s2,v,i)=>s2+v*[.2126,.7152,.0722][i],0)/255; const night=lum<.42;
     // shadows: slant follows the sun across the sky, length grows toward sunrise and sunset (kept on the page, not realistic)
-    const x=clamp((hr-s.noon)/((s.set-s.rise)/2),-1,1); const sk=night? .3 : 1.45*x; const st=night? 1.05 : 0.8+0.85*Math.pow(Math.abs(x),1.6);
+    const x=clamp((hr-s.noon)/((s.set-s.rise)/2),-1,1); const sk=night? .3 : 0.8*x; const st=night? 1.05 : 0.85+0.42*Math.pow(Math.abs(x),1.6);
     return {night,sk,st,glow:c[4],pal:c,glowA,shadow,sun:sun2,vh:h,times:s}; }
   window.SUNINFO=()=>{ const s=sun(new Date()); return {place:place(),rise:s.rise,set:s.set,noon:s.noon,ph:phase()}; };
   const NIGHT_INK={'--ink':'#e8ebf8','--rule':'#cfd6f2','--mute':'#9ea8cf','--acc':'#ff6a4d','--acc-ink':'#0d1329','--blue':'#8aa0ff','--ok':'#4fd88f','--bad':'#ff6a55','--warn':'#ffb648'};
