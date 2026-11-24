@@ -1518,8 +1518,10 @@ function updScore(){ const s=document.querySelector('#mquest .sc'); if(s) s.inne
 function newQuest(){ const q=document.getElementById('mquest'); target=null; document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('good','bad','sel')); clearSel();
   document.querySelectorAll('.modes button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.m==='explore')===(mmode==='explore'))));
   if(mmode==='explore'||!MENU||!MENU.flat.length){ q.innerHTML=''; return; }
-  qmiss=false; const idx=MENU.flat.map((x,i)=>i); const kn=idx.filter(i=>knownWord(MENU.flat[i].w)); const pool=qpool==='known'&&kn.length? kn : idx;
-  let t=0; for(let k=0;k<6;k++){ t=pool[Math.floor(Math.random()*pool.length)]; if(t!==lastTarget||pool.length<2) break; } lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
+  qmiss=false; const idx=MENU.flat.map((x,i)=>i); const kn=idx.filter(i=>knownWord(MENU.flat[i].w)); if(qpool==='known'&&!kn.length&&(newQuest.tries=(newQuest.tries||0)+1)<12){ genMenu(); return; } newQuest.tries=0; const base=qpool==='known'&&kn.length? kn : idx;
+  // each word is asked once per menu; when none is left, a new menu is drawn
+  const asked=MENU.asked||(MENU.asked=new Set()); const pool=base.filter(i=>!asked.has(i)); if(!pool.length){ genMenu(); return; }
+  let t=0; for(let k=0;k<6;k++){ t=pool[Math.floor(Math.random()*pool.length)]; if(t!==lastTarget||pool.length<2) break; } asked.add(t); lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
   const main = mmode==='meaning'? w[2] : w[1]; const hidden = mmode==='meaning'? `${w[1]} · ${toRomaji(w[1])}` : w[2];
   const nk=MENU.flat.filter(x=>knownWord(x.w)).length;
   q.innerHTML=`<div class="quest"><div class="qgroups"><div class="qmode" role="group" aria-label="${tr('Indice donné','Clue')}"><button data-q="meaning" aria-pressed="${mmode==='meaning'}">${tr('Sens','Meaning')}</button><button data-q="reading" aria-pressed="${mmode==='reading'}">${tr('Lecture','Reading')}</button></div><div class="qmode" role="group" aria-label="${tr('Mots demandés','Words asked')}"><button data-p="known" aria-pressed="${qpool==='known'}" title="${tr('Mots déjà appris sur ce menu','Words you have learned on this menu')}">${tr('Mes mots','My words')} ${nk}</button><button data-p="all" aria-pressed="${qpool==='all'}">${tr('Tous','All')}</button></div></div>
