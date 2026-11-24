@@ -180,7 +180,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .cardhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .stage{display:flex;justify-content:center;align-items:center;min-height:min(58vh,560px);border:2px solid var(--rule);padding:24px;overflow:auto;background:var(--stage);position:relative;box-shadow:inset 0 2px 18px rgba(60,40,10,.18)}
 .stwrap{position:relative}.stools{position:absolute;top:10px;right:10px;display:flex;gap:6px;z-index:2}
-.ico{width:42px;height:42px;display:grid;place-items:center;padding:0;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);font-size:18px;font-weight:700;cursor:pointer;box-shadow:2px 2px 0 var(--rule)}.ico:hover{background:var(--soft)}.ico:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--rule)}.ico[aria-pressed=true]{background:var(--ink);color:var(--paper)}.printed{position:absolute;left:10px;bottom:10px;z-index:2;font-family:var(--f-body);font-size:28px;font-weight:600;padding:2px 12px;background:var(--sheet);border:2px solid var(--rule)}.ico[lang=ja]{font-family:var(--f-jp);font-size:20px}
+.ico{width:42px;height:42px;display:grid;place-items:center;padding:0;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);font-size:18px;font-weight:700;cursor:pointer;box-shadow:2px 2px 0 var(--rule)}.ico:hover{background:var(--soft)}.ico:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--rule)}.ico[aria-pressed=true]{background:var(--ink);color:var(--paper)}.prtag{position:absolute;left:10px;bottom:10px;z-index:2;font-family:var(--f-body);font-size:28px;font-weight:600;padding:2px 12px;background:var(--sheet);border:2px solid var(--rule)}.ico[lang=ja]{font-family:var(--f-jp);font-size:20px}
 .stage::before,.stage::after{content:"";position:absolute;width:14px;height:14px;border:2px solid var(--ink);pointer-events:none}
 .stage::before{top:8px;left:8px;border-right:none;border-bottom:none}.stage::after{bottom:8px;right:8px;border-left:none;border-top:none}
 .stage canvas{max-width:100%;display:block;box-shadow:0 12px 28px rgba(60,40,10,.28),0 2px 4px rgba(60,40,10,.2)}
@@ -1214,7 +1214,7 @@ function showCard(){
     draw(false);
     el.querySelector('#ragain').onclick=()=>{seed=newSeed(); draw(false)};
     el.querySelector('#rwatch').onclick=()=>draw(true);
-    el.querySelector('#rprint').onclick=e=>{ const w=el.querySelector('.stwrap'); const s=w.querySelector('.printed'); if(s){ s.remove(); e.currentTarget.setAttribute('aria-pressed','false'); return; } w.insertAdjacentHTML('beforeend',`<span class="printed" lang="ja">${esc(key)}</span>`); e.currentTarget.setAttribute('aria-pressed','true'); };
+    el.querySelector('#rprint').onclick=e=>{ const w=el.querySelector('.stwrap'); const s=w.querySelector('.prtag'); if(s){ s.remove(); e.currentTarget.setAttribute('aria-pressed','false'); return; } w.insertAdjacentHTML('beforeend',`<span class="prtag" lang="ja">${esc(key)}</span>`); e.currentTarget.setAttribute('aria-pressed','true'); };
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
         <div class="answer"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
@@ -1909,7 +1909,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 20:51 · cbf7a5</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.24 · 20:59 · acb312</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -1963,7 +1963,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.24 · 20:51 · cbf7a5';
+const BUILD='2026.11.24 · 20:59 · acb312';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
