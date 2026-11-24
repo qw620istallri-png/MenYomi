@@ -2,7 +2,7 @@ import json, hashlib
 full=open('kanji-pinceau.html',encoding='utf-8').read()
 ver=hashlib.sha1(full.encode()).hexdigest()[:8]
 head='''<!doctype html>
-<html lang="fr"><head><meta charset="utf-8">
+<html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f7f0e1">
 <meta name="description" content="Lire les menus japonais écrits à la main.">

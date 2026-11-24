@@ -83,6 +83,8 @@ body.touring nav.tabs{display:none}
 #onb .ochip b{font-family:var(--f-jp);font-size:34px;font-weight:600;line-height:1}
 #onb .ochip span{font-size:17px}
 #onb .orow{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+#onb .obig{font-size:21px;padding:15px 26px}
+#onb .obig:disabled{opacity:.45;cursor:not-allowed}
 #onb .opad{width:min(100%,46vh,460px);margin-inline:auto;border:2px solid var(--rule);box-shadow:8px 8px 0 var(--ink);background:var(--sheet)}
 #onb .opad .pad{width:100%}
 #onb .owrite{display:grid;place-items:center;border:2px solid var(--rule);box-shadow:8px 8px 0 var(--ink);background:var(--stage);padding:18px;min-height:340px;position:relative}
@@ -429,7 +431,7 @@ const DATA = __DATA__;
 const EN = __EN__;
 const EXPL = __EXPL__;
 const xp=w=>{ const e=EXPL[w]; return e?`<p class="xp">${esc(e[LANG==='en'?1:0])}</p>`:''; };
-const LANG=(()=>{try{return localStorage.getItem('menyomi.lang')==='en'?'en':'fr'}catch(e){return 'fr'}})(); const tr=(fr,en)=>LANG==='en'?en:fr;
+const LANG=(()=>{ let v=null; try{ v=localStorage.getItem('menyomi.lang'); }catch(e){} if(v==='en'||v==='fr') return v; const l=(navigator.languages&&navigator.languages[0])||navigator.language||'fr'; return /^fr\b/i.test(l)?'fr':'en'; })(); document.documentElement.lang=LANG; const tr=(fr,en)=>LANG==='en'?en:fr;
 if(LANG==='en'){ document.documentElement.lang='en'; document.title='Menyomi';
   document.querySelectorAll('[data-en]').forEach(e=>e.textContent=e.dataset.en); document.querySelectorAll('[data-en-ph]').forEach(e=>e.placeholder=e.dataset.enPh); document.querySelectorAll('[data-en-al]').forEach(e=>e.setAttribute('aria-label',e.dataset.enAl));
   DATA.words.forEach(w=>{ if(EN.w[w[0]]) w[2]=EN.w[w[0]]; }); Object.entries(EN.types).forEach(([k,v])=>{ if(DATA.types[k]) DATA.types[k].fr=v; }); }
@@ -1363,9 +1365,8 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
   const head=`<div class="otop"><span class="obrand">Menyomi<span class="jp">めん読み</span></span><div class="osteps">${steps.map((s2,i)=>`<span class="${i<n?'done':i===n?'on':''}" title="${s2[1]}">${s2[0]}</span>`).join('')}</div><button class="btn ghost oskip" id="oskip">${tr('Passer','Skip')}</button></div>`;
   if(n===0){
     o.innerHTML=head+`<div class="ostage in"><div><p class="okick">書く</p><h2>${tr('Écris ton <em>premier</em> kanji','Write your <em>first</em> kanji')}</h2>
-      <p class="olead">${tr('Suis le modèle au doigt ou à la souris, trait par trait.','Trace the model with your finger or mouse, stroke by stroke.')}</p>
       <span class="ochip"><b>${ONB.ch}</b><span>${esc(k.mean)} · ${k.strokes} ${tr('traits','strokes')}</span></span>
-      <div class="orow"><button class="btn" id="oorder">${tr('Voir l’ordre ▶','Show the order ▶')}</button><button class="btn ghost" id="oclear">${tr('Effacer','Clear')}</button><button class="btn k" id="onext" disabled>${tr('C’est écrit →','Done →')}</button></div><p class="ohint" id="ohint" aria-live="polite"></p></div>
+      <div class="orow"><button class="btn" id="oorder">${tr('Voir l’ordre ▶','Show the order ▶')}</button><button class="btn ghost" id="oclear">${tr('Effacer','Clear')}</button></div><div class="orow"><button class="btn k obig" id="onext" disabled>${tr('C’est écrit →','Done →')}</button></div><p class="ohint" id="ohint" aria-live="polite"></p></div>
       <div class="opad" id="opad"></div></div>`;
     onbPad=new Pad(o.querySelector('#opad'),ONB.ch,{ghost:true}); setTimeout(()=>onbPad&&onbPad.animate(),700);
     const upd=()=>{ const c=onbPad?onbPad.strokes.length:0; o.querySelector('#onext').disabled=c<Math.min(3,k.strokes||3); o.querySelector('#ohint').textContent=c?`${c} / ${k.strokes} ${tr('traits','strokes')}`:''; };
