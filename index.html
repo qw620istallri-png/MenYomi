@@ -1730,7 +1730,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   const dayNo=()=>window.SUN_DAY??Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
   let DAY=dayNo(); const dayFx=()=>{ const r=rng(DAY*7919+13); return {wind:.65+r()*.9, mull:.38+r()*.12, rail:.34+r()*.12, tilt:(r()-.5)*.16}; }; let DFX=dayFx();
   // the scenes slide one screen along every day: today's Menus scene is tomorrow's Révisions scene
-  const POOL=['momiji','sudare','bamboo','shoji','pine','ginkgo','hanabira','sakura'], TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
+  const POOL=['momiji','sudare','bamboo','shoji','pine','fuji','ginkgo','noren','hanabira','furin','sakura','ame','suzume','kumo'], TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
   const kindFor=v=>POOL[(((TABI[v]??0)+DAY)%POOL.length+POOL.length)%POOL.length]; let curTab='revisions';
   const shapes={
     momiji(x){ const L=[[-1.5,.5],[-.78,.82],[0,1],[.78,.82],[1.5,.5]]; x.moveTo(0,0); x.lineTo(Math.cos(-2.1)*.16,Math.sin(-2.1)*.16);
@@ -1740,6 +1740,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     bamboo(x){ x.moveTo(0,0); x.quadraticCurveTo(.32,-.14,1,0); x.quadraticCurveTo(.32,.14,0,0); },
     sakuraLeaf(x){ x.moveTo(0,0); x.quadraticCurveTo(.4,-.3,1,0); x.quadraticCurveTo(.4,.3,0,0); },
     blossom(x){ for(let k=0;k<5;k++){ const a=k*1.2566; x.moveTo(Math.cos(a)*.18,Math.sin(a)*.18); x.ellipse(Math.cos(a)*.3,Math.sin(a)*.3,.24,.17,a,0,6.3); } },
+    heart(x){ x.moveTo(0,0); x.bezierCurveTo(.05,-.6,.62,-.55,1,0); x.bezierCurveTo(.62,.55,.05,.6,0,0); },
     petal(x){ x.moveTo(0,.5); x.quadraticCurveTo(.55,.15,.3,-.46); x.lineTo(0,-.3); x.lineTo(-.3,-.46); x.quadraticCurveTo(-.55,.15,0,.5); },
     pine(x){ for(let k=-6;k<=6;k++){ const a=k*.09; x.moveTo(0,0); x.lineTo(Math.cos(a)*1,Math.sin(a)*1); } },
     twig(x){ x.moveTo(0,0); x.lineTo(1,0); }
@@ -1756,6 +1757,15 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     return {img:c,w:c.width/sc,h:c.height/sc}; }
   function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];
     if(kind==='sudare'||kind==='shoji') return {kind,br,items,off:r()};
+    if(kind==='noren') return {kind,br,items,n:3+Math.floor(r()*2),len:H*(.3+r()*.08),x0:W*(.02+r()*.1),off:r()};
+    if(kind==='fuji'){ const rac=[], lv=[]; for(let i=0;i<17;i++) rac.push({x:W*(.04+r()*1.0),y:14+r()*30,len:55+r()*75,ph:r()*6.3,n:14+Math.floor(r()*6)});
+      for(let i=0;i<9;i++) lv.push({x:W*r()*1.05,y:10+r()*40,a:Math.PI*(.3+r()*.4),len:40+r()*30,ph:r()*6.3}); return {kind,br,items,rac,lv}; }
+    if(kind==='furin'){ const st=[]; for(let i=0;i<4;i++) st.push({x:W*(.06+i*.09+r()*.03),ph:r()*6.3,lv:[...Array(11)].map(()=>({y:H*(.1+r()*.8),side:r()<.5?-1:1,s:15+r()*9,fl:r()<.3}))});
+      return {kind,br,items,bx:W*(.62+r()*.15),by:H*(.2+r()*.06),st}; }
+    if(kind==='ame'){ const dots=[], riv=[]; for(let i=0;i<90;i++) dots.push({x:W*(.04+r()*1.0),y:r()*H*.95,rad:1.2+r()*r()*4.5});
+      for(let i=0;i<9;i++) riv.push({x:W*(.08+r()*.95),v:.012+r()*.03,off:r()*(H+200),len:60+r()*140,ph:r()*6.3,rad:2.4+r()*2.4}); return {kind,br,items,dots,riv}; }
+    if(kind==='kumo'){ const cl=[]; for(let i=0;i<4;i++){ const pf=[], n=6+Math.floor(r()*5); for(let k=0;k<n;k++) pf.push([(k/(n-1)-.5)*W*(.7+r()*.3),(r()-.5)*40,40+r()*45]); cl.push({pf,y:H*(.1+i*.22+r()*.06),off:r()*W*3,v:.004+r()*.003}); }
+      return {kind,br,items,cl,wire:r()}; }
     if(kind==='hanabira'){ const base=makeScene('sakura',seed+1); const keep=new Set(); base.br.forEach((b,i)=>{ if(keep.size<3&&b.pts[0][0]>W*.4) keep.add(i); }); if(!keep.size) keep.add(0);
       const map=new Map([...keep].map((b,i)=>[b,i])); const br2=[...keep].map(i=>base.br[i]); const it2=base.items.filter(it=>keep.has(it.b)).map(it=>({...it,b:map.get(it.b)}));
       const petals=[]; for(let i=0;i<40;i++) petals.push({x0:W*(.05+r()*1.35),off:r()*(H+80),v:.011+r()*.013,s:10+r()*7,ph:r()*6.3,sp:(r()<.5?-1:1)*(.6+r()*1.4),dr:.25+r()*.25});
@@ -1764,6 +1774,11 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     const limb=(x0,y0,ang,len,w,par,pt,bend)=>{ const pts=[]; for(let i=0;i<=10;i++){ const t=i/10, a=ang+bend*t; pts.push([x0+Math.cos(ang+bend*t*.5)*len*t, y0+Math.sin(ang+bend*t*.5)*len*t, t]); } br.push({pts,ph:r()*6,w,par,pt}); return br.length-1; };
     const at=(b,t)=>{ const P=br[b].pts; const f=t*10, i=Math.min(9,Math.floor(f)), u=f-i; return [P[i][0]+(P[i+1][0]-P[i][0])*u, P[i][1]+(P[i+1][1]-P[i][1])*u]; };
     const dirAt=(b,t)=>{ const P=br[b].pts, i=Math.min(9,Math.floor(t*10)); return Math.atan2(P[i+1][1]-P[i][1],P[i+1][0]-P[i][0]); };
+    if(kind==='suzume'){ const L=limb(W+8,H*.42,Math.PI*1.03,W*1.05,7,null,0,-.18), L2=limb(W*.78,-8,Math.PI*.62,H*.42,4.5,null,0,.25);
+      for(const B of [L,L2]) for(let k=0;k<5;k++){ const t=.2+k*.16; const [bx,by]=at(B,t); const d=dirAt(B,t)+(k%2?-1:1)*(.6+r()*.5); const T=limb(bx,by,d,18+r()*26,1.6,B,t,(r()-.5)*.4);
+        for(const tq of [.4,.75,1]){ const [ex,ey]=at(T,tq); items.push({b:T,t:tq,ox:ex-bx,oy:ey-by,shape:'blossom',a:r()*6.3,s:r()<.7?7+r()*4:4+r()*2,ph:r()*6}); } }
+      const [x0,y0]=br[L].pts[0]; for(const [t,ph] of [[.3,0],[.52,2.1],[.71,4.4]]){ const [bx,by]=at(L,t); items.push({b:L,t,ox:bx-x0,oy:by-y0-3,shape:'sparrow',a:0,s:1,ph}); }
+      return {kind,br,items}; }
     if(kind==='momiji'){ const roots=[[W+8,H*.08,Math.PI*.86,W*1.15,7,.35],[W*.82,-8,Math.PI*.63,H*.72,5.5,-.3],[W+8,H*.58,Math.PI*1.06,W*.85,6,-.25],[W*.3,-8,Math.PI*.52,H*.34,4,.3]];
       for(const [x0,y0,ang,len,w,bd] of roots){ const L=limb(x0,y0,ang+(r()-.5)*.12,len*(.9+r()*.2),w,null,0,bd+(r()-.5)*.3);
         for(let k=0;k<6;k++){ const t=.18+k*.135+(r()-.5)*.05; const [bx,by]=at(L,t); const side=k%2?-1:1; const sa=dirAt(L,t)+side*(.5+r()*.55); const S=limb(bx,by,sa,len*(.2+r()*.14),w*.42,L,t,(r()-.5)*.7);
@@ -1851,17 +1866,53 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   let cur=null, prev=null, t0=0; const cache={};
   const sway=(b,t)=>(Math.sin(t*.00042+b.ph)*.05+Math.sin(t*.0011+b.ph*2)*.015)*(b.amp??1)*DFX.wind;
   let BT=[1,0,0,1,0,0];
+  // a sparrow perches, hops, turns round, flies off and comes back
+  function sparrow(x,t,it){ const T=17000, u=((t+it.ph*4100)%T)/T; let dx=0,dy=0,fly=false;
+    if(u>.7&&u<.8){ const k=(u-.7)/.1; dx=k*k*320; dy=-k*200; fly=true; } else if(u>=.8&&u<.9) return; else if(u>=.9){ const k=1-(u-.9)/.1; dx=-k*k*300; dy=-k*160; fly=true; }
+    const face=fly?1:(Math.floor((t+it.ph*900)/2600)%2?1:-1), hop=fly?0:Math.pow(Math.max(0,Math.sin((t+it.ph*700)*.0024)),12)*5;
+    x.translate(dx,dy-hop); x.scale(face*1.5,1.5); x.beginPath(); x.ellipse(0,-7,9,6.5,-.2,0,6.3); x.moveTo(13,-13); x.arc(8,-13,5,0,6.3); x.fill();
+    x.beginPath(); x.moveTo(12,-15); x.lineTo(16.5,-13); x.lineTo(12,-11); x.fill(); x.beginPath(); x.moveTo(-6,-8); x.lineTo(-17,-3); x.lineTo(-16,0); x.lineTo(-5,-3); x.fill();
+    if(fly){ const f=Math.sin(t*.06); x.beginPath(); x.moveTo(-3,-9); x.lineTo(-8+2*f,-9-15*f); x.lineTo(5,-10); x.fill(); }
+    else { x.lineWidth=1.3; x.beginPath(); x.moveTo(0,-1.5); x.lineTo(-1,3); x.moveTo(4,-1.5); x.lineTo(5,3); x.stroke(); } }
   function drawScene(sc,t,alpha){ const x=xa; x.globalAlpha=alpha;
     if(sc.kind==='sudare'){ x.setTransform(...BT); const sw=Math.sin(t*.0004)*4; for(let y=10;y<H*.62;y+=9) x.fillRect(-10,y+sw*(y/H),W+20,4.6); x.fillRect(-10,H*.62+sw*.6,W+20,16); for(const cx of [W*.3,W*.75]) x.fillRect(cx+sw*.5,0,2,H*.66); return; }
     if(sc.kind==='shoji'){ x.setTransform(...BT); // kumiko lattice of two sliding panels; the right one is half open on a gap of plain light
       const gap0=W*(.5+sc.off*.12), gap1=gap0+W*.17, cw=W*.13, rh=H*.075, top=-10, bot=H*.8;
       const panel=(x0,x1,dx)=>{ x.fillRect(x0,top,5,bot-top); x.fillRect(x1-5,top,5,bot-top); for(let cx=x0+dx;cx<x1-6;cx+=cw) x.fillRect(cx,top,1.8,bot-top); for(let cy=top+rh*.6;cy<bot;cy+=rh) x.fillRect(x0,cy,x1-x0,1.8); x.fillRect(x0,bot,x1-x0,7); };
       panel(-10,gap0,cw*.7); panel(gap1,W+30,cw*.35); x.fillRect(-10,bot+7,W+40,H*.035); x.globalAlpha=alpha*.5; x.fillRect(-10,bot+7+H*.035,W+40,3); x.globalAlpha=alpha; return; }
+    if(sc.kind==='noren'){ x.setTransform(...BT); x.translate(0,H*.2); x.fillRect(-14,-6,W+40,7); x.globalAlpha=alpha*.6; const n=sc.n, pw=(W+20-sc.x0)/n, h=sc.len;
+      for(let i=0;i<n;i++){ const a=sc.x0+i*pw+2, b=a+pw-4, ph=i*1.7+sc.off*6; const sw=y=>(Math.sin(t*.0009*DFX.wind+ph)*9+Math.sin(t*.0023+ph*2)*3)*Math.pow(y/h,1.4)*DFX.wind;
+        x.beginPath(); x.moveTo(a,0); for(let k=0;k<=8;k++){ const y=h*k/8; x.lineTo(a+sw(y),y); } for(let k=0;k<=6;k++) x.lineTo(a+(b-a)*k/6+sw(h),h+Math.sin(k*1.3+ph+t*.002)*2);
+        for(let k=8;k>=0;k--){ const y=h*k/8; x.lineTo(b+sw(y),y); } x.closePath(); x.fill(); } return; }
+    if(sc.kind==='fuji'){ x.setTransform(...BT); x.translate(0,H*.2); x.fillRect(-14,6,W+40,8); x.fillRect(-14,44,W+40,5); for(let k=0;k<6;k++) x.fillRect(W*k*.2-4,-10,5,64);
+      x.lineWidth=3; x.lineCap='round'; x.beginPath(); x.moveTo(-10,30); for(let k=0;k<=12;k++) x.lineTo(k/12*(W+20),26+Math.sin(k*1.7)*9); x.stroke();
+      for(const l of sc.lv){ const sw=Math.sin(t*.0008*DFX.wind+l.ph)*.08, ca=Math.cos(l.a+sw), sa=Math.sin(l.a+sw); x.lineWidth=1.2; x.beginPath(); x.moveTo(l.x,l.y); x.lineTo(l.x+ca*l.len,l.y+sa*l.len); x.stroke();
+        for(let k=1;k<=6;k++){ const u=k/6.5, px=l.x+ca*l.len*u, py=l.y+sa*l.len*u; for(const sd of [-1,1]){ const aa=l.a+sw+sd*.9; x.beginPath(); x.ellipse(px+Math.cos(aa)*6,py+Math.sin(aa)*6,6.5,2.4,aa,0,6.3); x.fill(); } } }
+      for(const q of sc.rac){ const sw=Math.sin(t*.0007*DFX.wind+q.ph)*7*DFX.wind+Math.sin(t*.0019+q.ph*3)*2; x.lineWidth=1; x.beginPath(); x.moveTo(q.x,q.y); x.lineTo(q.x+sw*.3,q.y+q.len*.15); x.stroke();
+        for(let k=0;k<q.n;k++){ const u=k/(q.n-1), y=q.y+q.len*(.12+.88*u), xx=q.x+sw*Math.pow(u,1.3)+(k%2?2.6:-2.6)*(1-u*.6), rd=5.4*(1-u*.7)+.9; x.beginPath(); x.ellipse(xx,y,rd,rd*.8,0,0,6.3); x.fill(); } } return; }
+    if(sc.kind==='furin'){ x.setTransform(...BT); x.translate(0,H*.2); x.fillRect(-14,-4,W+40,12);
+      for(const s of sc.st){ const sw=Math.sin(t*.0006*DFX.wind+s.ph)*3; x.lineWidth=1.5; x.beginPath(); x.moveTo(s.x,0); x.quadraticCurveTo(s.x+sw,H*.5,s.x+sw*.4,H+10); x.stroke();
+        for(const l of s.lv){ const lx=s.x+sw*(l.y/H)*1.2, a=l.side*(.9+Math.sin(t*.0012+l.y)*.12); x.setTransform(...BT); x.translate(0,H*.2); x.translate(lx,l.y); x.rotate(a); x.scale(l.s,l.s); x.beginPath();
+          if(l.fl){ x.moveTo(0,0); x.lineTo(.9,-.55); x.quadraticCurveTo(1.15,0,.9,.55); x.closePath(); } else shapes.heart(x); x.fill(); } }
+      // the bell swings on its string; its paper strip turns edge-on and back in the wind
+      const sa=Math.sin(t*.0011*DFX.wind+1)*.12*DFX.wind+Math.sin(t*.0031)*.03, by=sc.by; x.setTransform(...BT); x.translate(0,H*.2); x.translate(sc.bx,0); x.rotate(sa); x.lineWidth=1.1; x.beginPath(); x.moveTo(0,0); x.lineTo(0,by); x.stroke();
+      x.beginPath(); x.moveTo(-15,by+20); x.bezierCurveTo(-15,by-4,15,by-4,15,by+20); x.closePath(); x.fill(); x.fillRect(-1.5,by-4,3,5);
+      x.beginPath(); x.moveTo(0,by+18); x.lineTo(0,by+44); x.stroke(); const tw=Math.cos(t*.0017*DFX.wind+.5); x.translate(0,by+44); x.rotate(-sa*1.6); x.fillRect(-7*tw,0,14*tw,58); return; }
+    if(sc.kind==='ame'){ x.setTransform(...BT); const a0=x.globalAlpha; x.globalAlpha=a0*.12; x.fillRect(-400,-200,W+800,H+400); x.globalAlpha=a0;
+      x.lineWidth=1.3; for(const d of sc.dots){ x.beginPath(); x.arc(d.x,d.y,d.rad,0,6.3); x.stroke(); }
+      for(const q of sc.riv){ const L=H+q.len+60, y=((t*q.v+q.off)%L)-30, wig=k=>Math.sin(k*.05+q.ph)*3+Math.sin(k*.13+q.ph*2)*1.2;
+        x.lineWidth=1.6; x.beginPath(); x.moveTo(q.x+wig(y-q.len),y-q.len); for(let k=q.len;k>=0;k-=6) x.lineTo(q.x+wig(y-k),y-k); x.stroke();
+        x.lineWidth=2.2; x.beginPath(); x.ellipse(q.x+wig(y),y+q.rad*.3,q.rad,q.rad*1.25,0,0,6.3); x.stroke(); } return; }
+    if(sc.kind==='kumo'){ x.setTransform(...BT); const a0=x.globalAlpha;
+      for(const c of sc.cl){ const span=W*3.2, cx=((t*c.v*DFX.wind+c.off)%span)-W*1.1; x.globalAlpha=a0*.32; x.beginPath(); for(const [ox,oy,rr] of c.pf){ x.moveTo(cx+ox+rr,c.y+oy); x.arc(cx+ox,c.y+oy,rr,0,6.3); } x.fill(); }
+      x.globalAlpha=a0; const px=W*(.78+sc.wire*.12); x.fillRect(px-5,-10,10,H+20); x.fillRect(px-26,H*.12,52,4); x.fillRect(px-20,H*.2,40,3.5); x.fillRect(px+6,H*.26,16,26);
+      x.lineWidth=1.4; for(const [y0,y1,sag] of [[H*.12,H*.3,30],[H*.125,H*.36,36],[H*.2,H*.42,26]]){ x.beginPath(); x.moveTo(px-24,y0); x.quadraticCurveTo(px*.45,y0+sag+40,-20,y1); x.stroke(); } return; }
     x.setTransform(...BT);
     for(const b of sc.br){ const [x0,y0]=b.pts[0]; if(b.par==null){ b._r=0; b._x=x0; b._y=y0; } else { const P=sc.br[b.par]; const ap=P._r+sway(P,t)*b.pt*1.5; const dx=x0-P.pts[0][0], dy=y0-P.pts[0][1]; b._r=ap; b._x=P._x+dx*Math.cos(ap)-dy*Math.sin(ap); b._y=P._y+dx*Math.sin(ap)+dy*Math.cos(ap); } }
     sc.br.forEach(b=>{ const a0=sway(b,t); const [x0,y0]=b.pts[0]; x.lineWidth=b.w; x.lineCap='round'; x.lineJoin='round'; x.beginPath(); const nodes=[];
       b.pts.forEach(([px,py,tt],i)=>{ const a=b._r+a0*tt*1.5, dx=px-x0, dy=py-y0; const qx=b._x+dx*Math.cos(a)-dy*Math.sin(a), qy=b._y+dx*Math.sin(a)+dy*Math.cos(a); i?x.lineTo(qx,qy):x.moveTo(qx,qy); if(b.nodes&&i&&i<b.pts.length-1) nodes.push([qx,qy]); }); x.stroke(); for(const [qx,qy] of nodes){ x.beginPath(); x.ellipse(qx,qy,b.w*.85,b.w*.32,0,0,6.3); x.fill(); } });
     for(const it of sc.items){ const b=sc.br[it.b]; const x0=b.pts[0][0], y0=b.pts[0][1]; const a=b._r+sway(b,t)*it.t*1.5; const px=b._x+it.ox*Math.cos(a)-it.oy*Math.sin(a), py=b._y+it.ox*Math.sin(a)+it.oy*Math.cos(a);
+      if(it.shape==='sparrow'){ x.setTransform(...BT); x.translate(px,py); sparrow(x,t,it); continue; }
       const fl=Math.sin(t*.0016+it.ph)*(it.shape==='sprite'||it.shape==='twig'?.04:.22); x.setTransform(...BT); x.translate(px,py); x.rotate(it.a+fl+a); x.scale(it.s,it.s);
       if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); }
     if(sc.petals) for(const q of sc.petals){ const L=H+80, y=((t*q.v*DFX.wind+q.off)%L)-40; const px=q.x0-(y+40)*q.dr*DFX.wind+Math.sin(t*.0011+q.ph)*9;
@@ -1875,7 +1926,10 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over';
     xb.clearRect(0,0,W,H); xb.drawImage(A,0,0,W,H); }
   let last=0; function loop(t){ requestAnimationFrame(loop); if(document.hidden||t-last<66) return; last=t; frame(t); }
-  window.setShade=v=>{ curTab=v in TABI?v:'revisions'; const kind=kindFor(curTab); if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
+  window.setShade=v=>{ curTab=v in TABI?v:'revisions'; const kind=kindFor(curTab); if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+kind.charCodeAt(0)*17+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
+  // review hooks: show one scene by name, or pin the hour
+  window.SHADE_POOL=POOL; window.setShadeKind=k=>{ if(cur&&cur.kind===k) return; prev=cur; cur=cache[k]||(cache[k]=makeScene(k,k.length*131+7+k.charCodeAt(0)*17+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
+  window.shadeHour=h=>{ window.SUN_HOUR=h; applyPhase(); if(reduce) frame(performance.now()); };
   if(!reduce) requestAnimationFrame(loop);
 })();
 (function logo(){ const c=document.getElementById('logo'); const ch=KVG['麺']?'麺':'食';
@@ -1957,7 +2011,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 00:16 · 124db9</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 00:25 · 95dded</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2011,7 +2065,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 00:16 · 124db9';
+const BUILD='2026.11.25 · 00:25 · 95dded';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
