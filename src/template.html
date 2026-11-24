@@ -1646,7 +1646,9 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   // each day draws a slightly different garden: new seed, wind and window position
   const dayNo=()=>window.SUN_DAY??Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
   let DAY=dayNo(); const dayFx=()=>{ const r=rng(DAY*7919+13); return {wind:.65+r()*.9, mull:.38+r()*.12, rail:.34+r()*.12, tilt:(r()-.5)*.16}; }; let DFX=dayFx();
-  const KIND={revisions:'momiji',menu:'sudare',atelier:'bamboo',main:'pine',kanji:'ginkgo',vocab:'sakura'};
+  // the scenes slide one screen along every day: today's Menus scene is tomorrow's Révisions scene
+  const POOL=['momiji','sudare','bamboo','shoji','pine','ginkgo','hanabira','sakura'], TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
+  const kindFor=v=>POOL[(((TABI[v]??0)+DAY)%POOL.length+POOL.length)%POOL.length]; let curTab='revisions';
   const shapes={
     momiji(x){ const L=[[-1.5,.5],[-.78,.82],[0,1],[.78,.82],[1.5,.5]]; x.moveTo(0,0); x.lineTo(Math.cos(-2.1)*.16,Math.sin(-2.1)*.16);
       L.forEach(([a,r],i)=>{ const pa=i?L[i-1][0]:-2.1; const m=(pa+a)/2; x.lineTo(Math.cos(m)*.3,Math.sin(m)*.3); x.lineTo(Math.cos(a-.1)*r*.75,Math.sin(a-.1)*r*.75); x.lineTo(Math.cos(a)*r,Math.sin(a)*r); x.lineTo(Math.cos(a+.1)*r*.75,Math.sin(a+.1)*r*.75); });
@@ -1655,6 +1657,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     bamboo(x){ x.moveTo(0,0); x.quadraticCurveTo(.32,-.14,1,0); x.quadraticCurveTo(.32,.14,0,0); },
     sakuraLeaf(x){ x.moveTo(0,0); x.quadraticCurveTo(.4,-.3,1,0); x.quadraticCurveTo(.4,.3,0,0); },
     blossom(x){ for(let k=0;k<5;k++){ const a=k*1.2566; x.moveTo(Math.cos(a)*.18,Math.sin(a)*.18); x.ellipse(Math.cos(a)*.3,Math.sin(a)*.3,.24,.17,a,0,6.3); } },
+    petal(x){ x.moveTo(0,.5); x.quadraticCurveTo(.55,.15,.3,-.46); x.lineTo(0,-.3); x.lineTo(-.3,-.46); x.quadraticCurveTo(-.55,.15,0,.5); },
     pine(x){ for(let k=-6;k<=6;k++){ const a=k*.09; x.moveTo(0,0); x.lineTo(Math.cos(a)*1,Math.sin(a)*1); } },
     twig(x){ x.moveTo(0,0); x.lineTo(1,0); }
   };
@@ -1669,7 +1672,11 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       x.beginPath(); x.ellipse(cx,cy+2,L*.32,L*.22,0,0,6.3); x.fill(); }
     return {img:c,w:c.width/sc,h:c.height/sc}; }
   function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];
-    if(kind==='sudare') return {kind,br,items};
+    if(kind==='sudare'||kind==='shoji') return {kind,br,items,off:r()};
+    if(kind==='hanabira'){ const base=makeScene('sakura',seed+1); const keep=new Set(); base.br.forEach((b,i)=>{ if(keep.size<3&&b.pts[0][0]>W*.4) keep.add(i); }); if(!keep.size) keep.add(0);
+      const map=new Map([...keep].map((b,i)=>[b,i])); const br2=[...keep].map(i=>base.br[i]); const it2=base.items.filter(it=>keep.has(it.b)).map(it=>({...it,b:map.get(it.b)}));
+      const petals=[]; for(let i=0;i<40;i++) petals.push({x0:W*(.05+r()*1.35),off:r()*(H+80),v:.011+r()*.013,s:10+r()*7,ph:r()*6.3,sp:(r()<.5?-1:1)*(.6+r()*1.4),dr:.25+r()*.25});
+      return {kind,br:br2,items:it2,petals}; }
     // a limb with sub-branches and twigs; leaves are added by the caller on the twigs
     const limb=(x0,y0,ang,len,w,par,pt,bend)=>{ const pts=[]; for(let i=0;i<=10;i++){ const t=i/10, a=ang+bend*t; pts.push([x0+Math.cos(ang+bend*t*.5)*len*t, y0+Math.sin(ang+bend*t*.5)*len*t, t]); } br.push({pts,ph:r()*6,w,par,pt}); return br.length-1; };
     const at=(b,t)=>{ const P=br[b].pts; const f=t*10, i=Math.min(9,Math.floor(f)), u=f-i; return [P[i][0]+(P[i+1][0]-P[i][0])*u, P[i][1]+(P[i+1][1]-P[i][1])*u]; };
@@ -1757,19 +1764,25 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   function paint(){ const [pa,sh,so,stg,gl]=ph.pal; const S2=root.style; S2.setProperty('--paper',pa); S2.setProperty('--sheet',sh); S2.setProperty('--soft',so); S2.setProperty('--stage',stg); S2.setProperty('--glow',gl); S2.setProperty('--glowA',ph.glowA.toFixed(2)); S2.setProperty('--sun',(ph.night?.13:ph.sun).toFixed(3)); S2.setProperty('--shadow',ph.shadow);
     for(const [k2,v] of Object.entries(NIGHT_INK)) ph.night? S2.setProperty(k2,v) : S2.removeProperty(k2);
     document.querySelectorAll('meta[name=theme-color]').forEach(m=>m.content=matchMedia('(max-width:700px)').matches?sh:pa); }
-  let ph=phase(); let SHADOW='#1a1714'; const applyPhase=()=>{ ph=phase(); if(dayNo()!==DAY){ DAY=dayNo(); DFX=dayFx(); for(const k in cache) delete cache[k]; if(cur){ const k=cur.kind; cur=null; prev=null; window.setShade&&window.setShade(Object.keys(KIND).find(v=>KIND[v]===k)); } } if(root.dataset.theme!=='dark') paint(); SHADOW=ph.shadow||'#1a1714'; root.classList.toggle('night',ph.night); }; applyPhase(); setInterval(applyPhase,60000);
+  let ph=phase(); let SHADOW='#1a1714'; const applyPhase=()=>{ ph=phase(); if(dayNo()!==DAY){ DAY=dayNo(); DFX=dayFx(); for(const k in cache) delete cache[k]; if(cur){ cur=null; prev=null; window.setShade&&window.setShade(curTab); } } if(root.dataset.theme!=='dark') paint(); SHADOW=ph.shadow||'#1a1714'; root.classList.toggle('night',ph.night); }; applyPhase(); setInterval(applyPhase,60000);
   let cur=null, prev=null, t0=0; const cache={};
   const sway=(b,t)=>(Math.sin(t*.00042+b.ph)*.05+Math.sin(t*.0011+b.ph*2)*.015)*(b.amp??1)*DFX.wind;
   let BT=[1,0,0,1,0,0];
   function drawScene(sc,t,alpha){ const x=xa; x.globalAlpha=alpha;
     if(sc.kind==='sudare'){ x.setTransform(...BT); const sw=Math.sin(t*.0004)*4; for(let y=10;y<H*.62;y+=9) x.fillRect(-10,y+sw*(y/H),W+20,4.6); x.fillRect(-10,H*.62+sw*.6,W+20,16); for(const cx of [W*.3,W*.75]) x.fillRect(cx+sw*.5,0,2,H*.66); return; }
+    if(sc.kind==='shoji'){ x.setTransform(...BT); // kumiko lattice of two sliding panels; the right one is half open on a gap of plain light
+      const gap0=W*(.5+sc.off*.12), gap1=gap0+W*.17, cw=W*.13, rh=H*.075, top=-10, bot=H*.8;
+      const panel=(x0,x1,dx)=>{ x.fillRect(x0,top,5,bot-top); x.fillRect(x1-5,top,5,bot-top); for(let cx=x0+dx;cx<x1-6;cx+=cw) x.fillRect(cx,top,1.8,bot-top); for(let cy=top+rh*.6;cy<bot;cy+=rh) x.fillRect(x0,cy,x1-x0,1.8); x.fillRect(x0,bot,x1-x0,7); };
+      panel(-10,gap0,cw*.7); panel(gap1,W+30,cw*.35); x.fillRect(-10,bot+7,W+40,H*.035); x.globalAlpha=alpha*.5; x.fillRect(-10,bot+7+H*.035,W+40,3); x.globalAlpha=alpha; return; }
     x.setTransform(...BT);
     for(const b of sc.br){ const [x0,y0]=b.pts[0]; if(b.par==null){ b._r=0; b._x=x0; b._y=y0; } else { const P=sc.br[b.par]; const ap=P._r+sway(P,t)*b.pt*1.5; const dx=x0-P.pts[0][0], dy=y0-P.pts[0][1]; b._r=ap; b._x=P._x+dx*Math.cos(ap)-dy*Math.sin(ap); b._y=P._y+dx*Math.sin(ap)+dy*Math.cos(ap); } }
     sc.br.forEach(b=>{ const a0=sway(b,t); const [x0,y0]=b.pts[0]; x.lineWidth=b.w; x.lineCap='round'; x.lineJoin='round'; x.beginPath(); const nodes=[];
       b.pts.forEach(([px,py,tt],i)=>{ const a=b._r+a0*tt*1.5, dx=px-x0, dy=py-y0; const qx=b._x+dx*Math.cos(a)-dy*Math.sin(a), qy=b._y+dx*Math.sin(a)+dy*Math.cos(a); i?x.lineTo(qx,qy):x.moveTo(qx,qy); if(b.nodes&&i&&i<b.pts.length-1) nodes.push([qx,qy]); }); x.stroke(); for(const [qx,qy] of nodes){ x.beginPath(); x.ellipse(qx,qy,b.w*.85,b.w*.32,0,0,6.3); x.fill(); } });
     for(const it of sc.items){ const b=sc.br[it.b]; const x0=b.pts[0][0], y0=b.pts[0][1]; const a=b._r+sway(b,t)*it.t*1.5; const px=b._x+it.ox*Math.cos(a)-it.oy*Math.sin(a), py=b._y+it.ox*Math.sin(a)+it.oy*Math.cos(a);
       const fl=Math.sin(t*.0016+it.ph)*(it.shape==='sprite'||it.shape==='twig'?.04:.22); x.setTransform(...BT); x.translate(px,py); x.rotate(it.a+fl+a); x.scale(it.s,it.s);
-      if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); } }
+      if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); }
+    if(sc.petals) for(const q of sc.petals){ const L=H+80, y=((t*q.v*DFX.wind+q.off)%L)-40; const px=q.x0-(y+40)*q.dr*DFX.wind+Math.sin(t*.0011+q.ph)*9;
+      const fl=.35+.65*Math.abs(Math.sin(t*.0019+q.ph)); x.setTransform(...BT); x.translate(px,y); x.rotate(q.ph+t*.0012*q.sp); x.scale(q.s,q.s*fl); x.beginPath(); shapes.petal(x); x.fill(); } }
   function frame(t){ const {st,night}=ph; const sk=ph.sk+DFX.tilt; BT=[KS,0,KS*sk*.55,KS*st,-KS*sk*H*.16,0];
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over'; xa.clearRect(0,0,A.width,A.height);
     if(night){ xa.setTransform(...BT); xa.fillStyle='#c4d2ff'; xa.fillRect(W*.06,-10,W*.96,H*.74); xa.globalCompositeOperation='destination-out'; }
@@ -1779,7 +1792,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over';
     xb.clearRect(0,0,W,H); xb.drawImage(A,0,0,W,H); }
   let last=0; function loop(t){ requestAnimationFrame(loop); if(document.hidden||t-last<66) return; last=t; frame(t); }
-  window.setShade=v=>{ const kind=KIND[v]||'momiji'; if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
+  window.setShade=v=>{ curTab=v in TABI?v:'revisions'; const kind=kindFor(curTab); if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
   if(!reduce) requestAnimationFrame(loop);
 })();
 (function logo(){ const c=document.getElementById('logo'); const ch=KVG['麺']?'麺':'食';
