@@ -510,6 +510,14 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   #v-menu .quest{grid-template-columns:minmax(0,1fr) auto auto !important}
   #v-menu .quest .btn{padding:6px 12px}
 }
+
+.syncbox{display:flex;align-items:center;gap:12px;flex-wrap:wrap;border:2px solid var(--rule);background:var(--sheet);padding:10px 12px;margin:0 0 12px}
+.syncbox.on img,.syncbox.on>svg{width:36px;height:36px;border-radius:50%;border:2px solid var(--rule)}
+.syncbox.on>div{display:grid;flex:1;min-width:0}
+.syncbox.on>div span{font-family:var(--f-mono);font-size:14px;color:var(--mute)}
+.syncbox .bad,.hint.bad{color:var(--bad)}
+.gbtn{background:#fff;color:#1f1f1f;gap:10px}
+.gbtn:disabled{opacity:.6}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -741,7 +749,7 @@ const newSeed = () => (Math.random()*2**31)|0;
 const DPR = Math.min(2, window.devicePixelRatio||1);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const nextFrame = () => new Promise(r=>requestAnimationFrame(()=>r()));
-const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}, set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}, set(k,v,quiet){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} if(k==='kanjipinceau.v2'&&!quiet&&window.SYNC) SYNC.queue();}};
 
 // ---------- kana / romaji
 const KR={'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro','わ':'wa','を':'o','ん':'n','が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo','ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po','ぁ':'a','ぃ':'i','ぅ':'u','ぇ':'e','ぉ':'o','ゔ':'vu','〆':'shime'};
@@ -1051,7 +1059,7 @@ function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endS
 function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now();
   if(c.reps===0){ if(g===0)c.due=now+MIN; else if(g===1)c.due=now+6*MIN; else if(g===2){c.reps=1;c.ivl=1;c.due=now+DAY} else {c.reps=1;c.ivl=4;c.due=now+4*DAY} }
   else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=now+c.ivl*DAY; } }
-  return c; }
+  c.at=now; return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
 function grade(id,g){ if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
     SESSION.q.shift(); if(g===0) SESSION.q.push(id); showCard(); return; }
@@ -1072,7 +1080,7 @@ function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.fi
   const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{ endSession(); showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; if(b('#rtest')) b('#rtest').onclick=testMe; }
 function endSession(){ if(SESSION&&SESSION.test&&SESSION.n) TESTRES={ok:SESSION.ok,n:SESSION.n}; SESSION=null; }
 function testMe(){ const pool=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0); if(!pool.length) return; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),pool).slice(0,20),test:true,ok:0,n:0,seen:new Set()}; showCard(); }
-const newper=document.getElementById('newper'); newper.value=String(S.newPer); newper.onchange=()=>{S.newPer=+newper.value; store.set(SKEY,S); showCard();};
+const newper=document.getElementById('newper'); newper.value=String(S.newPer); newper.onchange=()=>{S.newPer=+newper.value; S.tp=Date.now(); store.set(SKEY,S); showCard();};
 function wordChips(word){ const cs=[...new Set([...word].filter(c=>isKanji(c)&&c!=='〇'))]; return `<div class="chips">${cs.map(c=>`<button class="chip" data-k="${c}"><span class="k">${c}</span><span class="m">${esc(kInfo(c).mean)}</span></button>`).join('')}</div>`; }
 const MEDIA=[ // reading-card looks: surface, tool, color, vertical
   {surface:'washi',tool:'brush',v:true,label:'papier, pinceau'},{surface:'kinari',tool:'brush',v:true,label:'bande de papier, pinceau'},{surface:'wood',tool:'brush',v:true,label:'plaque de bois, pinceau'},
@@ -1700,8 +1708,48 @@ function bindProgress(body){ const out=body.querySelector('#pcode'), msg=body.qu
   body.querySelector('#pfile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>stage(readCode(t))); };
   body.querySelector('#pimp').onclick=e=>{ if(!pending){ stage(readCode(body.querySelector('#ppaste').value)); return; }
     S=Object.assign({cards:{},day:'',newToday:0,newPer:10,todayIds:[],extraNew:0},pending); store.set(SKEY,S); pending=null; e.target.classList.remove('r'); e.target.textContent=tr('Importé ✓','Imported ✓'); renderStats(); if(location.hash==='#revisions'||!location.hash) showCard(); }; }
+
+// ---------- Google sign-in (Firebase) keeps the progress in sync across devices; the SDK loads only when needed
+const FBCONF={apiKey:"AIzaSyDrb2gnC9PYalYAFzv8oJwpJ6Bimonvy-Q",authDomain:"menyomi.firebaseapp.com",projectId:"menyomi",storageBucket:"menyomi.firebasestorage.app",messagingSenderId:"1098890822588",appId:"1:1098890822588:web:4ba5dd878b283afacf21b9"};
+const SITE_URL='https://qw620istallri-png.github.io/MenYomi/';
+function mergeState(a,b){ if(!b||!b.cards) return a; const out={...a,cards:{...a.cards}}; const lt=c=>c.at||(c.due-(c.ivl||0)*DAY);
+  for(const [id,c] of Object.entries(b.cards)){ const m=out.cards[id]; if(!m||lt(c)>lt(m)) out.cards[id]=c; }
+  if(b.day===a.day){ out.newToday=Math.max(a.newToday||0,b.newToday||0); out.extraNew=Math.max(a.extraNew||0,b.extraNew||0); out.todayIds=[...new Set([...(a.todayIds||[]),...(b.todayIds||[])])]; }
+  if((b.tp||0)>(a.tp||0)){ out.newPer=b.newPer; out.tp=b.tp; }
+  return out; }
+const SYNC=window.SYNC=(()=>{ let M=null, auth=null, db=null, user=null, timer=null, busy=false, last=0, err='', ld=null; const subs=new Set();
+  const emit=()=>subs.forEach(f=>{ try{f()}catch(e){} });
+  const load=()=> ld||(ld=Promise.all([import('./fb/firebase-app.js'),import('./fb/firebase-auth.js'),import('./fb/firebase-firestore-lite.js')]).then(([A,U,F])=>{
+      const app=A.initializeApp(FBCONF); auth=U.getAuth(app); db=F.getFirestore(app); M={U,F};
+      U.onAuthStateChanged(auth,u=>{ user=u; try{ localStorage.setItem('menyomi.sync',u?'1':'0'); }catch(e){} emit(); if(u) pull(); }); return M; }).catch(e=>{ ld=null; throw e; }));
+  const ref=()=>M.F.doc(db,'users',user.uid);
+  async function push(){ if(!user) return; clearTimeout(timer); await M.F.setDoc(ref(),{s:JSON.stringify(S),t:Date.now(),v:1}); last=Date.now(); err=''; emit(); }
+  async function pull(){ if(!user||busy) return; busy=true;
+    try{ const snap=await M.F.getDoc(ref()); let remote=null; if(snap.exists()){ try{ remote=JSON.parse(snap.data().s); }catch(e){} }
+      const merged=mergeState(S,remote); const a=JSON.stringify(merged);
+      if(a!==JSON.stringify(S)){ S=merged; store.set(SKEY,S,true); renderStats(); }
+      if(!remote||a!==JSON.stringify(remote)) await push(); last=Date.now(); err=''; }
+    catch(e){ err=String(e&&e.code||e); console.warn('sync',e); }
+    busy=false; emit(); }
+  document.addEventListener('visibilitychange',()=>{ if(!user) return; if(document.visibilityState==='visible') pull(); else if(timer) push().catch(()=>{}); });
+  let on=false; try{ on=localStorage.getItem('menyomi.sync')==='1'; }catch(e){} if(on) load().catch(()=>{});
+  return { get user(){return user}, get last(){return last}, get err(){return err}, sub(f){subs.add(f); return ()=>subs.delete(f);},
+    async signIn(){ err=''; await load(); const p=new M.U.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); await M.U.signInWithPopup(auth,p); },
+    async signOut(){ if(M&&auth){ await push().catch(()=>{}); await M.U.signOut(auth); } },
+    queue(){ if(!user) return; clearTimeout(timer); timer=setTimeout(()=>push().catch(e=>{ err=String(e&&e.code||e); emit(); }),2500); },
+    pull }; })();
+const GLOGO='<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
+function renderSync(host){ if(!host||!document.body.contains(host)) return; const u=SYNC.user;
+  const onSite=/github\.io$|^localhost$|^127\./.test(location.hostname);
+  const errMsg=e=>/popup-blocked|popup-closed|cancelled-popup/.test(e)? tr('Fenêtre de connexion fermée ou bloquée.','The sign-in window was closed or blocked.') : /unauthorized-domain|operation-not-supported|web-storage/.test(e)? tr('La connexion Google ne marche pas ici.','Google sign-in does not work here.') : /permission-denied/.test(e)? tr('Accès refusé par la base. Vérifie les règles Firestore.','The database refused access. Check the Firestore rules.') : e? tr('Synchronisation impossible pour l’instant.','Sync is not possible right now.') : '';
+  if(u){ const t=SYNC.last? new Date(SYNC.last).toLocaleTimeString(LANG==='en'?'en-GB':'fr-FR',{hour:'2-digit',minute:'2-digit'}) : '…';
+    host.innerHTML=`<div class="syncbox on">${u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:GLOGO}<div><b>${esc(u.displayName||u.email||'Google')}</b><span>${tr('Synchronisé','Synced')} ${t}${SYNC.err?` · <span class="bad">${esc(errMsg(SYNC.err))}</span>`:''}</span></div><button class="btn" id="gsyncnow" title="${tr('Synchroniser maintenant','Sync now')}">↻</button><button class="btn ghost" id="gout">${tr('Déconnexion','Sign out')}</button></div>`;
+    host.querySelector('#gout').onclick=()=>SYNC.signOut(); host.querySelector('#gsyncnow').onclick=()=>SYNC.pull(); return; }
+  host.innerHTML=`<div class="syncbox"><button class="btn gbtn" id="gin">${GLOGO}<span>${tr('Se connecter avec Google','Sign in with Google')}</span></button></div>${!onSite?`<p class="hint" style="margin:6px 0 0">${tr('Dans cet aperçu, Google bloque souvent la connexion. Elle marche sur','In this preview Google often blocks sign-in. It works on')} <a href="${SITE_URL}" target="_blank" rel="noopener">${tr('le site','the site')}</a>.</p>`:''}<p class="hint bad" id="gerr" style="margin:6px 0 0">${esc(errMsg(SYNC.err))}</p>`;
+  host.querySelector('#gin').onclick=async e=>{ const b=e.currentTarget; b.disabled=true; try{ await SYNC.signIn(); }catch(er){ const m=host.querySelector('#gerr'); if(m) m.textContent=errMsg(String(er&&er.code||er)||'x'); } b.disabled=false; }; }
 document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbody').innerHTML=`<div class="row"><button class="btn k" id="otour" style="font-size:18px;padding:12px 18px">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button></div><h2>${tr('Progression','Progress')}</h2>
-  <p style="margin:0">${tr('Elle reste dans ce navigateur. Pour passer d’un appareil à l’autre, copiez le code ici et collez-le là-bas.','It stays in this browser. To move between devices, copy the code here and paste it there.')}</p>
+  <div id="synchost"></div>
+  <p style="margin:0">${tr('Sans compte, elle reste dans ce navigateur. Pour la passer à un autre appareil, copiez le code ici et collez-le là-bas.','Without an account it stays in this browser. To move it to another device, copy the code here and paste it there.')}</p>
   <div class="row"><button class="btn k" id="pcopy">${tr('Copier le code','Copy the code')}</button><button class="btn" id="pdl"${document.querySelector('link[rel=manifest]')?'':' hidden'}>${tr('Télécharger','Download')}</button></div>
   <textarea class="field" id="pcode" rows="3" readonly hidden style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
   <textarea class="field" id="ppaste" rows="3" placeholder="${tr('Collez un code ici…','Paste a code here…')}" style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
@@ -1710,7 +1758,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgbod
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voice')} : VOICEVOX:冥鳴ひまり</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  `; bindProgress(document.getElementById('dlgbody')); document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
+  `; bindProgress(document.getElementById('dlgbody')); { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
 const ONB={ch:'牛', word:'牛丼', others:['親子丼','カツ丼','天丼']};

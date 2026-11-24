@@ -1,7 +1,7 @@
 import json, hashlib
 full=open('kanji-pinceau.html',encoding='utf-8').read()
 ver=hashlib.sha1(full.encode()+open('voice.mp3','rb').read()).hexdigest()[:8]
-import shutil; shutil.copy('voice.mp3','site/voice.mp3')
+import shutil; shutil.copy('voice.mp3','site/voice.mp3'); shutil.copytree('fb','site/fb',dirs_exist_ok=True)
 head='''<!doctype html>
 <html><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
