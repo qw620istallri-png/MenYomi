@@ -321,7 +321,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .vlist div span:first-child{font-family:var(--f-jp);font-size:19px;margin-right:8px}
 .search{width:min(100%,420px);font-size:18px;padding:10px 12px}
 /* dialog */
-dialog{border:2px solid var(--rule);border-radius:0;background:var(--sheet);color:var(--ink);padding:0;width:min(980px,calc(100vw - 20px));max-height:calc(100vh - 24px)}
+dialog{border:2px solid var(--rule);border-radius:0;background:var(--sheet);color:var(--ink);padding:0;width:min(980px,calc(100vw - 20px));max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overscroll-behavior:contain}
 dialog::backdrop{background:rgba(12,12,12,.62)}
 .dlg{padding:24px;display:grid;gap:14px}
 .dlg-top{display:flex;gap:24px;flex-wrap:wrap}
@@ -519,6 +519,9 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .quest .btn.go{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
 .qnext{float:right;margin:0 0 8px 12px}
 @media (max-width:700px){.qnext{float:none;display:flex;width:100%;justify-content:center;margin:0 0 10px}}
+
+.dlgend{justify-self:start;margin-top:6px}
+@media (max-width:700px){.dlgend{justify-self:stretch;justify-content:center;padding:12px}}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -1263,7 +1266,13 @@ function openWord(wd){ const w=WMAP[wd]; if(!w) return; const body=document.getE
     textCanvas(body.querySelector('#dwc'),w[0],{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),tool),size:clamp((v?Math.min(380,innerHeight*0.55):Math.min(520,innerWidth*0.5))/(n*0.95+0.6),34,110),vertical:v,surface:surf,pad:0.3}); };
   draw(); body.querySelector('#dwagain').onclick=draw; if(!dlg.open) dlg.showModal(); body.scrollTop=0; }
 document.getElementById('dlgbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(b){ openWord(b.dataset.w); } });
-const dlg=document.getElementById('dlg'); document.getElementById('dlgclose').onclick=()=>dlg.close(); dlg.addEventListener('click',e=>{if(e.target===dlg) dlg.close()});
+const dlg=document.getElementById('dlg'); document.getElementById('dlgclose').onclick=()=>dlg.close(); dlg.addEventListener('click',e=>{if(e.target===dlg||e.target.closest('.dlgend')) dlg.close()});
+// the phone's back button closes the dialog instead of leaving the page
+{ const open=dlg.showModal.bind(dlg); dlg.showModal=()=>{ open(); try{ history.pushState({dlg:1},''); }catch(e){} };
+  dlg.addEventListener('close',()=>{ try{ if(history.state&&history.state.dlg) history.back(); }catch(e){} });
+  addEventListener('popstate',()=>{ if(dlg.open) dlg.close(); }); }
+// a second close button at the end of long dialogs, within thumb reach
+new MutationObserver(()=>{ const b=document.getElementById('dlgbody'); if(b&&!b.querySelector('.dlgend')){ const x=document.createElement('button'); x.className='btn dlgend'; x.type='button'; x.textContent=tr('Fermer','Close'); b.appendChild(x); } }).observe(document.getElementById('dlgbody'),{childList:true});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-k]'); if(b){ if(dlg.open) dlg.close(); openKanji(b.dataset.k);} });
 
 // ---------- menu generator
