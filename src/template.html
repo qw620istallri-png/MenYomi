@@ -642,13 +642,13 @@ const VOICE = __VOICE__;
 // pre-rendered VOICEVOX clips packed in voice.mp3 ([offset,length] per word); the browser's Japanese voice fills in when a clip is missing or the file can't load
 const say=(()=>{ let buf=null, ld=null, ctx=null, cur=[]; const dec={};
   const load=()=> ld||(ld=fetch('voice.mp3').then(r=>{ if(!r.ok) throw new Error(r.status); return r.arrayBuffer(); }).then(b=>buf=b).catch(e=>{ ld=null; throw e; }));
-  const tts=txt=>{ try{ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang='ja-JP'; u.rate=0.9;
+  const tts=txt=>{ try{ if(!('speechSynthesis' in window)) return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang='ja-JP'; u.rate=0.78;
     const v=speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang)); const best=v.find(v=>/Kyoko|O-ren|Nanami|Google/i.test(v.name))||v[0]; if(best) u.voice=best; speechSynthesis.speak(u); }catch(e){} };
   return async (keys,reading,btn)=>{ keys=keys.filter(Boolean);
     const AC=window.AudioContext||window.webkitAudioContext; if(AC&&!ctx){ try{ ctx=new AC(); }catch(e){} } if(ctx&&ctx.state==='suspended') ctx.resume();
     if(btn){ btn.classList.add('on'); setTimeout(()=>btn.classList.remove('on'),900); }
     if(ctx && keys.length && keys.every(k=>VOICE[k])){ try{ await load(); cur.forEach(s=>{ try{s.stop()}catch(e){} }); cur=[]; let at=ctx.currentTime+0.02;
-        for(const k of keys){ const e=VOICE[k]; const ab=dec[k]||(dec[k]=await ctx.decodeAudioData(buf.slice(e[0],e[0]+e[1]))); const s=ctx.createBufferSource(); s.buffer=ab; s.connect(ctx.destination); s.start(at); at+=ab.duration+0.04; cur.push(s); }
+        for(const k of keys){ const e=VOICE[k]; const ab=dec[k]||(dec[k]=await ctx.decodeAudioData(buf.slice(e[0],e[0]+e[1]))); const s=ctx.createBufferSource(); s.buffer=ab; s.connect(ctx.destination); s.start(at); at+=ab.duration+0.18; cur.push(s); }
         return; }catch(e){} }
     tts(reading||keys.join('')); }; })();
 const SPK='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
