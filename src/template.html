@@ -354,6 +354,113 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .about p,.about li{max-width:70ch}
 .about a{text-decoration-thickness:2px;text-decoration-color:var(--acc)}
 @media (max-width:560px){.grades{grid-template-columns:repeat(2,minmax(0,1fr))}.grades button:nth-child(2){border-right:none}.grades button:nth-child(-n+2){border-bottom:1px solid var(--rule)}.dlg{padding:16px}}
+
+/* ---------- v9: phones fit one screen */
+.ph{display:none}
+.answerbar .ln{display:none}
+.stat small{font-size:.55em;font-weight:700;margin-left:1px}
+.stat.stog{background:transparent;border:none;border-left:1px solid var(--rule);cursor:pointer;color:inherit;font:inherit;font-family:var(--f-mono);font-size:14px;text-transform:uppercase;text-align:left}
+.stat.stog:hover{background:var(--soft)}
+.stat.stog.on{background:var(--ink);color:var(--paper)}
+.stat.stog .car{display:inline-block;transition:transform .2s}
+.stat.stog.on .car{transform:rotate(180deg)}
+.stat.stog.on b small{color:var(--paper)}
+.stats .stat:nth-child(2){border-right:none}
+.rctl{display:flex;gap:8px;align-items:stretch;flex-wrap:nowrap}
+.rctl .btn{white-space:nowrap}
+.rctl .btn:disabled{opacity:.45;cursor:not-allowed}
+.rctl .tres{align-self:center;font-family:var(--f-mono);font-size:14px;text-transform:uppercase;padding:0 6px}
+.skwrap{margin-bottom:16px}
+.skwrap .skills{margin-bottom:0;border-bottom:none}
+.skset{display:flex;align-items:center;justify-content:space-between;gap:12px;border:2px solid var(--rule);background:var(--sheet);padding:8px 12px}
+.skset select{padding:4px 8px}
+.wtools{display:flex;flex-wrap:wrap;gap:8px}
+.wtools #wcheck{background:var(--ink);color:var(--paper)}
+.wtools #wundo,.wtools #wclear{min-width:44px;justify-content:center;font-size:18px;padding-inline:10px}
+.grades{scroll-margin-bottom:86px}
+#onb .s0{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);grid-template-areas:"t p" "c p";align-content:center}
+#onb .s0 .otext{grid-area:t;align-self:end}
+#onb .s0 .opad{grid-area:p}
+#onb .s0 .octl{grid-area:c;align-self:start}
+#onb .ochiprow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+#onb .ochiprow .ohint{margin:0;min-height:0;font-family:var(--f-mono);font-size:15px}
+@media (max-width:760px){
+  #onb{padding:10px 14px 14px}
+  #onb .otop{margin-bottom:10px;padding-bottom:8px}
+  #onb .s0{grid-template-columns:minmax(0,1fr);grid-template-areas:"t" "p" "c";gap:12px}
+  #onb .s0 .okick{display:inline;font-size:30px;margin-right:6px;vertical-align:-2px}
+  #onb .s0 h2{display:inline;font-size:28px}
+  #onb .s0 .ochiprow{margin-top:10px}
+  #onb .s0 .ochip{padding:4px 10px;box-shadow:3px 3px 0 var(--blue)}
+  #onb .s0 .ochip b{font-size:26px}
+  #onb .s0 .ochip span{font-size:15px}
+  #onb .s0 .opad{width:min(100%,calc(100vh - 290px));width:min(100%,calc(100dvh - 290px));box-shadow:5px 5px 0 var(--ink)}
+  #onb .s0 .octl{display:flex;gap:8px;align-items:stretch}
+  #onb .s0 .orow{margin:0;flex-wrap:nowrap;gap:4px}
+  #onb .s0 .orow:last-child{flex:1}
+  #onb .s0 .obig{flex:1;justify-content:center;font-size:18px;padding:10px 12px}
+  #onb .ph{display:inline}#onb .dt{display:none}
+}
+@media (max-width:700px){
+  .ph{display:inline}.dt{display:none}
+  header.top{padding-block:10px 8px;gap:0 12px;align-items:center}
+  #logo{width:46px;height:46px;box-shadow:3px 3px 0 var(--blue)}
+  .mast h1{font-size:32px;gap:8px;flex-wrap:nowrap;white-space:nowrap}
+  .mast h1 .jp{font-size:15px}
+  .hctl .btn{padding:6px 10px}
+  header.top{grid-template-columns:auto minmax(0,1fr) auto}
+  .mast{min-width:0}
+  #v-revisions .vhead{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:10px 0}
+  .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stat{flex-direction:column;align-items:flex-start;gap:0;padding:3px 10px 5px;line-height:1.15;min-width:0}
+  .stat b{font-size:26px;line-height:1.05}
+  .stat>span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .rctl{gap:6px}
+  .rctl .btn{flex:1 1 0;justify-content:center;padding:8px 6px;min-width:0}
+  .rctl .tres{display:none}
+  .panel.card{padding:12px}
+  .card{gap:10px}
+  #rhand{display:none}
+  #rst.stage{min-height:0;height:clamp(170px,calc(100vh - 440px),440px);height:clamp(170px,calc(100dvh - 440px),440px);padding:8px}
+  .stage canvas{max-height:100%;width:auto;object-fit:contain}
+  .card .tools{flex-wrap:nowrap;gap:6px}
+  .card .tools .btn{padding:8px 8px;white-space:nowrap;flex:1 1 auto;justify-content:center}
+  .answerbar{grid-template-columns:minmax(0,1fr) auto}
+  .answerbar .ghost{display:none}
+  .answerbar input{padding:9px 12px;font-size:18px}
+  .answerbar.empty .lv{display:none}.answerbar.empty .ln{display:inline}
+  .prompt b{font-size:28px}
+  .prompt{font-size:16px}
+  .padbox{gap:10px}
+  #rpad.padhost{flex:none;width:min(100%,calc(100vh - 420px));width:min(100%,calc(100dvh - 420px));margin-inline:auto}
+  .padside{flex-basis:100%}
+  .wtools{display:grid;grid-template-columns:auto auto 44px 44px minmax(0,1fr);gap:6px}
+  .wtools .btn{padding:8px 8px;justify-content:center;white-space:nowrap}
+  .grades button{padding:8px}
+}
+
+@media (max-width:760px){
+  #onb .s1,#onb .s2{gap:12px}
+  #onb .s1 .okick,#onb .s2 .okick{display:inline;font-size:30px;margin-right:6px;vertical-align:-2px}
+  #onb .s1 h2,#onb .s2 h2{display:inline;font-size:28px}
+  #onb .s1 .owrite{min-height:0;height:clamp(150px,calc(100vh - 520px),420px);height:clamp(150px,calc(100dvh - 520px),420px);padding:10px;box-shadow:5px 5px 0 var(--ink)}
+  #onb .s1 .owrite canvas{max-height:100%;width:auto}
+  #onb .s1 .oans{margin-top:8px}
+  #onb .s1 .answer .w{display:none}
+  #onb .s1 .oparts{margin-top:8px}
+  #onb .s1 .orow,#onb .s2 .orow{margin-top:12px}
+  #onb .s2 .olead{margin:8px 0 0;font-size:17px}
+  #onb .s2 .omenu{box-shadow:5px 5px 0 var(--ink)}
+}
+@media (max-width:700px){
+  #mst.stage{height:clamp(120px,calc(100vh - 500px),320px);height:clamp(120px,calc(100dvh - 500px),320px);padding:8px !important}
+  #card .quest.mq{margin:0 !important;padding:8px 12px}
+  #mch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  #mch button{padding:8px 10px;font-size:15px;line-height:1.25;min-height:58px;align-items:center}
+  #rpad.padhost{width:min(100%,calc(100vh - 510px));width:min(100%,calc(100dvh - 510px))}
+  .prompt .hint{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
+@media (max-width:380px){.mast h1{font-size:28px}.mast h1 .jp{display:none}}
 </style>
 
 <div id="veil" aria-hidden="true"></div>
@@ -376,9 +483,8 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 
 <section class="view" id="v-revisions">
   <div class="vhead"><div class="stats" id="stats"></div>
-    <div class="row" id="rctl"></div>
-    <div class="row"><label class="lab" for="newper" data-en="New / day">Nouvelles / jour</label><select id="newper"><option>5</option><option selected>10</option><option>20</option><option>30</option></select><button class="btn" id="skbtn" aria-expanded="false" aria-controls="skills" data-en="Progress">Progression</button></div></div>
-  <div class="skills" id="skills" hidden></div>
+    <div class="rctl" id="rctl"></div></div>
+  <div class="skwrap" id="skwrap" hidden><div class="skills" id="skills"></div><div class="skset"><label class="lab" for="newper" data-en="New cards per day">Nouvelles cartes par jour</label><select id="newper"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option><option value="30">30</option></select></div></div>
   <div class="panel card" id="card"></div>
 </section>
 
@@ -702,7 +808,7 @@ function simulate(items, W, r){
 class Tool{
   constructor(ctx, kind, R, r, opt={}){ this.ctx=ctx; this.kind=kind; this.R=R; this.r=r; this.down=false; this.last=null; ctx.fillStyle='#000'; ctx.strokeStyle='#000';
     this.sm=opt.smooth??0.35; this.entry=opt.entry??true;
-    this.nb = kind==='brush'? clamp(Math.round(R/1.2),8,28) : kind==='chisel'? clamp(Math.round(R/1.5),6,16) : 0; }
+    this.fine=!!opt.fine; this.nb = kind==='brush'? (this.fine? clamp(Math.round(R/0.7),16,110) : clamp(Math.round(R/1.2),8,28)) : kind==='chisel'? clamp(Math.round(R/1.5),6,16) : 0; }
   begin(x,y,p,v){ this.down=true; this.ink=1; this.w=this.R*p; this.last=[x,y]; const r=this.r;
     this.bristles=Array.from({length:this.nb},(_,i)=>{const a=r()*6.28, d=Math.sqrt(r()); return {x:Math.cos(a)*d,y:Math.sin(a)*d*0.75,load:0.75+r()*0.25,on:true,f:(i/(Math.max(1,this.nb-1)))-0.5}});
     if(this.kind==='brush' && this.entry){ const c=this.ctx; c.beginPath(); c.ellipse(x,y,this.R*0.42*p+0.4,this.R*0.32*p+0.3,-0.6,0,7); c.fill(); }
@@ -718,8 +824,9 @@ class Tool{
     const core=w*0.5*Math.min(1,this.ink*1.35+0.05);
     if(core>0.35){ c.beginPath(); c.ellipse(x,y,core,core*0.78,-0.35,0,7); c.fill(); }
     const fast=Math.min(1,v/(this.R*90));
-    for(const b of this.bristles){ if(b.on && r()<0.006+0.03*(1.1-this.ink)*(0.3+fast)) b.on=false; else if(!b.on && r()<0.05*this.ink*b.load*(1.2-fast)) b.on=true;
-      if(!b.on) continue; c.beginPath(); c.arc(x+b.x*w*0.5,y+b.y*w*0.5,Math.max(0.45,w*0.085),0,7); c.fill(); }
+    const dry=this.fine?0.35:1, br=this.fine?0.06:0.085;
+    for(const b of this.bristles){ if(b.on && r()<(0.006+0.03*(1.1-this.ink)*(0.3+fast))*dry) b.on=false; else if(!b.on && r()<0.05*this.ink*b.load*(1.2-fast)/dry) b.on=true;
+      if(!b.on) continue; c.beginPath(); c.arc(x+b.x*w*0.5,y+b.y*w*0.5,Math.max(0.45,w*br),0,7); c.fill(); }
   }
   seg(x0,y0,x1,y1,p,v){ const c=this.ctx;
     if(p<0.08) return;
@@ -795,14 +902,14 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
 const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,{cards:{},day:'',newToday:0,newPer:10});
 const MIN=60e3, DAY=864e5; const today=()=>new Date().toISOString().slice(0,10);
 if(S.day!==today()){S.day=today(); S.newToday=0; S.extraNew=0; S.todayIds=[]}
-S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null;
+S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null, TESTRES=null; let SKON=false; try{ SKON=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
 const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','饂飩','寿司'];
 function buildCards(){ const ids=[], seen=new Set(); const order=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w))];
   order.forEach(w=>{ if(!/[一-鿿]/.test(w)) return; ids.push('r:'+w); ids.push('m:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
 const CARDS=buildCards();
 // meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
 const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m') return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
-function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; SESSION=null; } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
+function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endSession(); } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
   if(due.length) return due[0]; if(S.newToday<S.newPer+S.extraNew){const n=CARDS.find(id=>!S.cards[id]&&canIntro(id)); if(n) return n;}
   const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon[0]||null; }
 function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now();
@@ -810,18 +917,25 @@ function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const
   else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=now+c.ivl*DAY; } }
   return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
-function grade(id,g){ if(SESSION){ SESSION.q.shift(); if(g===0) SESSION.q.push(id); showCard(); return; }
+function grade(id,g){ if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
+    SESSION.q.shift(); if(g===0) SESSION.q.push(id); showCard(); return; }
   if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(!S.todayIds.includes(id)) S.todayIds.push(id); store.set(SKEY,S); showCard(); }
-function redoToday(){ SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
-function nextSet(){ S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
-function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?tr('encore une fois','once more'):tr('entraînement','practice')):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
+function redoToday(){ TESTRES=null; SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
+function nextSet(){ TESTRES=null; S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
+const PHONE=()=>matchMedia('(max-width:700px)').matches;
+function toGrades(){ if(!PHONE()) return; const g=document.querySelector('#card .grades'); if(g) setTimeout(()=>g.scrollIntoView({block:'end',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}),80); }
+function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?(SESSION.test?tr('remise en révision','back to reviews'):tr('encore une fois','once more')):(SESSION.test?tr('test','test'):tr('entraînement','practice'))):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
 function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const learned=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
   const nw=Math.max(0,Math.min(S.newPer+S.extraNew-S.newToday, CARDS.filter(id=>!S.cards[id]&&canIntro(id)).length)); const t=S.todayIds.length;
-  document.getElementById('stats').innerHTML= SESSION? `<span class="stat"><b>${SESSION.q.length}</b>${tr('à refaire','to redo')}</span><span class="stat">${tr('entraînement','practice')}</span>`
-    : `<span class="stat"><b>${due}</b>${tr('à revoir','due')}</span><span class="stat"><b>${nw}</b>${tr('nouvelles','new')}</span><span class="stat"><b>${learned}</b>/ ${CARDS.length} ${tr('apprises','learned')}</span>`;
-  const c=document.getElementById('rctl'); c.innerHTML= SESSION? `<button class="btn" id="rstop">${tr('Arrêter l’entraînement','Stop practice')}</button>`
-    : `${t?`<button class="btn" id="rredo">${tr('Refaire ceux du jour','Redo today’s')} (${t})</button>`:''}<button class="btn" id="rnext">${tr('Set suivant','Next set')} +${S.newPer}</button>`;
-  const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{SESSION=null; showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; }
+  const prog=`<button class="stat stog${SKON?' on':''}" id="skbtn" aria-expanded="${SKON}" aria-controls="skwrap" title="${tr('Progression','Progress')}"><b>${learned}<small>/${CARDS.length}</small></b><span>${tr('apprises','learned')} <span class="car" aria-hidden="true">▾</span></span></button>`;
+  document.getElementById('stats').innerHTML= SESSION? `<span class="stat"><b>${SESSION.q.length}</b><span>${SESSION.test?tr('à tester','to test'):tr('à refaire','to redo')}</span></span>${SESSION.test?`<span class="stat"><b>${SESSION.ok}<small>/${SESSION.n}</small></b><span>${tr('justes','right')}</span></span>`:`<span class="stat"><b>·</b><span>${tr('pratique','practice')}</span></span>`}${prog}`
+    : `<span class="stat"><b>${due}</b><span>${tr('à revoir','due')}</span></span><span class="stat"><b>${nw}</b><span>${tr('nouvelles','new')}</span></span>${prog}`;
+  const c=document.getElementById('rctl'); const known=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
+  c.innerHTML= SESSION? `<button class="btn" id="rstop">${SESSION.test?tr('Arrêter le test','Stop the test'):tr('Arrêter l’entraînement','Stop practice')}</button>`
+    : `${t?`<button class="btn" id="rredo" title="${tr('Refaire les cartes du jour','Redo today’s cards')}">${tr('Refaire','Redo')} ${t}</button>`:''}<button class="btn" id="rnext" title="${tr('Ajouter des nouvelles cartes aujourd’hui','Add new cards today')}">+${S.newPer} ${tr('mots','words')}</button><button class="btn" id="rtest"${known?'':' disabled'} title="${tr('Des cartes au hasard parmi celles apprises','Random cards among the learned ones')}">${tr('Me tester','Test me')}</button>${TESTRES?`<span class="tres">${tr('Test','Test')} ${TESTRES.ok}/${TESTRES.n}</span>`:''}`;
+  const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{ endSession(); showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; if(b('#rtest')) b('#rtest').onclick=testMe; }
+function endSession(){ if(SESSION&&SESSION.test&&SESSION.n) TESTRES={ok:SESSION.ok,n:SESSION.n}; SESSION=null; }
+function testMe(){ const pool=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0); if(!pool.length) return; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),pool).slice(0,20),test:true,ok:0,n:0,seen:new Set()}; showCard(); }
 const newper=document.getElementById('newper'); newper.value=String(S.newPer); newper.onchange=()=>{S.newPer=+newper.value; store.set(SKEY,S); showCard();};
 function wordChips(word){ const cs=[...new Set([...word].filter(c=>isKanji(c)&&c!=='〇'))]; return `<div class="chips">${cs.map(c=>`<button class="chip" data-k="${c}"><span class="k">${c}</span><span class="m">${esc(kInfo(c).mean)}</span></button>`).join('')}</div>`; }
 const MEDIA=[ // reading-card looks: surface, tool, color, vertical
@@ -832,7 +946,7 @@ let curAnim=null;
 const HANDS={kaisho:'soignée',hurry:'pressée',gyosho:'semi-cursive',sosho:'très cursive'}, HANDS_EN={kaisho:'neat',hurry:'hurried',gyosho:'semi-cursive',sosho:'very cursive'};
 const MEDIA_EN=['paper, brush','paper strip, brush','wooden plaque, brush','yellow poster, chisel marker','poster, red marker','slate, chalk','card, pen','paper, chisel marker'];
 function showCard(){
-  renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
+  renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard();
   if(!id){ const t=S.todayIds.length; el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2><div class="row" style="margin-top:12px">${t?`<button class="btn" id="dredo">${tr('Refaire ceux du jour','Redo today’s')} (${t})</button>`:''}<button class="btn k" id="dnext">${tr('Set suivant','Next set')} +${S.newPer}</button><a class="btn r" href="#menu">${tr('Défi menu','Menu challenge')}</a></div>`;
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; return; }
@@ -842,27 +956,27 @@ function showCard(){
   if(kind==='p'){ const w=WMAP[key];
     el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Inversée','Reverse')}</span></div>
       <div class="quest" style="margin:0;grid-template-columns:auto minmax(0,1fr)"><span class="q">${tr('Comment dit-on','How do you say')}</span><b>${esc(w[2])}</b></div>
-      <form class="answerbar" id="pform" autocomplete="off"><input id="pin" lang="ja" placeholder="${tr('romaji, kana ou kanji','romaji, kana or kanji')}" aria-label="${tr('Votre réponse','Your answer')}"><button class="btn k" type="submit">${tr('Vérifier','Check')}</button><button class="btn ghost" type="button" id="preveal">${tr('Je ne sais pas','I don’t know')}</button></form>
+      <form class="answerbar" id="pform" autocomplete="off"><input id="pin" lang="ja" placeholder="${tr('romaji, kana ou kanji','romaji, kana or kanji')}" aria-label="${tr('Votre réponse','Your answer')}"><button class="btn k" type="submit"><span class="lv">${tr('Vérifier','Check')}</span><span class="ln">${tr('Je ne sais pas','I don’t know')}</span></button><button class="btn ghost" type="button" id="preveal">${tr('Je ne sais pas','I don’t know')}</button></form>
       <div id="pans"></div>`;
     const reveal=res=>{ el.querySelector('#pform').querySelectorAll('input,button').forEach(x=>x.disabled=true); const a=el.querySelector('#pans');
       a.innerHTML=`${res===true?`<p class="feedback ok" style="margin:0 0 10px">${tr('Juste !','Correct!')}</p>`:res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
         <div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       const r=rng(newSeed()); const m=pick(r,MEDIA); const n=[...key].length; const box=a.querySelector('.stage').clientWidth-52;
       textCanvas(a.querySelector('#pc'),key,{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),m.tool),size:Math.floor(clamp(m.v?Math.min(110,(innerHeight*0.42)/(n*0.95+0.6)):Math.min(120,box/(n*0.95+0.6)),40,120)),vertical:m.v,surface:m.surface,color:m.color,pad:0.32});
-      a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
-    el.querySelector('#pform').onsubmit=e=>{ e.preventDefault(); const v=el.querySelector('#pin').value; if(!v.trim()){ el.querySelector('#pin').focus(); return; }
+      a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
+    el.querySelector('#pform').onsubmit=e=>{ e.preventDefault(); const v=el.querySelector('#pin').value; if(!v.trim()){ if(PHONE()) reveal(null); else el.querySelector('#pin').focus(); return; }
       const alts=WORDS.filter(x=>x[2]===w[2]); reveal(alts.some(x=>checkAnswer(v,x[0],x[1])===true)); };
     el.querySelector('#preveal').onclick=()=>reveal(null); return; }
   if(kind==='r'){
     const w=WMAP[key]; let seed=newSeed();
     el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Lecture','Reading')}</span><span class="mono" id="rhand" style="color:var(--mute)"></span></div>
       <div class="stage" id="rst"><canvas id="rc"></canvas></div>
-      <div class="row"><button class="btn" id="ragain">${tr('Autre main ↻','Another hand ↻')}</button><button class="btn" id="rwatch">${tr('Voir écrire ▶','Watch it written ▶')}</button><button class="btn ghost" id="rprint">${tr('Version imprimée','Printed form')}</button></div>
-      <form class="answerbar" id="rform" autocomplete="off"><input id="rin" lang="ja" placeholder="${tr('romaji ou kana','romaji or kana')}" aria-label="${tr('Votre lecture','Your reading')}"><button class="btn k" type="submit">${tr('Vérifier','Check')}</button><button class="btn ghost" type="button" id="reveal">${tr('Je ne sais pas','I don’t know')}</button></form>
+      <div class="row tools"><button class="btn" id="ragain" title="${tr('Autre écriture','Another handwriting')}"><span class="dt">${tr('Autre main ↻','Another hand ↻')}</span><span class="ph">${tr('Autre ↻','Other ↻')}</span></button><button class="btn" id="rwatch"><span class="dt">${tr('Voir écrire ▶','Watch it written ▶')}</span><span class="ph">${tr('Écrire ▶','Write ▶')}</span></button><button class="btn ghost" id="rprint"><span class="dt">${tr('Version imprimée','Printed form')}</span><span class="ph">${tr('Imprimé','Print')}</span></button></div>
+      <form class="answerbar" id="rform" autocomplete="off"><input id="rin" lang="ja" placeholder="${tr('romaji ou kana','romaji or kana')}" aria-label="${tr('Votre lecture','Your reading')}"><button class="btn k" type="submit"><span class="lv">${tr('Vérifier','Check')}</span><span class="ln">${tr('Je ne sais pas','I don’t know')}</span></button><button class="btn ghost" type="button" id="reveal">${tr('Je ne sais pas','I don’t know')}</button></form>
       <div id="rans"></div>`;
     const draw=(anim)=>{ const r=rng(seed); const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','hurry','gyosho','gyosho','sosho']);
       const wr=makeWriter(r,preset,m.tool); const box=el.querySelector('#rst').clientWidth-52; const n=[...key].length;
-      const size=Math.floor(clamp(m.v? Math.min(160, (innerHeight*0.6)/(n*0.95+0.6)) : Math.min(180, box/(n*0.95+0.6)), 48, 180));
+      const vmax=PHONE()? el.querySelector('#rst').clientHeight-24 : innerHeight*0.6; const size=Math.floor(clamp(m.v? Math.min(160, vmax/(n*0.95+0.6)) : Math.min(180, box/(n*0.95+0.6)), 48, 180));
       curAnim=textCanvas(el.querySelector('#rc'),key,{seed,writer:wr,size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35,anim,speedup:0.8}).token;
       el.querySelector('#rhand').textContent=LANG==='en'?`${MEDIA_EN[MEDIA.indexOf(m)]} · ${HANDS_EN[preset]} hand`:`${m.label} · main ${HANDS[preset]}`; };
     draw(false);
@@ -872,20 +986,19 @@ function showCard(){
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
         <div class="answer"><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
-      a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
-    el.querySelector('#rform').onsubmit=e=>{ e.preventDefault(); const r=checkAnswer(el.querySelector('#rin').value,key,w[1]); if(r==null){el.querySelector('#rin').focus(); return;} reveal(r); };
+      a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
+    el.querySelector('#rform').onsubmit=e=>{ e.preventDefault(); const v=el.querySelector('#rin').value; if(!v.trim()&&PHONE()){ reveal(null); return; } const r=checkAnswer(v,key,w[1]); if(r==null){el.querySelector('#rin').focus(); return;} reveal(r); };
     el.querySelector('#reveal').onclick=()=>reveal(null);
   } else {
     const k=kInfo(key); const ex=WORDS.find(w=>w[0].includes(key)&&w[0].length>1);
     el.innerHTML=`<div class="cardhead"><span class="pill b">${isNew?tr('Nouveau · ','New · '):''}${tr('Écriture','Writing')}</span><span class="mono" style="color:var(--mute)">${k.strokes} ${tr('traits','strokes')}</span></div>
       <div class="prompt"><b>${esc(k.mean)}</b><span>${esc(k.on)} · ${esc(k.kun)}</span>${ex?`<span class="hint">${esc(ex[0].replaceAll(key,'＿'))} · ${esc(ex[1])} · ${esc(ex[2])}</span>`:''}</div>
       <div class="padbox"><div id="rpad" class="padhost"></div><div class="padside">
-        <div class="row"><button class="btn" id="worder">${tr('Ordre des traits ▶','Stroke order ▶')}</button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo">${tr('Annuler','Undo')}</button><button class="btn" id="wclear">${tr('Effacer','Clear')}</button></div>
-        <button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
+        <div class="wtools"><button class="btn" id="worder"><span class="dt">${tr('Ordre des traits ▶','Stroke order ▶')}</span><span class="ph">${tr('Ordre ▶','Order ▶')}</span></button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo" aria-label="${tr('Annuler le dernier trait','Undo last stroke')}" title="${tr('Annuler (clic droit)','Undo (right-click)')}">↶</button><button class="btn" id="wclear" aria-label="${tr('Effacer','Clear')}" title="${tr('Effacer','Clear')}">✕</button><button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button></div><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
     const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
     el.querySelector('#worder').onclick=()=>pad.animate(); el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
     el.querySelector('#wcheck').onclick=()=>{ const res=pad.check(); el.querySelector('#wres').innerHTML=res.html; el.querySelector('#wgr').innerHTML=wordChips(key)+'<div style="height:12px"></div>'+gradeButtons(id,res.suggest);
-      el.querySelectorAll('#wgr .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
+      el.querySelectorAll('#wgr .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   }
 }
 
@@ -896,27 +1009,27 @@ function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed())
   const opts=shuffle(r,[w[2],...ds]);
   el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Sens','Meaning')}</span><span class="mono" id="mhand" style="color:var(--mute)"></span></div>
     <div class="stage" id="mst" style="min-height:0;padding-block:22px"><canvas id="mc"></canvas></div>
-    <div class="quest" style="margin:14px 0 12px;grid-template-columns:minmax(0,1fr)"><span class="q">${tr('Que veut dire ce mot ?','What does this word mean?')}</span></div>
+    <div class="quest mq" style="margin:14px 0 12px;grid-template-columns:minmax(0,1fr)"><span class="q">${tr('Que veut dire ce mot ?','What does this word mean?')}</span></div>
     <div class="choices" id="mch">${opts.map((m,i)=>`<button type="button" data-i="${i}"><kbd class="k">${i+1}</kbd><span>${esc(m)}</span></button>`).join('')}</div><div id="mans" style="margin-top:16px"></div>`;
   const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','gyosho']); const box=el.querySelector('#mst').clientWidth-52; const n=[...key].length;
-  const size=Math.floor(clamp(m.v? Math.min(120,(innerHeight*0.36)/(n*0.95+0.6)) : Math.min(160,box/(n*0.95+0.6)),44,160));
+  const mvh=PHONE()? el.querySelector('#mst').clientHeight-20 : innerHeight*0.36; const size=Math.floor(clamp(m.v? Math.min(120,mvh/(n*0.95+0.6)) : Math.min(160,box/(n*0.95+0.6)),44,160));
   textCanvas(el.querySelector('#mc'),key,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35});
   let tries=0, done=false;
   const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
     el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
-    el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
+    el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===w[2];
     if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(w[2])}"]`).classList.add('good'); finish(false); } } }); }
 
 // how far each skill has come: reading, meaning, recalling the word, writing
-function renderSkills(){ const host=document.getElementById('skills'); if(!host||host.hidden) return; const now=Date.now();
+function renderSkills(){ const host=document.getElementById('skills'), wr=document.getElementById('skwrap'); if(!host||!wr||wr.hidden) return; const now=Date.now();
   const K=[['r','読',tr('Lire','Read'),'var(--acc)'],['m','意',tr('Comprendre','Understand'),'var(--ok)'],['p','言',tr('Retrouver','Recall'),'var(--warn)'],['w','書',tr('Écrire','Write'),'var(--blue)']];
   host.innerHTML=K.map(([k,j,l,c])=>{ const all=CARDS.filter(id=>id[0]===k); const got=all.filter(id=>S.cards[id]&&S.cards[id].reps>0).length; const due=all.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const pc=all.length?got/all.length:0;
     return `<div class="sk" title="${esc(l)}"><span class="t"><span class="j">${j}</span>${esc(l)}</span><span class="bar" style="--c:${c}"><i style="width:${(pc*100).toFixed(1)}%"></i></span><span class="n">${got} / ${all.length}${due?` · ${due} ${tr('à revoir','due')}`:''}</span></div>`; }).join(''); }
 
-(function(){ const b=document.getElementById('skbtn'), h=document.getElementById('skills'); let on=false; try{ on=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
-  const set=v=>{ on=v; h.hidden=!v; b.setAttribute('aria-expanded',String(v)); b.classList.toggle('k',v); try{ localStorage.setItem('menyomi.skills',v?'1':'0'); }catch(e){} if(v) renderSkills(); };
-  set(on); b.onclick=()=>set(!on); })();
+function setSkills(v){ SKON=v; const h=document.getElementById('skwrap'); if(h) h.hidden=!v; const b=document.getElementById('skbtn'); if(b){ b.setAttribute('aria-expanded',String(v)); b.classList.toggle('on',v); } try{ localStorage.setItem('menyomi.skills',v?'1':'0'); }catch(e){} if(v) renderSkills(); }
+document.getElementById('stats').addEventListener('click',e=>{ if(e.target.closest('#skbtn')) setSkills(!SKON); });
+setSkills(SKON);
 // keyboard: Enter moves to the next step, 1–4 (or & é " ' on AZERTY) pick a choice or a grade
 const KEYMAP={'1':0,'2':1,'3':2,'4':3,'5':4,'&':0,'é':1,'"':2,"'":3,'(':4};
 let cardShownAt=0;
@@ -944,7 +1057,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
   const wr=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['brush','brush','chisel'])); const surf=pick(r,['kinari','washi','wood','white']);
   const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((innerHeight*0.5)/(n*0.95+0.7),30,60));
   const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
-    el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); };
+    el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); b.title=String(i+1); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
     textCanvas(cv,o,{seed:newSeed(),writer:wr,size,vertical:true,surface:surf,pad:0.32,valign:'start',minH:size*(n*0.95+0.75)});
     b.onclick=()=>{ if(done) return; tries++; if(o===key){ done=true; b.classList.add('good'); finish(tries===1); }
@@ -956,7 +1069,7 @@ class Pad{
     ['paper','guide','ink','wet','over'].forEach(n=>{const c=document.createElement('canvas'); c.className=n; d.appendChild(c); this[n]=c;});
     this.strokes=[]; this.snaps=[]; this.resize();
     this.ro=new ResizeObserver(()=>{ if(Math.round(this.el.clientWidth*DPR)!==this.size) this.resize(); }); this.ro.observe(d);
-    d.addEventListener('pointerdown',e=>this.down(e)); d.addEventListener('pointermove',e=>this.move(e)); d.addEventListener('pointerup',e=>this.up(e)); d.addEventListener('pointercancel',()=>this.up()); }
+    d.addEventListener('pointerdown',e=>{ if(e.button===2) return; this.down(e); }); d.addEventListener('contextmenu',e=>{ e.preventDefault(); if(!this.drawing){ this.undo(); d.dispatchEvent(new CustomEvent('padchange')); } }); d.addEventListener('pointermove',e=>this.move(e)); d.addEventListener('pointerup',e=>this.up(e)); d.addEventListener('pointercancel',()=>this.up()); }
   resize(){ const s=Math.round(this.el.clientWidth*DPR)||800; this.size=s; ['paper','guide','ink','wet','over'].forEach(n=>{this[n].width=this[n].height=s});
     const p=this.paper.getContext('2d'); fillSurface(p,'washi',s,s); p.strokeStyle='rgba(200,60,45,.35)'; p.lineWidth=Math.max(1,s/300); p.setLineDash([s/60,s/60]);
     p.beginPath(); p.moveTo(s/2,0); p.lineTo(s/2,s); p.moveTo(0,s/2); p.lineTo(s,s/2); p.stroke(); p.setLineDash([]); p.strokeStyle='rgba(200,60,45,.5)'; p.lineWidth=Math.max(1.5,s/220); p.strokeRect(s*0.02,s*0.02,s*0.96,s*0.96);
@@ -970,12 +1083,34 @@ class Pad{
       for(let k=0;k<=i;k++){const q=g.strokes[k][0]; gx.fillText(k+1,q[0]*this.size*0.9/109+this.size*0.05-this.size*0.04,q[1]*this.size*0.9/109+this.size*0.05)}
       if(p>=1){ i++; t0=now; if(i>=g.strokes.length){ setTimeout(()=>this.drawGuide(),900); return; } } this._raf=requestAnimationFrame(tick); };
     this._raf=requestAnimationFrame(tick); }
-  demo(){ // a simulated hand writes on the pad
-    this.clear(); const s=this.size, r=rng(newSeed()); const wr=makeWriter(r,'kaisho','brush',{mess:0.08}); const it=[{ch:this.ch,cx:s/2,cy:s/2,size:s*0.9}];
-    const sim=simulate(it,wr,r); const ix=this.ink.getContext('2d'); const layer=document.createElement('canvas'); layer.width=layer.height=s; const tool=new Tool(layer.getContext('2d'),'brush',s*0.9*0.085*wr.weight,r);
-    let i=0, t0=performance.now(); const fr=now=>{ const tt=(now-t0)/1000*0.75; let j=i; while(j<sim.samples.length&&sim.samples[j].t<=tt) j++; play(tool,sim.samples,i,j); i=j;
-      ix.clearRect(0,0,s,s); ix.save(); ix.globalCompositeOperation='source-over'; ix.drawImage(layer,0,0); ix.globalCompositeOperation='source-in'; ix.fillStyle='#161210'; ix.fillRect(0,0,s,s); ix.restore();
-      if(i<sim.samples.length) requestAnimationFrame(fr); }; requestAnimationFrame(fr); }
+  demo(){ // a simulated hand writes on the pad: each stroke is a filled ribbon whose width follows pressure, direction and speed
+    this.clear(); cancelAnimationFrame(this._demo); const s=this.size, r=rng(newSeed()); const wr=makeWriter(r,'kaisho','brush',{mess:0.05}); const it=[{ch:this.ch,cx:s/2,cy:s/2,size:s*0.9}];
+    const sim=simulate(it,wr,r), S=sim.samples; const R=s*0.9*0.07*wr.weight, unit=s*0.9, gap=Math.max(1,R*0.12);
+    // split into strokes, compute a smoothed width per sample
+    const strokes=[]; let cur=null;
+    S.forEach((q,k)=>{ if(q.p>0.035){ if(!cur){ cur={pts:[],k0:k}; strokes.push(cur); } const l=cur.pts[cur.pts.length-1]; if(!l||Math.hypot(q.x-l.x,q.y-l.y)>=gap) cur.pts.push({...q,k}); else { l.p=Math.max(l.p,q.p); l.k2=k; } } else cur=null; });
+    strokes.forEach(st=>{ const P=st.pts; for(let n=0;n<2;n++) for(let k=1;k<P.length-1;k++){ P[k].x=(P[k-1].x+P[k].x*2+P[k+1].x)/4; P[k].y=(P[k-1].y+P[k].y*2+P[k+1].y)/4; } });
+    strokes.forEach(st=>{ let w=null; const P=st.pts; st.L=0;
+      P.forEach((q,k)=>{ const a=P[Math.max(0,k-2)], b=P[Math.min(P.length-1,k+2)]; const dx=b.x-a.x, dy=b.y-a.y, l=Math.hypot(dx,dy)||1;
+        q.nx=-dy/l; q.ny=dx/l; const vert=Math.abs(dy)/l; const vn=q.v/unit;
+        const tw=R*Math.pow(q.p,1.25)*(0.74+0.42*vert)/(1+0.22*Math.max(0,vn-0.6));
+        w = w==null? tw*1.15 : w+(tw-w)*0.3; q.w=w; if(k) st.L+=Math.hypot(q.x-P[k-1].x,q.y-P[k-1].y); q.s=st.L; }); });
+    const ix=this.ink.getContext('2d');
+    const draw=upto=>{ ix.clearRect(0,0,s,s); ix.fillStyle='#161210';
+      for(const st of strokes){ if(st.k0>=upto) break; const P=st.pts.filter(q=>q.k<upto); if(P.length<2) continue;
+        const rr=rng(st.k0*7+3); const ph=rr()*6; const wob=k=>1+0.018*Math.sin(k*0.23+ph)+0.008*Math.sin(k*0.9+ph*2);
+        ix.beginPath(); P.forEach((q,k)=>{ const h=q.w*0.5*wob(k); k?ix.lineTo(q.x+q.nx*h,q.y+q.ny*h):ix.moveTo(q.x+q.nx*h,q.y+q.ny*h); });
+        for(let k=P.length-1;k>=0;k--){ const q=P[k], h=q.w*0.5*wob(k+40); ix.lineTo(q.x-q.nx*h,q.y-q.ny*h); } ix.closePath(); ix.fill();
+        // touch-down: the brush tip lands at an angle, a little to the upper left
+        const a=P[0], b2=P[Math.min(P.length-1,3)], ang=Math.atan2(b2.y-a.y,b2.x-a.x), w0=Math.max(P[Math.min(P.length-1,4)].w,R*0.6); ix.beginPath(); ix.ellipse(a.x+Math.cos(ang)*w0*0.18,a.y+Math.sin(ang)*w0*0.18,w0*0.56,w0*0.44,-0.7,0,7); ix.fill();
+        const e=P[P.length-1]; if(e.w>R*0.35){ ix.beginPath(); ix.arc(e.x,e.y,e.w*0.5,0,7); ix.fill(); }
+        // dry-brush streaks where the ink runs low on long strokes
+        const dryFrom=R*9; if(st.L>dryFrom){ ix.save(); ix.globalCompositeOperation='destination-out'; ix.lineCap='round';
+          for(let b=0;b<4;b++){ const off=(rr()-0.5)*0.75, lw=Math.max(0.8,R*0.022*(0.6+rr())); ix.lineWidth=lw; ix.beginPath(); let on=false;
+            P.forEach(q=>{ const d=(q.s-dryFrom)/(st.L-dryFrom+1); const x=q.x+q.nx*q.w*0.5*off, y=q.y+q.ny*q.w*0.5*off;
+              if(d>0.25&&rr()<0.93){ ix.globalAlpha=Math.min(0.5,d*0.6); on?ix.lineTo(x,y):ix.moveTo(x,y); on=true; } else on=false; }); ix.stroke(); }
+          ix.restore(); } } };
+    const t0=performance.now(); const fr=now=>{ const tt=(now-t0)/1000*0.8; let j=0; while(j<S.length&&S[j].t<=tt) j++; draw(j); if(j<S.length) this._demo=requestAnimationFrame(fr); }; this._demo=requestAnimationFrame(fr); }
   clear(){ this.ink.getContext('2d').clearRect(0,0,this.size,this.size); this.over.getContext('2d').clearRect(0,0,this.size,this.size); this.strokes=[]; this.snaps=[]; }
   undo(){ if(!this.snaps.length) return; this.ink.getContext('2d').putImageData(this.snaps.pop(),0,0); this.strokes.pop(); this.over.getContext('2d').clearRect(0,0,this.size,this.size); }
   xy(e){ const b=this.el.getBoundingClientRect(); return [(e.clientX-b.left)*this.size/b.width,(e.clientY-b.top)*this.size/b.height]; }
@@ -1433,29 +1568,29 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
   const steps=[['一',tr('Écrire','Write')],['二',tr('Retenir','Learn')],['三',tr('Trouver','Find')]];
   const head=`<div class="otop"><span class="obrand">Menyomi<span class="jp">めん読み</span></span><div class="osteps">${steps.map((s2,i)=>`<span class="${i<n?'done':i===n?'on':''}" title="${s2[1]}">${s2[0]}</span>`).join('')}</div><button class="btn ghost oskip" id="oskip">${tr('Passer','Skip')}</button></div>`;
   if(n===0){
-    o.innerHTML=head+`<div class="ostage in"><div><p class="okick">書く</p><h2>${tr('Écris ton <em>premier</em> kanji','Write your <em>first</em> kanji')}</h2>
-      <span class="ochip"><b>${ONB.ch}</b><span>${esc(k.mean)} · ${k.strokes} ${tr('traits','strokes')}</span></span>
-      <div class="orow"><button class="btn" id="oorder">${tr('Voir l’ordre ▶','Show the order ▶')}</button><button class="btn ghost" id="oclear">${tr('Effacer','Clear')}</button></div><div class="orow"><button class="btn k obig" id="onext" disabled>${tr('C’est écrit →','Done →')}</button></div><p class="ohint" id="ohint" aria-live="polite"></p></div>
-      <div class="opad" id="opad"></div></div>`;
+    o.innerHTML=head+`<div class="ostage in s0"><div class="otext"><p class="okick">書く</p><h2>${tr('Écris ton <em>premier</em> kanji','Write your <em>first</em> kanji')}</h2>
+      <div class="ochiprow"><span class="ochip"><b>${ONB.ch}</b><span>${esc(k.mean)} · ${k.strokes} ${tr('traits','strokes')}</span></span><span class="ohint" id="ohint" aria-live="polite"></span></div></div>
+      <div class="opad" id="opad"></div>
+      <div class="octl"><div class="orow"><button class="btn" id="oorder"><span class="dt">${tr('Voir l’ordre ▶','Show the order ▶')}</span><span class="ph">${tr('Ordre ▶','Order ▶')}</span></button><button class="btn ghost" id="oclear">${tr('Effacer','Clear')}</button></div><div class="orow"><button class="btn k obig" id="onext" disabled>${tr('C’est écrit →','Done →')}</button></div></div></div>`;
     onbPad=new Pad(o.querySelector('#opad'),ONB.ch,{ghost:true,onFull:()=>{ const b=o.querySelector('#onext'); if(b){ b.disabled=false; b.click(); } }}); setTimeout(()=>onbPad&&onbPad.animate(),700);
     const upd=()=>{ const c=onbPad?onbPad.strokes.length:0; o.querySelector('#onext').disabled=c<Math.min(3,k.strokes||3); o.querySelector('#ohint').textContent=c?`${c} / ${k.strokes} ${tr('traits','strokes')}`:''; };
-    onbPad.el.addEventListener('pointerup',()=>setTimeout(upd,30));
+    onbPad.el.addEventListener('pointerup',()=>setTimeout(upd,30)); onbPad.el.addEventListener('padchange',upd);
     o.querySelector('#oorder').onclick=()=>onbPad.animate(); o.querySelector('#oclear').onclick=()=>{ onbPad.clear(); upd(); };
     o.querySelector('#onext').onclick=()=>{ onbPad.check(); setTimeout(()=>tourStep(1),900); };
   }
   if(n===1){ if(onbPad&&onbPad.ro) onbPad.ro.disconnect(); onbPad=null;
-    o.innerHTML=head+`<div class="ostage in vfirst"><div><p class="okick">覚える</p><h2>${tr('Ton kanji <em>sur un menu</em>','Your kanji <em>on a menu</em>')}</h2>
+    o.innerHTML=head+`<div class="ostage in vfirst s1"><div><p class="okick">覚える</p><h2>${tr('Ton kanji <em>sur un menu</em>','Your kanji <em>on a menu</em>')}</h2>
       <div class="oans" id="oans"><div class="answer"><div class="w">${esc(w[0])}</div><div class="rd">${esc(w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
       <div class="oparts">${wordChips(w[0]).replace(/^<div class="chips">|<\/div>$/g,'')}</div>
       <div class="orow"><button class="btn k" id="onext">${tr('Le trouver sur un menu →','Find it on a menu →')}</button></div></div></div>
       <div class="owrite"><canvas id="ocv"></canvas></div></div>`;
-    const r=rng(4242), box=Math.min(o.querySelector('.owrite').clientWidth-40,520); const size=Math.floor(clamp(Math.min(150,(innerHeight*.5)/(2*.95+.6)),70,150));
+    const r=rng(4242), box=Math.min(o.querySelector('.owrite').clientWidth-40,520); const ovh=matchMedia('(max-width:760px)').matches? o.querySelector('.owrite').clientHeight-24 : innerHeight*.5; const size=Math.floor(clamp(Math.min(150,ovh/(2*.95+.6)),56,150));
     const show=()=>o.querySelector('#oans').classList.add('show');
     textCanvas(o.querySelector('#ocv'),w[0],{seed:4242,writer:makeWriter(r,'gyosho','brush'),size:Math.min(size,Math.floor(box/(2*.95+.6))*2),vertical:true,surface:'kinari',pad:0.3,anim:!matchMedia('(prefers-reduced-motion: reduce)').matches,speedup:0.9});
     setTimeout(show,2600); o.querySelector('#onext').onclick=()=>tourStep(2);
   }
   if(n===2){
-    o.innerHTML=head+`<div class="ostage in vfirst"><div><p class="okick">見つける</p><h2>${tr('Où est le <em>bol de bœuf</em> ?','Where is the <em>beef bowl</em>?')}</h2>
+    o.innerHTML=head+`<div class="ostage in vfirst s2"><div><p class="okick">見つける</p><h2>${tr('Où est le <em>bol de bœuf</em> ?','Where is the <em>beef bowl</em>?')}</h2>
       <p class="olead">${tr('Touche le bon plat sur le menu du comptoir.','Tap the right dish on the counter menu.')}</p><p class="ohint" id="ohint" aria-live="polite"></p>
       <div class="orow" id="oend" hidden><button class="btn k" id="ostart">${tr('Commencer les révisions →','Start reviewing →')}</button><a class="btn" href="#menu" id="omenu">${tr('Voir un vrai menu','See a full menu')}</a></div></div>
       <div class="omenu" id="ombd"><div class="ostamp" id="ostamp">合格</div></div></div>`;
