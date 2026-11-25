@@ -1526,7 +1526,8 @@ function openKanji(ch){ const body=document.getElementById('dlgbody'); const k=k
   const layer=document.createElement('canvas'); layer.width=layer.height=S0; drawRef(layer.getContext('2d'),ch,S0/2,S0/2,S0*0.86,{colors}); x.save(); x.globalCompositeOperation='multiply'; x.drawImage(layer,0,0); x.restore();
   const vr=()=>{ const box=body.querySelector('#dvar'); box.innerHTML=`<figure><div class="printed">${esc(ch)}</div><figcaption>${tr('imprimé','printed')}</figcaption></figure>`; const r=rng(newSeed());
     const opts=[['kaisho','brush','washi','pinceau soigné'],['hurry','brush','wood','pinceau pressé'],['gyosho','brush','kinari','semi-cursive'],['sosho','brush','washi','très cursive'],['hurry','chisel','yellow','feutre biseauté'],['hurry','marker','white','feutre rond'],['hurry','chalk','board','craie'],['gyosho','pen','cream','stylo']];
-    shuffle(r,opts).slice(0,4).forEach(([pr,tl,sf,cap])=>{ const f=document.createElement('figure'); const cv=document.createElement('canvas'); f.appendChild(cv); f.insertAdjacentHTML('beforeend',`<figcaption>${LANG==='en'?CAPEN[cap]:cap}</figcaption>`); box.appendChild(f);
+    const one=g=>pick(r,opts.filter(o=>g.includes(o[3]))); const pool=[one(['pinceau soigné','pinceau pressé']),one(['semi-cursive','très cursive']),...opts.filter(o=>!/pinceau|cursive/.test(o[3]))];
+    shuffle(r,pool).slice(0,4).forEach(([pr,tl,sf,cap])=>{ const f=document.createElement('figure'); const cv=document.createElement('canvas'); f.appendChild(cv); f.insertAdjacentHTML('beforeend',`<figcaption>${LANG==='en'?CAPEN[cap]:cap}</figcaption>`); box.appendChild(f);
       textCanvas(cv,ch,{seed:(r()*1e9)|0,writer:makeWriter(r,pr,tl),size:96,surface:sf,pad:0.16}); cv.style.width=''; }); };
   vr(); body.querySelector('#dregen').onclick=vr; body.querySelector('#dwrite').onclick=()=>{atelierChar=ch; dlg.close()};
   dlg.showModal(); body.scrollTop=0; }

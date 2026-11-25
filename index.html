@@ -1609,7 +1609,8 @@ function openKanji(ch){ const body=document.getElementById('dlgbody'); const k=k
   const layer=document.createElement('canvas'); layer.width=layer.height=S0; drawRef(layer.getContext('2d'),ch,S0/2,S0/2,S0*0.86,{colors}); x.save(); x.globalCompositeOperation='multiply'; x.drawImage(layer,0,0); x.restore();
   const vr=()=>{ const box=body.querySelector('#dvar'); box.innerHTML=`<figure><div class="printed">${esc(ch)}</div><figcaption>${tr('imprimé','printed')}</figcaption></figure>`; const r=rng(newSeed());
     const opts=[['kaisho','brush','washi','pinceau soigné'],['hurry','brush','wood','pinceau pressé'],['gyosho','brush','kinari','semi-cursive'],['sosho','brush','washi','très cursive'],['hurry','chisel','yellow','feutre biseauté'],['hurry','marker','white','feutre rond'],['hurry','chalk','board','craie'],['gyosho','pen','cream','stylo']];
-    shuffle(r,opts).slice(0,4).forEach(([pr,tl,sf,cap])=>{ const f=document.createElement('figure'); const cv=document.createElement('canvas'); f.appendChild(cv); f.insertAdjacentHTML('beforeend',`<figcaption>${LANG==='en'?CAPEN[cap]:cap}</figcaption>`); box.appendChild(f);
+    const one=g=>pick(r,opts.filter(o=>g.includes(o[3]))); const pool=[one(['pinceau soigné','pinceau pressé']),one(['semi-cursive','très cursive']),...opts.filter(o=>!/pinceau|cursive/.test(o[3]))];
+    shuffle(r,pool).slice(0,4).forEach(([pr,tl,sf,cap])=>{ const f=document.createElement('figure'); const cv=document.createElement('canvas'); f.appendChild(cv); f.insertAdjacentHTML('beforeend',`<figcaption>${LANG==='en'?CAPEN[cap]:cap}</figcaption>`); box.appendChild(f);
       textCanvas(cv,ch,{seed:(r()*1e9)|0,writer:makeWriter(r,pr,tl),size:96,surface:sf,pad:0.16}); cv.style.width=''; }); };
   vr(); body.querySelector('#dregen').onclick=vr; body.querySelector('#dwrite').onclick=()=>{atelierChar=ch; dlg.close()};
   dlg.showModal(); body.scrollTop=0; }
@@ -2249,7 +2250,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 11:07 · f51deb</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 11:12 · 5ec3e8</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2303,7 +2304,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 11:07 · f51deb';
+const BUILD='2026.11.25 · 11:12 · 5ec3e8';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
