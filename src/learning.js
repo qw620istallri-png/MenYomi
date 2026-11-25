@@ -1,11 +1,13 @@
 // Personal word list and daily practice reuse the existing cards.
 const favorite=w=>!!(S.favorites[w]&&S.favorites[w].on);
-function favoriteBtn(w){ return WMAP[w]?`<button class="btn ghost" type="button" data-favorite="${esc(w)}" aria-pressed="${favorite(w)}">${favorite(w)?tr('En favoris','Saved'):tr('Garder en favoris','Save word')}</button>`:''; }
+const FAV_SVG='<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9z"/></svg>';
+const favLabel=w=>favorite(w)?tr('Retirer des favoris','Remove from saved words'):tr('Garder en favori','Save word');
+function favoriteBtn(w){ return WMAP[w]?`<button class="fav" type="button" data-favorite="${esc(w)}" aria-pressed="${favorite(w)}" aria-label="${favLabel(w)}" title="${favLabel(w)}">${FAV_SVG}</button>`:''; }
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-favorite]'); if(!b) return;
   const w=b.dataset.favorite; if(!WMAP[w]) return;
   e.preventDefault(); e.stopPropagation(); S.favorites[w]={on:!favorite(w),at:Date.now()}; store.set(SKEY,S);
-  document.querySelectorAll('[data-favorite]').forEach(el=>{ if(el.dataset.favorite===w){ el.setAttribute('aria-pressed',String(favorite(w))); el.textContent=favorite(w)?tr('En favoris','Saved'):tr('Garder en favoris','Save word'); } });
+  document.querySelectorAll('[data-favorite]').forEach(el=>{ if(el.dataset.favorite===w){ el.setAttribute('aria-pressed',String(favorite(w))); el.setAttribute('aria-label',favLabel(w)); el.title=favLabel(w); el.classList.remove('pop-in'); void el.offsetWidth; if(favorite(w)) el.classList.add('pop-in'); } });
 },true);
 function reviewPersonal(){
   const ids=WORDS.filter(w=>favorite(w[0])).map(w=>firstId(w[0])); if(!ids.length) return;

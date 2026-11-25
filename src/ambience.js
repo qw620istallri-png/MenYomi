@@ -65,6 +65,8 @@ const Ambience=(()=>{
     root.style.setProperty('--background-texture',textures[choice.background]?'url('+textures[choice.background]+')':'none');
     root.dataset.background=choice.background;return choice;
   }
+  // review page: show one background by name
+  function background(kind){ if(!(kind in textures))textures[kind]=texture(kind); const root=document.documentElement; root.style.setProperty('--background-texture',textures[kind]?'url('+textures[kind]+')':'none'); root.dataset.background=kind; }
   function swing(element,strength=1){
     if(!element.animate||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     element.getAnimations().forEach(a=>a.cancel());const paper=element.classList.contains('note');
@@ -106,6 +108,6 @@ const Ambience=(()=>{
     function clear(){cancelAnimationFrame(frame);overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
     return {refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
   }
-  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
+  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
 })();
 if(typeof module!=='undefined')module.exports=Ambience;

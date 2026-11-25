@@ -428,6 +428,12 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .pop{position:absolute;z-index:20;width:min(390px,calc(100% - 20px));background:var(--sheet);color:var(--ink);border:2px solid var(--rule);box-shadow:6px 6px 0 var(--ink);padding:16px 18px 18px;text-align:left}
 .pop::before{content:"";position:absolute;left:calc(var(--ax,50%) - 9px);top:-11px;width:16px;height:16px;background:var(--sheet);border-left:2px solid var(--rule);border-top:2px solid var(--rule);transform:rotate(45deg)}
 .pop.up::before{top:auto;bottom:-11px;transform:rotate(225deg)}
+.whead{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}.pop .whead{padding-right:30px;justify-content:flex-start;align-items:flex-start}.pop .whead .fav{margin:10px 0 0 4px}
+.fav{flex:none;display:grid;place-items:center;width:40px;height:40px;margin:-6px -6px -6px 0;border:none;background:none;cursor:pointer;color:var(--ink);border-radius:50%}
+.fav svg{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linejoin:round;transition:fill .15s,transform .15s}
+.fav:hover svg{transform:scale(1.12)}.fav[aria-pressed="true"] svg{fill:#f6c624;stroke:var(--ink)}
+.fav.pop-in svg{animation:favpop .35s ease-out}@keyframes favpop{40%{transform:scale(1.35) rotate(-8deg)}100%{transform:none}}
+.fav:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
 .pop .x{position:absolute;top:6px;right:6px;border:none;background:none;color:var(--ink);font-size:20px;cursor:pointer;padding:4px 8px}
 .pop .chips .chip .m{max-width:16ch}
 .minfo .w,.pop .w{font-family:var(--f-jp);font-weight:600;font-size:50px;line-height:1.2}
@@ -1383,6 +1389,8 @@ const Ambience=(()=>{
     root.style.setProperty('--background-texture',textures[choice.background]?'url('+textures[choice.background]+')':'none');
     root.dataset.background=choice.background;return choice;
   }
+  // review page: show one background by name
+  function background(kind){ if(!(kind in textures))textures[kind]=texture(kind); const root=document.documentElement; root.style.setProperty('--background-texture',textures[kind]?'url('+textures[kind]+')':'none'); root.dataset.background=kind; }
   function swing(element,strength=1){
     if(!element.animate||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     element.getAnimations().forEach(a=>a.cancel());const paper=element.classList.contains('note');
@@ -1424,7 +1432,7 @@ const Ambience=(()=>{
     function clear(){cancelAnimationFrame(frame);overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
     return {refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
   }
-  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
+  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
 })();
 if(typeof module!=='undefined')module.exports=Ambience;
 
@@ -2007,7 +2015,7 @@ function priceBlock(it,m){ if(it.price==null) return '';
   return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">${it.price} ¥</span>${written!==it.price+'円'?`<span>${tr('écrit','written')} <b style="font-family:var(--f-jp);font-weight:600">${esc(written)}</b></span>`:''}<span>${esc(nr.kana)}</span><span class="mono" style="text-transform:none;color:var(--mute)">${esc(nr.romaji)}</span></div>`; }
 function showInfo(it,ok,btn,note){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
   showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}${note?`<p class="qnote">${esc(note)}</p>`:''}
-    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}${it.full?`<p class="full" lang="ja">${esc(it.full)}</p>`:''}<div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${hasKanji(w[0])?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}<div class="row">${favoriteBtn(w[0])}${reviewBtn(firstId(w[0]))}</div>
+    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}${it.full?`<p class="full" lang="ja">${esc(it.full)}</p>`:''}<div class="whead"><div class="w">${esc(w[0])}</div>${favoriteBtn(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${hasKanji(w[0])?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}${reviewBtn(firstId(w[0]))?`<div class="row">${reviewBtn(firstId(w[0]))}</div>`:''}
     ${priceBlock(it,m)}
     ${sec?`<p class="hint" style="margin:10px 0 0">${tr('Rubrique','Section')} ${esc(sec[0])} · ${esc(toRomaji(sec[1]))} · ${esc(sec[2])}</p>`:''}
     <div style="height:12px"></div>${wordChips(w[0]+(typeof it.price==='number'&&m.vertical?priceText(it.price,m.pstyle):''))}`, btn||it.btn); }
@@ -2172,7 +2180,7 @@ document.getElementById('vsearch').oninput=renderVocab;
 document.getElementById('vidx').addEventListener('click',e=>{ const b=e.target.closest('[data-ix]'); if(!b) return; const g=document.querySelector(`#vbody .vgroup[data-j="${b.dataset.ix}行"]`); if(g) g.scrollIntoView({block:'start',behavior:'auto'}); });
 document.getElementById('vbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(!b) return;
   const open=b.getAttribute('aria-expanded')==='true'; document.querySelectorAll('#vbody .vx').forEach(x=>x.remove()); document.querySelectorAll('#vbody .vrow').forEach(x=>x.setAttribute('aria-expanded','false')); if(open) return;
-  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+favoriteBtn(w[0])+reviewBtn(firstId(w[0]))+'</div></div>'; b.after(x);
+  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><div class="whead"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+favoriteBtn(w[0])+'</div>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+reviewBtn(firstId(w[0]))+'</div></div>'; b.after(x);
   const draw=()=>{ const r=rng(newSeed()); const v=pick(r,['kaisho','hurry','gyosho']); const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
     textCanvas(x.querySelector('canvas'),w[0],{seed:newSeed(),writer:makeWriter(r,v,tool),size:clamp((x.clientWidth-40)/([...w[0]].length+0.8),40,84),surface:surf,pad:0.3}); };
   x.querySelector('.btn').onclick=draw; draw(); });
@@ -2202,9 +2210,9 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   const W=300,H=480; let KS=1; B.width=W; B.height=H;
   const fitRes=()=>{ const cw=A.getBoundingClientRect().width||innerWidth*.82; KS=clamp(cw/W/1.3,1,2.6)*Math.min(1.5,DPR>1?1.15:1); A.width=Math.round(W*KS); A.height=Math.round(H*KS);
     // which part of the canvas is actually on screen (the canvas overhangs the window and is tilted by CSS): undo the CSS matrix for each window corner
-    const cw2=A.offsetWidth||1, ch2=A.offsetHeight||1, ol=A.offsetLeft, ot=A.offsetTop, vw=innerWidth, vh=innerHeight;
+    const cw2=A.offsetWidth||1, ch2=A.offsetHeight||1, ol=A.offsetLeft, ot=A.offsetTop, vw=innerWidth, vh=innerHeight; RHO=(cw2/A.width)/(ch2/A.height);
     VQ=[[0,0],[vw,0],[0,vh],[vw,vh]].map(([sx,sy])=>{ const X=sx-(ol+cw2), Y=sy-ot, lx=X/(.75-.0008*X), ly=Y*(1+.0008*lx)+.0625*lx; return [clamp((cw2+lx)*A.width/cw2,0,A.width), clamp(ly*A.height/ch2,0,A.height)]; }); };
-  let VQ=null;
+  let VQ=null, FPQ=null, RHO=1;
   fitRes(); addEventListener('resize',()=>{ clearTimeout(fitRes._t); fitRes._t=setTimeout(()=>{ fitRes(); if(reduce) frame(performance.now()); },300); });
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
   // each day draws a slightly different garden: new seed, wind and window position
@@ -2236,7 +2244,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       x.lineWidth=.95; x.beginPath(); for(let k=0;k<nn;k++){ const a=-Math.PI/2+lean+(k/(nn-1)-.5)*Math.PI*1.25+(r()-.5)*.08; const l=L*(.7+r()*.35)*(1-.25*Math.abs(Math.sin(a))*0); x.moveTo(cx,cy+2); x.lineTo(cx+Math.cos(a)*l,cy+2+Math.sin(a)*l*.85); } x.stroke();
       x.beginPath(); x.ellipse(cx,cy+2,L*.32,L*.22,0,0,6.3); x.fill(); }
     return {img:c,w:c.width/sc,h:c.height/sc}; }
-  function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];if(kind==='chochin'){const count=Ambience.selection(curTab).lanterns,anchors=count===3?[.25,.53,.81]:count===4?[.18,.40,.62,.84]:[.15,.325,.5,.675,.85];return{kind,br,items,lanterns:anchors.map((a,i)=>({x:W*(a+(r()-.5)*.02),y:H*(.08+(i%2)*.1+r()*.025),scale:(count===3?.76:count===4?.66:.56)+r()*.15,ph:r()*6.3}))};}
+  function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];if(kind==='chochin'){const count=Ambience.selection(curTab).lanterns,anchors=count===3?[.25,.53,.81]:count===4?[.18,.40,.62,.84]:[.15,.325,.5,.675,.85];return{kind,br,items,lanterns:anchors.map((a,i)=>({u:a+(r()-.5)*.02,dv:(i%2)*.06+r()*.02,x:W*(a+(r()-.5)*.02),y:H*(.08+(i%2)*.1+r()*.025),scale:(count===3?.76:count===4?.66:.56)+r()*.15,ph:r()*6.3}))};}
     if(kind==='sudare'||kind==='shoji') return {kind,br,items,off:r()};
     if(kind==='noren') return {kind,br,items,n:3+Math.floor(r()*2),len:H*(.3+r()*.08),x0:W*(.02+r()*.1),off:r()};
     if(kind==='fuji'){ const rac=[], lv=[]; for(let i=0;i<17;i++) rac.push({x:W*(.04+r()*1.0),y:14+r()*30,len:55+r()*75,ph:r()*6.3,n:14+Math.floor(r()*6)});
@@ -2347,6 +2355,8 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   let cur=null, prev=null, t0=0; const cache={};
   const sway=(b,t)=>(Math.sin(t*.00042+b.ph)*.05+Math.sin(t*.0011+b.ph*2)*.015)*(b.amp??1)*DFX.wind;
   let BT=[1,0,0,1,0,0];
+  // the part of the scene that is on screen (window corners TL, TR, BL, BR in scene units): focal objects are placed inside it, so a wide screen keeps them in view
+  const inView=(u,v)=>{ if(!FPQ) return [u*W,v*H]; const [a,b,c,d]=FPQ, k=(i)=>a[i]*(1-u)*(1-v)+b[i]*u*(1-v)+c[i]*(1-u)*v+d[i]*u*v; return [k(0),k(1)]; };
   // a sparrow perches, hops, turns round, flies off and comes back
   function sparrow(x,t,it){ const T=17000, u=((t+it.ph*4100)%T)/T; let dx=0,dy=0,fly=false;
     if(u>.7&&u<.8){ const k=(u-.7)/.1; dx=k*k*320; dy=-k*200; fly=true; } else if(u>=.8&&u<.9) return; else if(u>=.9){ const k=1-(u-.9)/.1; dx=-k*k*300; dy=-k*160; fly=true; }
@@ -2358,7 +2368,8 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   function drawScene(sc,t,alpha){ const x=xa; x.globalAlpha=alpha;
     if(sc.kind==='chochin'){
       for(const lamp of sc.lanterns){
-        x.save();x.setTransform(...BT);x.translate(lamp.x,lamp.y);x.rotate(Math.sin(t*.0004+lamp.ph)*.006);x.scale(lamp.scale,lamp.scale);
+        const [lx,ly]=FPQ?inView(lamp.u,.1+lamp.dv):[lamp.x,lamp.y], fw=FPQ?Math.hypot(FPQ[1][0]-FPQ[0][0],FPQ[1][1]-FPQ[0][1])/W:1, ls=Math.min(lamp.scale*clamp(fw/.75,.6,1.15), .8*fw*W/sc.lanterns.length/68*Math.sqrt(RHO));
+        x.save();x.setTransform(...BT);x.translate(lx,ly);x.rotate(Math.sin(t*.0004+lamp.ph)*.006);x.scale(ls/Math.sqrt(RHO),ls*Math.sqrt(RHO));
         x.lineWidth=1.2;x.beginPath();x.moveTo(0,-100);x.lineTo(0,-15);x.stroke();
         x.globalAlpha=alpha*.23;x.beginPath();x.ellipse(0,57,34,70,0,0,6.3);x.fill();
         x.globalAlpha=alpha*.7;x.fillRect(-15,-15,30,7);x.fillRect(-15,122,30,7);
@@ -2382,12 +2393,13 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
         for(let k=1;k<=6;k++){ const u=k/6.5, px=l.x+ca*l.len*u, py=l.y+sa*l.len*u; for(const sd of [-1,1]){ const aa=l.a+sw+sd*.9; x.beginPath(); x.ellipse(px+Math.cos(aa)*6,py+Math.sin(aa)*6,6.5,2.4,aa,0,6.3); x.fill(); } } }
       for(const q of sc.rac){ const sw=Math.sin(t*.0007*DFX.wind+q.ph)*7*DFX.wind+Math.sin(t*.0019+q.ph*3)*2; x.lineWidth=1; x.beginPath(); x.moveTo(q.x,q.y); x.lineTo(q.x+sw*.3,q.y+q.len*.15); x.stroke();
         for(let k=0;k<q.n;k++){ const u=k/(q.n-1), y=q.y+q.len*(.12+.88*u), xx=q.x+sw*Math.pow(u,1.3)+(k%2?2.6:-2.6)*(1-u*.6), rd=5.4*(1-u*.7)+.9; x.beginPath(); x.ellipse(xx,y,rd,rd*.8,0,0,6.3); x.fill(); } } return; }
-    if(sc.kind==='furin'){ x.setTransform(...BT); x.translate(0,H*.2); x.fillRect(-14,-4,W+40,12);
+    if(sc.kind==='furin'){ const [bx,bTop]=inView(.64,.36), rail=Math.min(H*.2,Math.max(inView(.64,.03)[1],-H*.15)); x.setTransform(...BT); x.translate(0,rail); x.fillRect(-14-W,-4,W*3,12);
+      sc.st.forEach((s,i)=>{ s.x=inView(.05+i*.1,.5)[0]; });
       for(const s of sc.st){ const sw=Math.sin(t*.0006*DFX.wind+s.ph)*3; x.lineWidth=1.5; x.beginPath(); x.moveTo(s.x,0); x.quadraticCurveTo(s.x+sw,H*.5,s.x+sw*.4,H+10); x.stroke();
-        for(const l of s.lv){ const lx=s.x+sw*(l.y/H)*1.2, a=l.side*(.9+Math.sin(t*.0012+l.y)*.12); x.setTransform(...BT); x.translate(0,H*.2); x.translate(lx,l.y); x.rotate(a); x.scale(l.s,l.s); x.beginPath();
+        for(const l of s.lv){ const lx=s.x+sw*(l.y/H)*1.2, a=l.side*(.9+Math.sin(t*.0012+l.y)*.12); x.setTransform(...BT); x.translate(0,rail); x.translate(lx,l.y); x.rotate(a); x.scale(l.s,l.s); x.beginPath();
           if(l.fl){ x.moveTo(0,0); x.lineTo(.9,-.55); x.quadraticCurveTo(1.15,0,.9,.55); x.closePath(); } else shapes.heart(x); x.fill(); } }
       // the bell swings on its string; its paper strip turns edge-on and back in the wind
-      const sa=Math.sin(t*.0011*DFX.wind+1)*.12*DFX.wind+Math.sin(t*.0031)*.03, by=sc.by; x.setTransform(...BT); x.translate(0,H*.2); x.translate(sc.bx,0); x.rotate(sa); x.lineWidth=1.1; x.beginPath(); x.moveTo(0,0); x.lineTo(0,by); x.stroke();
+      const sa=Math.sin(t*.0011*DFX.wind+1)*.12*DFX.wind+Math.sin(t*.0031)*.03, by=Math.max(30,bTop-rail-20); x.setTransform(...BT); x.translate(0,rail); x.translate(bx,0); x.rotate(sa); x.lineWidth=1.1; x.beginPath(); x.moveTo(0,0); x.lineTo(0,by); x.stroke();
       x.beginPath(); x.moveTo(-15,by+20); x.bezierCurveTo(-15,by-4,15,by-4,15,by+20); x.closePath(); x.fill(); x.fillRect(-1.5,by-4,3,5);
       x.beginPath(); x.moveTo(0,by+18); x.lineTo(0,by+44); x.stroke(); const tw=Math.cos(t*.0017*DFX.wind+.5); x.translate(0,by+44); x.rotate(-sa*1.6); x.fillRect(-7*tw,0,14*tw,58); return; }
     if(sc.kind==='ame'){ x.setTransform(...BT); const a0=x.globalAlpha; x.globalAlpha=a0*.12; x.fillRect(-400,-200,W+800,H+400); x.globalAlpha=a0;
@@ -2415,7 +2427,8 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     // fit the scene to what is on screen: the window's footprint in scene space is centred on the scene and just covered by it, so the whole scene shows, edges included
     { const [a,,c,d,e,f]=BT; const q=(VQ||[[0,0],[A.width,0],[0,A.height],[A.width,A.height]]).map(([u,v])=>{ const y=(v-f)/d; return [(u-e-c*y)/a,y]; });
       const xs=q.map(p=>p[0]), ys=q.map(p=>p[1]), x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys), Cx=(x0+x1)/2, Cy=(y0+y1)/2;
-      const z=Math.max((x1-x0)/W,(y1-y0)/H)*1.04, tx=Cx-z*W/2, ty=Cy-z*H/2; BT=[a*z,0,c*z,d*z,a*tx+c*ty+e,d*ty+f]; }
+      const z=Math.max((x1-x0)/W,(y1-y0)/H)*1.04, tx=Cx-z*W/2, ty=Cy-z*H/2; BT=[a*z,0,c*z,d*z,a*tx+c*ty+e,d*ty+f];
+      FPQ=q.map(([u,v])=>[(u-tx)/z,(v-ty)/z]); }
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over'; xa.clearRect(0,0,A.width,A.height);
     if(night){ xa.setTransform(...BT); xa.fillStyle='#c4d2ff'; xa.fillRect(W*.06,-10,W*.96,H*.74); xa.globalCompositeOperation='destination-out'; }
     const col=night?'#000':SHADOW; xa.fillStyle=xa.strokeStyle=col;
@@ -2519,7 +2532,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 0fbb1980b2</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · d4669e86e8</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2575,12 +2588,14 @@ addEventListener('hashchange',route);
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
 // Personal word list and daily practice reuse the existing cards.
 const favorite=w=>!!(S.favorites[w]&&S.favorites[w].on);
-function favoriteBtn(w){ return WMAP[w]?`<button class="btn ghost" type="button" data-favorite="${esc(w)}" aria-pressed="${favorite(w)}">${favorite(w)?tr('En favoris','Saved'):tr('Garder en favoris','Save word')}</button>`:''; }
+const FAV_SVG='<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9z"/></svg>';
+const favLabel=w=>favorite(w)?tr('Retirer des favoris','Remove from saved words'):tr('Garder en favori','Save word');
+function favoriteBtn(w){ return WMAP[w]?`<button class="fav" type="button" data-favorite="${esc(w)}" aria-pressed="${favorite(w)}" aria-label="${favLabel(w)}" title="${favLabel(w)}">${FAV_SVG}</button>`:''; }
 document.addEventListener('click',e=>{
   const b=e.target.closest('[data-favorite]'); if(!b) return;
   const w=b.dataset.favorite; if(!WMAP[w]) return;
   e.preventDefault(); e.stopPropagation(); S.favorites[w]={on:!favorite(w),at:Date.now()}; store.set(SKEY,S);
-  document.querySelectorAll('[data-favorite]').forEach(el=>{ if(el.dataset.favorite===w){ el.setAttribute('aria-pressed',String(favorite(w))); el.textContent=favorite(w)?tr('En favoris','Saved'):tr('Garder en favoris','Save word'); } });
+  document.querySelectorAll('[data-favorite]').forEach(el=>{ if(el.dataset.favorite===w){ el.setAttribute('aria-pressed',String(favorite(w))); el.setAttribute('aria-label',favLabel(w)); el.title=favLabel(w); el.classList.remove('pop-in'); void el.offsetWidth; if(favorite(w)) el.classList.add('pop-in'); } });
 },true);
 function reviewPersonal(){
   const ids=WORDS.filter(w=>favorite(w[0])).map(w=>firstId(w[0])); if(!ids.length) return;
@@ -2596,7 +2611,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes travaillées','cards practised')} · ${es.filter(([,e])=>e.ok).length} ${tr('réussies au premier essai','right on the first try')}.</p>${wrong.length?`<p>${tr('À retrouver sans hésiter','Words to revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}.</p><button class="btn" id="review-difficult">${tr('Retravailler mes hésitations','Practise my difficult cards')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · 0fbb1980b2';
+const BUILD='2 · d4669e86e8';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
