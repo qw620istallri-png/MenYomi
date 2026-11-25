@@ -641,6 +641,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 #mquest{position:sticky;top:0;z-index:20}
 #mquest .quest{box-shadow:0 6px 16px rgba(30,20,5,.25)}
 .quest .btn.go{background:var(--acc);color:var(--acc-ink);border-color:var(--acc)}
+.drow{display:flex;gap:8px;margin-top:4px}.drow .btn{flex:1 1 auto;min-width:0;white-space:nowrap;justify-content:center;text-align:center;padding-left:8px;padding-right:8px}.drow .lg{display:none}@media(min-width:701px){.drow .lg{display:inline}.drow .btn{flex:0 1 auto;padding-left:14px;padding-right:14px}}
 .dstats{margin:2px 0 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr))}.dstats .stat{min-width:0}.dstats .stat:last-child{border-right:none}
 .dwords{display:flex;flex-wrap:wrap;gap:6px}.dwords span{font-family:var(--f-jp);font-weight:600;font-size:20px;padding:2px 10px;border:2px solid var(--rule);background:var(--sheet)}
 .qnext{float:right;margin:0 0 8px 12px}
@@ -1292,11 +1293,11 @@ function showCard(){
   if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard'); el.style.marginTop='';
   if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const st=streakDays();
-    const nx=Math.min(...Object.values(S.cards).map(c=>c.due).filter(x=>x>now)); const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
+    const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
     el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2>
-    <div class="stats dstats"><span class="stat"><b>${st}<small>${tr(' j',' d')}</small></b><span>連続 ${tr('série','streak')}</span></span>${dd[1]?`<span class="stat"><b>${Math.round(100*dd[0]/dd[1])}<small>%</small></b><span>${tr('justes','right')}</span></span>`:''}${isFinite(nx)?`<span class="stat"><b>${fmtDelay(nx-now).replace(' ','<small> ')}</small></b><span>${tr('prochaine','next')}</span></span>`:''}</div>
+    <div class="stats dstats"><span class="stat"><b>${st}<small>${tr(' j',' d')}</small></b><span>連続 ${tr('série','streak')}</span></span>${dd[1]?`<span class="stat"><b>${Math.round(100*dd[0]/dd[1])}<small>%</small></b><span>${tr('justes','right')}</span></span>`:''}</div>
     ${words.length?`<div class="dwords">${words.slice(0,24).map(w=>`<span lang="ja" title="${esc(WMAP[w][2])}">${esc(w)}</span>`).join('')}</div>`:''}
-    <div class="row" style="margin-top:4px">${t?`<button class="btn" id="dredo">${tr('Refaire ceux du jour','Redo today’s')} (${t})</button>`:''}<button class="btn k" id="dnext">${tr('Set suivant','Next set')} +${S.newPer}</button><a class="btn r" href="#menu" id="dmenu">${tr('Défi menu','Menu challenge')}</a></div>`;
+    <div class="drow">${t?`<button class="btn" id="dredo">${tr('Refaire','Redo')}<span class="lg">${tr(' ceux du jour',' today’s')}</span> (${t})</button>`:''}<button class="btn k" id="dnext">Set<span class="lg">${tr(' suivant',' next')}</span> +${S.newPer}</button><a class="btn r" href="#menu" id="dmenu">${tr('Défi','Menu')}<span class="lg">${tr(' menu',' challenge')}</span></a></div>`;
     el.querySelector('#dmenu').onclick=()=>{ window.MENU_FOCUS=words; qpool='known'; if(typeof menuDone!=='undefined'&&menuDone) setTimeout(()=>genMenu(),0); };
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard'); centerDone(); return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
@@ -2187,7 +2188,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:19 · 1d276e</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:27 · f2f38a</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2241,7 +2242,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 09:19 · 1d276e';
+const BUILD='2026.11.25 · 09:27 · f2f38a';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
