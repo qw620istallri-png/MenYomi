@@ -1626,12 +1626,12 @@ function openWord(wd){ const w=WMAP[wd]; if(!w) return; const body=document.getE
 document.getElementById('dlgbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(b){ openWord(b.dataset.w); } });
 const dlg=document.getElementById('dlg'); document.getElementById('dlgclose').onclick=()=>dlg.close(); dlg.addEventListener('close',()=>{ document.getElementById('dlgslot').innerHTML=''; }); dlg.addEventListener('click',e=>{if(e.target===dlg||e.target.closest('.dlgend')) dlg.close()});
 // the phone's back button closes the dialog instead of leaving the page
-{ const open=dlg.showModal.bind(dlg); dlg.showModal=()=>{ open(); try{ history.pushState({dlg:1},''); }catch(e){} };
+{ const open=dlg.showModal.bind(dlg); dlg.showModal=()=>{ if(dlg.open) return; open(); try{ history.pushState({dlg:1},''); }catch(e){} };
   dlg.addEventListener('close',()=>{ try{ if(history.state&&history.state.dlg) history.back(); }catch(e){} });
   addEventListener('popstate',()=>{ if(dlg.open) dlg.close(); }); }
 // a second close button at the end of long dialogs, within thumb reach
 new MutationObserver(()=>{ const b=document.getElementById('dlgbody'); if(b&&!b.querySelector('.dlgend')){ const x=document.createElement('button'); x.className='btn dlgend'; x.type='button'; x.textContent=tr('Fermer','Close'); b.appendChild(x); } }).observe(document.getElementById('dlgbody'),{childList:true});
-document.addEventListener('click',e=>{const b=e.target.closest('[data-k]'); if(b){ if(dlg.open) dlg.close(); openKanji(b.dataset.k);} });
+document.addEventListener('click',e=>{const b=e.target.closest('[data-k]'); if(b){ openKanji(b.dataset.k); dlg.scrollTop=0; } }); // an open sheet just changes its content: closing it would also step history back and shut the new one
 
 // ---------- menu generator
 const TYPES=DATA.types, REGIONS=DATA.regions;
@@ -2250,7 +2250,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 11:12 · 5ec3e8</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 11:13 · 1ee5f9</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2304,7 +2304,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 11:12 · 5ec3e8';
+const BUILD='2026.11.25 · 11:13 · 1ee5f9';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
