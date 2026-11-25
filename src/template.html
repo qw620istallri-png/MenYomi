@@ -43,11 +43,71 @@ html.night #logo{box-shadow:4px 4px 0 var(--blue)}
 #sunB{filter:blur(12px);-webkit-mask-image:linear-gradient(252deg,transparent 22%,#000 68%);mask-image:linear-gradient(252deg,transparent 22%,#000 68%)}
 @media (max-width:700px){#shade canvas{width:130vw}}
 .wrap{max-width:1320px;margin:0 auto;position:relative}
-@media (min-width:1700px) and (min-height:900px){.wrap,#dlg{zoom:1.12}}
-@media (min-width:1900px) and (min-height:1000px){.wrap,#dlg{zoom:1.25}}
-@media (min-width:2200px) and (min-height:1150px){.wrap,#dlg{zoom:1.42}}
-@media (min-width:2500px) and (min-height:1300px){.wrap,#dlg{zoom:1.55}}
-@media (min-width:701px){#apad.padhost{flex-basis:clamp(380px,calc(100vh - 350px),620px);width:clamp(380px,calc(100vh - 350px),620px)}}
+@media (min-width:1700px) and (min-height:900px){.wrap,#dlg{zoom:1.12;--z:1.12}}
+@media (min-width:1900px) and (min-height:1000px){.wrap,#dlg{zoom:1.25;--z:1.25}}
+@media (min-width:2200px) and (min-height:1150px){.wrap,#dlg{zoom:1.42;--z:1.42}}
+@media (min-width:2500px) and (min-height:1300px){.wrap,#dlg{zoom:1.55;--z:1.55}}
+/* atelier · write: picker + random, pad with one icon row under it */
+#v-atelier .apick{display:grid;grid-template-columns:minmax(0,1fr);margin-bottom:10px;position:relative}
+.asel{display:flex;align-items:center;gap:10px;min-width:0;height:48px;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);padding:0 12px;cursor:pointer;text-align:left;box-shadow:2px 2px 0 var(--rule)}
+.asel .k{font-family:var(--f-jp);font-size:30px;font-weight:600;line-height:1}
+.asel .m{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700;font-size:16px}
+.asel svg,.atools svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.atools svg .fill{fill:currentColor;stroke:none}
+.arand{display:flex;align-items:stretch;justify-self:start;height:46px;border:2px solid var(--rule);background:var(--sheet);box-shadow:2px 2px 0 var(--rule)}
+.arand .lab{display:flex;align-items:center;padding:0 10px}
+.arand button{border:none;border-left:2px solid var(--rule);background:transparent;color:var(--ink);font-weight:700;font-size:15px;padding:0 13px;cursor:pointer;white-space:nowrap}
+.arand button:hover,.asel:hover{background:var(--soft)}
+.arand button:active,.asel:active{transform:translate(1px,1px)}
+.asearch{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;display:grid;grid-template-rows:auto minmax(0,1fr);max-height:min(62vh,560px);background:var(--sheet);border:2px solid var(--rule);box-shadow:6px 6px 0 var(--rule)}
+.asearch[hidden]{display:none}
+.asearch input{width:100%;border:none;border-bottom:2px solid var(--rule);background:transparent;color:var(--ink);padding:12px 14px;font-size:18px;border-radius:0}
+.alist{overflow:auto;overscroll-behavior:contain}
+.alist button{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;border:none;border-bottom:1px solid var(--soft);background:transparent;color:var(--ink);text-align:left;padding:6px 12px;cursor:pointer;font-size:16px}
+.alist button .k{font-family:var(--f-jp);font-size:28px;font-weight:600;line-height:1.1}
+.alist button .m{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.alist button .r{font-family:var(--f-jp);font-size:14px;color:var(--mute);white-space:nowrap}
+.alist button.kn .k{text-decoration:underline 3px var(--ok);text-underline-offset:4px}
+.alist button:hover,.alist button.on{background:var(--soft)}
+.alist .none{padding:14px;color:var(--mute)}
+.acol{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0;width:100%}
+#apad.padhost{flex:none;width:100%}
+.atools{display:flex;align-items:center;gap:6px}
+.atools .sp{flex:1}
+.atools .ico{width:48px;height:46px}
+.atools #aghost[aria-pressed="true"] .off{display:none}
+.atools #aghost[aria-pressed="false"]{color:var(--mute)}
+.atools .ico.go{width:78px;background:var(--ink);color:var(--paper)}
+.ainfo{border:none;background:none;padding:0;color:var(--ink);text-align:left;cursor:pointer;font:inherit;font-size:16px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.ainfo .r{font-family:var(--f-jp)}
+.ainfo .mono{color:var(--mute);font-size:14px;text-transform:uppercase}
+#ares:empty{display:none}
+@media (min-width:701px){
+  /* on a computer the picker sits beside the pad, so the pad gets the height */
+  #v-atelier.on{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:24px;align-items:start}
+  #v-atelier .asub{grid-column:1/-1}
+  #v-atelier .apadbox{display:contents}
+  #v-atelier .acol{grid-column:1;grid-row:2/span 2;width:clamp(280px,calc(100vh / var(--z,1) - 350px),640px)}
+  #v-atelier .apick{grid-column:2;grid-row:2}
+  #v-atelier .padside{grid-column:2;grid-row:3;gap:10px;align-content:start}
+  body:has(#v-atelier.on){padding-bottom:16px}
+}
+
+@media (max-width:700px){
+  #v-atelier .modes.asub{margin-bottom:8px}
+  #v-atelier .apick{margin-bottom:6px}
+  .arand{justify-self:stretch}.arand .lab{flex:none;padding:0 12px}.arand button{flex:1}
+  .padside:has(#ares:not(:empty)) #ainfo{display:none}
+  #ares div{display:inline}#ares div+div::before{content:" · "}
+  #v-atelier .apadbox{gap:6px}
+  #v-atelier .acol{gap:6px}
+  #apad.padhost{width:min(100%,calc(100vh - 432px));width:min(100%,calc(100dvh - 432px));margin-inline:auto}
+  #v-atelier .padside{gap:4px}
+  #ares{font-size:15px}
+}
+@media (max-width:380px){
+  .view .asub button{padding:7px 10px;gap:6px;white-space:nowrap}.view .asub .j{font-size:20px}.view .asub b{font-size:17px}
+}
 a{color:inherit}
 :focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .mono{font-family:var(--f-mono);font-size:14px;letter-spacing:.02em;text-transform:uppercase}
@@ -452,7 +512,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   .prompt b{font-size:28px}
   .prompt{font-size:16px}
   .padbox{gap:10px}
-  #rpad.padhost{flex:none;width:min(100%,calc(100vh - 420px));width:min(100%,calc(100dvh - 420px));margin-inline:auto}
+  #rpad.padhost{flex:none;width:min(100%,calc(100vh - 432px));width:min(100%,calc(100dvh - 432px));margin-inline:auto}
   .padside{flex-basis:100%}
   .wtools{display:grid;grid-template-columns:auto auto 44px 44px minmax(0,1fr);gap:6px}
   .wtools .btn{padding:8px 8px;justify-content:center;white-space:nowrap}
@@ -612,15 +672,26 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 
 <section class="view" id="v-atelier">
   <div class="modes asub" role="group" aria-label="Atelier"><button data-sub="atelier" aria-pressed="true"><span class="j">書く</span><b data-en="Write">Écrire</b></button><button data-sub="main" aria-pressed="false"><span class="j">運筆</span><b data-en="The hand">La main</b></button></div>
-  <div class="row" style="margin-bottom:14px" id="apick"></div>
-  <div class="padbox">
-    <div id="apad" class="padhost"></div>
-    <div class="padside">
-      <div id="ainfo"></div>
-      <div class="row"><button class="btn" id="aghost" data-en="Guide: on">Modèle : visible</button><button class="btn" id="aanim" data-en="Stroke order">Ordre des traits</button><button class="btn" id="ademo" data-en="Demo">Démonstration</button></div>
-      <div class="row"><button class="btn k" id="acheck" data-en="Check">Vérifier</button><button class="btn" id="aundo" data-en="Undo">Annuler</button><button class="btn" id="aclear" data-en="Clear">Effacer</button></div>
-      <div class="result" id="ares"></div>
+  <div class="apick" id="apick">
+    <button class="asel" id="asel" aria-haspopup="dialog" aria-expanded="false"><span class="k" id="aselk"></span><span class="m" id="aselm"></span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg></button>
+    <div class="asearch" id="asearch" hidden><input id="aq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><div class="alist" id="alist"></div></div>
+  </div>
+  <div class="padbox apadbox">
+    <div class="acol">
+      <div id="apad" class="padhost"></div>
+      <div class="atools">
+        <button class="ico" id="aghost" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="off" d="M4 4l16 16"/></svg></button>
+        <button class="ico" id="aanim"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M8 5.5l11 6.5-11 6.5z"/></svg></button>
+        <button class="ico" id="ademo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3.5l5.5 5.5-8.5 8.5H6.5V12z"/><path d="M3.5 21h8"/></svg></button>
+        <span class="sp"></span>
+        <button class="ico" id="aundo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+        <button class="ico" id="aclear"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9.5 7V4h5v3M6.5 7l1 13h9l1-13"/></svg></button>
+        <button class="ico go" id="acheck"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+      </div>
     </div>
+    <div class="padside">
+    <div class="arand" role="group"><span class="lab" data-en="Random">Hasard</span><button id="arknown" data-en="Mine">Mes mots</button><button id="arall" data-en="All">Tous</button></div>
+      <button class="ainfo" id="ainfo"></button><div class="result" id="ares"></div></div>
   </div>
 </section>
 
@@ -1547,16 +1618,47 @@ let menuResize=null, menuW=innerWidth; addEventListener('resize',()=>{ clearTime
 
 // ---------- atelier
 let atelierChar='焼', apad=null; const WRITABLE=[...new Set([...CARDS.filter(id=>id[0]==='w').map(id=>id.slice(2)), ...Object.keys(KVG).filter(c=>isKanji(c)&&c!=='〇')])];
-function renderAtelier(){ const p=document.getElementById('apick');
-  p.innerHTML=`<label class="lab" for="asel">Kanji</label><select id="asel" style="min-width:min(100%,280px)">${WRITABLE.map(c=>`<option value="${c}"${c===atelierChar?' selected':''}>${c} · ${esc(kInfo(c).mean)}</option>`).join('')}</select><button class="btn" id="arand">${tr('Au hasard','Random')}</button>`;
-  p.querySelector('#asel').onchange=e=>{atelierChar=e.target.value; setA()}; p.querySelector('#arand').onclick=()=>{atelierChar=WRITABLE[Math.floor(Math.random()*WRITABLE.length)]; renderAtelier()};
-  if(!apad) apad=new Pad(document.getElementById('apad'),atelierChar,{ghost:true,onFull:()=>document.getElementById('acheck').click()}); setA(); }
+function renderAtelier(){ if(!apad){ apad=new Pad(document.getElementById('apad'),atelierChar,{ghost:true,onFull:()=>document.getElementById('acheck').click()}); bindAtelier(); } setA(); }
 function setA(){ apad.setChar(atelierChar); const k=kInfo(atelierChar);
-  document.getElementById('ainfo').innerHTML=`<button class="chip" data-k="${atelierChar}"><span class="k">${atelierChar}</span><span class="m">${esc(k.mean)}</span></button><p style="margin:6px 0 0">${esc(k.on)} · ${esc(k.kun)}</p><p class="mono" style="margin:2px 0 0;color:var(--mute)">${k.strokes} ${tr('traits','strokes')}${k.jlpt?' · JLPT N'+k.jlpt:''}</p>`; document.getElementById('ares').innerHTML=''; }
-document.getElementById('aghost').onclick=e=>{apad.ghostOn=!apad.ghostOn; apad.drawGuide(); e.target.textContent=tr('Modèle : ','Guide: ')+(apad.ghostOn?tr('visible','on'):tr('masqué','off'))};
-document.getElementById('aanim').onclick=()=>apad.animate(); document.getElementById('ademo').onclick=()=>apad.demo();
-document.getElementById('aundo').onclick=()=>apad.undo(); document.getElementById('aclear').onclick=()=>{apad.clear(); document.getElementById('ares').innerHTML=''};
-document.getElementById('acheck').onclick=()=>{document.getElementById('ares').innerHTML=apad.check().html};
+  document.getElementById('aselk').textContent=atelierChar; document.getElementById('aselm').textContent=k.mean;
+  const inf=document.getElementById('ainfo'); inf.dataset.k=atelierChar; inf.innerHTML=`<span class="r">${esc(k.on)} · ${esc(k.kun)}</span><span class="mono">${k.strokes} ${tr('traits','strokes')}${k.jlpt?' · N'+k.jlpt:''}</span>`;
+  document.getElementById('ares').innerHTML=''; }
+// random draw among the kanji I know, or among all of them
+function aRandom(known){ let pool=known?WRITABLE.filter(knownKanji):WRITABLE; if(known&&!pool.length){ toast(tr('Aucun kanji appris pour l’instant : tirage parmi tous.','No kanji learned yet: drawing from all of them.')); pool=WRITABLE; }
+  let c=atelierChar; for(let n=0;n<8&&c===atelierChar;n++) c=pool[Math.floor(Math.random()*pool.length)]; aPick(c); }
+function aPick(c){ atelierChar=c; setA(); aClose(); }
+// typed search over kanji, French/English meaning, kana or romaji readings
+const fold=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+let AIDX=null, AKNOWN=new Set();
+function aIndex(){ return AIDX||(AIDX=WRITABLE.map(c=>{ const k=kInfo(c); const rd=[...new Set(String(k.on+'・'+k.kun).split(/[・、,\s]+/).map(x=>toHira(x.replace(/[()（）.\-—]/g,''))).filter(Boolean))];
+  return {c,mean:k.mean,m:fold(k.mean),w:fold(k.mean).split(/[^a-z0-9]+/).filter(Boolean),rd,ro:rd.map(x=>normRo(toRomaji(x))),disp:(k.kun&&k.kun!=='—'?k.kun:k.on).split('・')[0]}; })); }
+function aFind(q){ const L=aIndex(); q=q.trim(); const kn=e=>AKNOWN.has(e.c);
+  if(!q) return [...L.filter(kn),...L.filter(e=>!kn(e))].slice(0,80);
+  const f=fold(q), kana=/[぀-ヿ]/.test(q)?toHira(q):null, ro=/^[a-z' -]+$/i.test(q)?normRo(q):null;
+  const sc=e=>{ if(q.includes(e.c)) return 200; let s=0;
+    if(e.w.includes(f)) s=60; else if(f.length>1&&e.w.some(w=>w.startsWith(f))) s=45; else if(f.length>2&&e.m.includes(f)) s=25;
+    if(kana){ if(e.rd.includes(kana)) s=Math.max(s,70); else if(e.rd.some(r=>r.startsWith(kana))) s=Math.max(s,40); }
+    if(ro&&ro.length>1){ if(e.ro.includes(ro)) s=Math.max(s,55); else if(ro.length>2&&e.ro.some(r=>r.startsWith(ro))) s=Math.max(s,30); else if(ro.length>3&&e.ro.some(r=>r.startsWith(ro.slice(0,-1)))) s=Math.max(s,18); }
+    return s? s+(kn(e)?8:0) : 0; };
+  return L.map(e=>[sc(e),e]).filter(x=>x[0]>0).sort((a,b)=>b[0]-a[0]).slice(0,80).map(x=>x[1]); }
+function aList(){ const q=document.getElementById('aq').value, R=aFind(q), box=document.getElementById('alist');
+  box.innerHTML=R.length? R.map((e,i)=>`<button data-c="${e.c}" class="${AKNOWN.has(e.c)?'kn':''}${i===0&&q.trim()?' on':''}"><span class="k">${e.c}</span><span class="m">${esc(e.mean)}</span><span class="r">${esc(e.disp)}</span></button>`).join('') : `<div class="none">${tr('Aucun kanji trouvé.','No kanji found.')}</div>`; box.scrollTop=0; }
+function aOpen(){ const p=document.getElementById('asearch'), q=document.getElementById('aq'); AKNOWN=new Set(WRITABLE.filter(knownKanji)); p.hidden=false; document.getElementById('asel').setAttribute('aria-expanded','true'); q.value=''; aList(); q.focus(); }
+function aClose(){ const p=document.getElementById('asearch'); if(p.hidden) return; p.hidden=true; document.getElementById('asel').setAttribute('aria-expanded','false'); }
+function bindAtelier(){ const $=id=>document.getElementById(id);
+  const T=[['aghost','Modèle','Guide'],['aanim','Ordre des traits','Stroke order'],['ademo','Démonstration','Demo'],['aundo','Annuler','Undo'],['aclear','Effacer','Clear'],['acheck','Vérifier','Check']];
+  for(const [id,fr,en] of T){ $(id).title=tr(fr,en); $(id).setAttribute('aria-label',tr(fr,en)); }
+  $('aq').placeholder=tr('kanji, sens, lecture…','kanji, meaning, reading…'); $('asel').title=tr('Chercher un kanji','Search a kanji');
+  $('asel').onclick=()=>$('asearch').hidden?aOpen():aClose();
+  $('aq').oninput=aList;
+  $('aq').onkeydown=e=>{ if(e.key==='Escape'){ aClose(); $('asel').focus(); } else if(e.key==='Enter'){ const b=$('alist').querySelector('button'); if(b) aPick(b.dataset.c); } };
+  $('alist').onclick=e=>{ const b=e.target.closest('button[data-c]'); if(b) aPick(b.dataset.c); };
+  document.addEventListener('pointerdown',e=>{ if(!$('asearch').hidden&&!e.target.closest('#apick')) aClose(); });
+  $('arknown').onclick=()=>aRandom(true); $('arall').onclick=()=>aRandom(false);
+  $('aghost').onclick=()=>{ apad.ghostOn=!apad.ghostOn; apad.drawGuide(); $('aghost').setAttribute('aria-pressed',String(apad.ghostOn)); };
+  $('aanim').onclick=()=>apad.animate(); $('ademo').onclick=()=>apad.demo();
+  $('aundo').onclick=()=>{ apad.undo(); $('ares').innerHTML=''; }; $('aclear').onclick=()=>{ apad.clear(); $('ares').innerHTML=''; };
+  $('acheck').onclick=()=>{ $('ares').innerHTML=apad.check().html; }; }
 
 // ---------- the hand simulator
 const SIMTEXTS=['焼鳥','唐揚げ','刺身盛合せ','醤油ラーメン','本日のおすすめ','お品書き','味噌煮込み饂飩','生ビール','鯖味噌定食','天ざる','櫃まぶし','焼','書','鶏','麺'];
