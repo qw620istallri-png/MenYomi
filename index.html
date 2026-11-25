@@ -1938,7 +1938,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       for(let i=0;i<9;i++) riv.push({x:W*(.08+r()*.95),v:.012+r()*.03,off:r()*(H+200),len:60+r()*140,ph:r()*6.3,rad:2.4+r()*2.4}); return {kind,br,items,dots,riv}; }
     if(kind==='kumo'){ const cl=[]; for(let i=0;i<4;i++){ const pf=[], n=6+Math.floor(r()*5); for(let k=0;k<n;k++) pf.push([(k/(n-1)-.5)*W*(.7+r()*.3),(r()-.5)*40,40+r()*45]); cl.push({pf,y:H*(.1+i*.22+r()*.06),off:r()*W*3,v:.004+r()*.003}); }
       return {kind,br,items,cl,wire:r()}; }
-    if(kind==='hanabira'){ const base=makeScene('sakura',seed+1); const keep=new Set(); base.br.forEach((b,i)=>{ if(keep.size<3&&b.pts[0][0]>W*.4) keep.add(i); }); if(!keep.size) keep.add(0);
+    if(kind==='hanabira'){ const base=makeScene('sakura',seed+1); const keep=new Set(); base.br.forEach((b,i)=>{ if(keep.size<5&&b.pts[0][0]>W*.3) keep.add(i); }); if(!keep.size) keep.add(0);
       const map=new Map([...keep].map((b,i)=>[b,i])); const br2=[...keep].map(i=>base.br[i]); const it2=base.items.filter(it=>keep.has(it.b)).map(it=>({...it,b:map.get(it.b)}));
       const petals=[]; for(let i=0;i<40;i++) petals.push({x0:W*(.05+r()*1.35),off:r()*(H+80),v:.011+r()*.013,s:10+r()*7,ph:r()*6.3,sp:(r()<.5?-1:1)*(.6+r()*1.4),dr:.25+r()*.25});
       return {kind,br:br2,items:it2,petals}; }
@@ -1980,12 +1980,12 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
           br.push({pts:sp,ph:r()*6,w:3.4,amp:.5}); const sb=br.length-1; const pr=padSprite(r,40+r()*30,17+r()*10);
           items.push({b:sb,t:1,ox:sp[4][0]-bx,oy:sp[4][1]-by-6,shape:'sprite',spr:pr,a:(r()-.5)*.3,s:1,ph:r()*6}); } }
       return {kind,br,items}; }
-    const nb={momiji:5,bamboo:6,pine:5,ginkgo:5,sakura:5}[kind];
+    const nb={momiji:5,bamboo:6,pine:5,ginkgo:5,sakura:15}[kind];
     for(let b=0;b<nb;b++){ const fromTop=r()<.55; const x0=fromTop? W*(.25+r()*.8) : W+4, y0=fromTop? -6 : H*(r()*.55);
       const ang=fromTop? Math.PI*(.55+r()*.3) : Math.PI*(.85+r()*.25); const len=H*(.35+r()*.35); const bend=(r()-.5)*.9;
       const pts=[]; for(let i=0;i<=10;i++){ const t=i/10, a=ang+bend*t; pts.push([x0+Math.cos(a)*len*t, y0+Math.sin(a)*len*t, t]); }
       br.push({pts,ph:r()*6,w:kind==='bamboo'?1.6:kind==='pine'?3:2.2});
-      const per={momiji:9,bamboo:7,pine:8,ginkgo:11,sakura:10}[kind];
+      const per={momiji:9,bamboo:7,pine:8,ginkgo:11,sakura:16}[kind];
       for(let i=0;i<per;i++){ const t=.12+.88*r(); const k=Math.min(9,Math.floor(t*10)); const p=pts[k]; const side=r()<.5?-1:1; const base=ang+bend*t;
         if(kind==='bamboo'){ const n=3+Math.floor(r()*3); for(let q=0;q<n;q++) items.push({b,t,ox:p[0]-x0,oy:p[1]-y0,shape:'bamboo',a:base+side*(.5+q*.32)+Math.PI*.1,s:26+r()*16,ph:r()*6}); }
         else if(kind==='pine') items.push({b,t,ox:p[0]-x0,oy:p[1]-y0,shape:'pine',a:base+side*(.4+r()*.9),s:16+r()*10,ph:r()*6,line:true});
@@ -2089,11 +2089,15 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); }
     if(sc.petals) for(const q of sc.petals){ const L=H+80, y=((t*q.v*DFX.wind+q.off)%L)-40; const px=q.x0-(y+40)*q.dr*DFX.wind+Math.sin(t*.0011+q.ph)*9;
       const fl=.35+.65*Math.abs(Math.sin(t*.0019+q.ph)); x.setTransform(...BT); x.translate(px,y); x.rotate(q.ph+t*.0012*q.sp); x.scale(q.s,q.s*fl); x.beginPath(); shapes.petal(x); x.fill(); } }
+  const NOCROSS=new Set(['sakura','hanabira']); // cherry scenes: an open window, no cross bars
   function frame(t){ const {st,night}=ph; const sk=ph.sk+DFX.tilt; BT=[KS,0,KS*sk*.55,KS*st,-KS*sk*H*.16,0];
+    // slant and stretch can leave the canvas edges bare: zoom the scene about its centre until it covers the whole canvas, with a little to spare
+    { const [a,,c,d,e,f]=BT, Cx=W/2, Cy=H/2; let z=1; for(const [u,v] of [[0,0],[A.width,0],[0,A.height],[A.width,A.height]]){ const y=(v-f)/d, x=(u-e-c*y)/a; z=Math.max(z,Math.abs(x-Cx)/(W/2),Math.abs(y-Cy)/(H/2)); }
+      z=Math.min(1.8,z*1.04); BT=[a*z,0,c*z,d*z,e+a*(1-z)*Cx+c*(1-z)*Cy,f+d*(1-z)*Cy]; }
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over'; xa.clearRect(0,0,A.width,A.height);
     if(night){ xa.setTransform(...BT); xa.fillStyle='#c4d2ff'; xa.fillRect(W*.06,-10,W*.96,H*.74); xa.globalCompositeOperation='destination-out'; }
     const col=night?'#000':SHADOW; xa.fillStyle=xa.strokeStyle=col;
-    xa.setTransform(...BT); xa.fillRect(W*DFX.mull,-10,6,H+20); xa.fillRect(-20,H*DFX.rail,W+40,6); xa.fillRect(W*.04,-10,4,H+20);
+    xa.setTransform(...BT); if(!(cur&&NOCROSS.has(cur.kind))){ xa.fillRect(W*DFX.mull,-10,6,H+20); xa.fillRect(-20,H*DFX.rail,W+40,6); } xa.fillRect(W*.04,-10,4,H+20);
     const k=reduce?1:clamp((t-t0)/1100,0,1); if(prev&&k<1) drawScene(prev,t,1-k); if(cur) drawScene(cur,t,k);
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over';
     xb.clearRect(0,0,W,H); xb.drawImage(A,0,0,W,H); }
@@ -2183,7 +2187,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:08 · 9c1623</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:19 · 1d276e</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2237,7 +2241,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 09:08 · 9c1623';
+const BUILD='2026.11.25 · 09:19 · 1d276e';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
