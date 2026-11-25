@@ -6,7 +6,7 @@ Site : https://qw620istallri-png.github.io/MenYomi/
 
 - `index.html` : l'application complète (données incluses, fonctionne hors ligne une fois installée).
 - `src/template.html` : interface et moteur d’écriture. `progress.js` : validation,
-  fusion et transaction de progression. `learning.js` : favoris et parcours izakaya.
+  fusion et transaction de progression. `learning.js` : favoris et bilan quotidien.
 - `src/data.json` et `src/kanji.json` : données de tracés, dictionnaire et explications
   conservées depuis l’application livrée. `menudata.py` reste la source du vocabulaire.
 

@@ -10,14 +10,6 @@ function fixture(english=false){
   const context={S:P.fresh(),WMAP:Object.fromEntries(data.words.map(w=>[w[0],w])),WORDS:data.words,document:{getElementById:id=>elements[id],addEventListener(){}},tr:(fr,en)=>english?en:fr,esc:s=>String(s),store:{set(){}},SKEY:'test',cancelAuto(){},LAST_GRADE:null,REPLAY_ID:null,SESSION:null,TESTRES:null,dlg:{open:false,showModal(){this.open=true;},close(){this.open=false;}},location:{hash:''},xp:()=>'',wordChips:()=>'',reviewBtn:()=>'',sayBtn:()=>'',toRomaji:s=>s,rng:()=>()=>.5,makeWriter:()=>({}),textCanvas(){},firstId:w=>'r:'+w,fillSelects(){context.menuDone=true;},genMenu(){context.generated=true;},menuDone:false,mmode:'meaning',qpool:'known',toast(){},today:()=> '2026-11-25',showCard(){},newQuest(){}};
   vm.createContext(context);vm.runInContext(learning,context);return{context,body,type};
 }
-test('izakaya path introduces each word before the menu challenge, in both languages',()=>{
-  for(const english of [false,true]){
-    const {context:c,body,type}=fixture(english);vm.runInContext('openLesson()',c);
-    for(let i=0;i<8;i++){assert.match(body.innerHTML,english?/Meet the words/:/Découvrir les mots/);body.querySelector('#lesson-next').onclick();}
-    assert.equal(Object.keys(c.S.lessonSeen).length,8);assert.ok(body.querySelector('#lesson-menu'));
-    body.querySelector('#lesson-menu').onclick();assert.equal(c.location.hash,'menu');assert.equal(type.value,'izakaya');assert.equal(c.generated,true);
-  }
-});
 test('personal practice uses saved words and resets a pending undo replay',()=>{
   const {context:c}=fixture();c.S.favorites['ライス']={on:true,at:1};c.REPLAY_ID='r:焼鳥';
   vm.runInContext('reviewPersonal()',c);assert.deepEqual(Array.from(c.SESSION.q),['r:ライス']);assert.equal(c.REPLAY_ID,null);assert.equal(c.location.hash,'revisions');
