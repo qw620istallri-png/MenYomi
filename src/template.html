@@ -58,7 +58,8 @@ body:not(:has(#v-revisions.on)) #hstop{display:none}#hstop .sm{display:none}@med
   #v-revisions.busy #card.wcard:has(> .padbox){grid-template-columns:min(var(--stH),60%) minmax(340px,1fr)}
   #v-revisions.busy #card > .padbox > .padhost{grid-column:1;grid-row:1 / -1;flex:none;width:min(100%,var(--stH));justify-self:center}
   #v-revisions.busy #card > .padbox > .padside{grid-column:2}
-  #v-revisions.busy #card :is(#rst,#mst,#pst).stage{min-height:0;height:var(--stH)}
+  #v-revisions.busy #card :is(#rst,#mst,#pst,#hst).stage{min-height:0;height:var(--stH)}
+  body:has(#v-revisions.busy.on) nav.tabs{margin-bottom:18px}
   #v-revisions.busy #card .stwrap{position:relative}
   #v-revisions.busy #card .grades button{min-width:0;padding-inline:8px}
   #v-revisions.busy #card .answer .w{font-size:36px;line-height:1.1}
@@ -1237,7 +1238,7 @@ addEventListener('resize',()=>{ clearTimeout(centerDone._t); centerDone._t=setTi
 // desktop: the drawing takes exactly the height left in the window under the card's top
 function fitStage(){ const vr=document.getElementById('v-revisions'); if(!DESK()||!vr.classList.contains('busy')){ vr.style.removeProperty('--stH'); return; }
   if(scrollY>0&&vr.classList.contains('on')) scrollTo(0,0); const el=document.getElementById('card'); const z=parseFloat(getComputedStyle(document.querySelector('.wrap')).zoom)||1;
-  const top=el.getBoundingClientRect().top+scrollY; vr.style.setProperty('--stH',Math.round(clamp((innerHeight-top)/z-46,220,820))+'px'); }
+  const top=el.getBoundingClientRect().top+scrollY; vr.style.setProperty('--stH',Math.round(clamp((innerHeight-top)/z-74,220,820))+'px'); }
 addEventListener('resize',()=>{ clearTimeout(fitStage._t); fitStage._t=setTimeout(()=>{ const vr=document.getElementById('v-revisions'); if(vr.classList.contains('busy')&&DESK()){ const before=vr.style.getPropertyValue('--stH'); fitStage(); if(vr.style.getPropertyValue('--stH')!==before&&!document.querySelector('#card .grades')) showCard(); } },250); });
 function showCard(){
   if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
@@ -1371,7 +1372,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
     <div class="quest" style="margin:0;grid-template-columns:auto minmax(0,1fr)"><span class="q">${tr('Trouvez','Find')}</span><b>${esc(w[2])}</b></div>
     <div class="stage hunt" id="hst"></div><div id="hans"></div>`;
   const wr=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['brush','brush','chisel'])); const surf=pick(r,['kinari','washi','wood','white']);
-  const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((innerHeight*0.5)/(n*0.95+0.7),30,60));
+  const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((DESK()&&host.clientHeight>200? host.clientHeight-90 : innerHeight*0.5)/(n*0.95+0.7),30,60));
   const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); b.title=String(i+1); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
