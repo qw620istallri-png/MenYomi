@@ -443,7 +443,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .vlist div span:first-child{font-family:var(--f-jp);font-size:19px;margin-right:8px}
 .search{width:min(100%,420px);font-size:18px;padding:10px 12px}
 /* dialog */
-dialog{border:2px solid var(--rule);border-radius:0;background:var(--sheet);color:var(--ink);padding:0;width:min(980px,calc(100vw - 20px));max-height:calc(100vh - 24px);max-height:calc(100dvh - 24px);overscroll-behavior:contain}
+dialog{border:2px solid var(--rule);border-radius:0;background:var(--sheet);color:var(--ink);padding:0;width:min(980px,calc(100vw / var(--z,1) - 20px));max-height:calc(100vh / var(--z,1) - 24px);max-height:calc(100dvh / var(--z,1) - 24px);overflow:auto;overscroll-behavior:contain}
 dialog::backdrop{background:rgba(12,12,12,.62)}
 .dlg{padding:24px;display:grid;gap:14px}
 .dlg-top{display:flex;gap:24px;flex-wrap:wrap}
