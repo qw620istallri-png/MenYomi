@@ -460,7 +460,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   #v-main .srand{justify-self:stretch}#v-main .srand .lab{flex:none;padding:0 12px}#v-main .srand button{flex:1}
   #v-main .simstage{min-height:0;height:clamp(200px,calc(100vh - 380px),520px);height:clamp(200px,calc(100dvh - 380px),520px);padding:10px}
   #v-main .simstage canvas{max-height:100%;width:auto;max-width:100%}}
-@media (min-width:901px){#v-main .simstage{min-height:0;height:clamp(300px,calc(100vh / var(--z,1) - 330px),640px)} #v-main .simstage canvas{max-height:100%;width:auto} body:has(#v-main.on){padding-bottom:16px}}
+@media (min-width:901px){#v-main .simstage{min-height:0;height:clamp(300px,calc(100vh / var(--z,1) - 330px),640px);padding:12px} #v-main .simstage canvas{max-height:100%;width:auto} body:has(#v-main.on){padding-bottom:16px}}
 .sliders{display:grid;gap:14px}
 .sliders label{display:grid;gap:4px;font-family:var(--f-mono);font-size:14px;text-transform:uppercase;color:var(--mute)}
 .sliders select{color:var(--ink);font-family:var(--f-body);text-transform:none}
@@ -1812,11 +1812,12 @@ function setupSim(){ const $=id=>document.getElementById(id);
   $('sgo').onclick=()=>runSim(true); $('sinst').onclick=()=>runSim(false); }
 function runSim(anim){ if(simTok) simTok.stop=true; const text=simText, tool=stool.value; const r=rng(newSeed());
   const pr=PRESETS[spreset.value]; const w=makeWriter(r,spreset.value,tool,{speed:+sspeed.value,cursive:+scurs.value,stiff:+sstiff.value,mess:+smess.value,flow:pr.flow,slant:0});
-  const surf={brush:'washi',chisel:'yellow',marker:'white',chalk:'board',pen:'cream'}[tool]; const st=document.querySelector('.simstage'), box=st.clientWidth-40, bh=st.clientHeight-30; const n=[...text].length;
-  // a tall stage (phone) writes top to bottom, like a menu strip, so the word can be bigger
+  const surf={brush:'washi',chisel:'yellow',marker:'white',chalk:'board',pen:'cream'}[tool]; const st=document.querySelector('.simstage'), cs=getComputedStyle(st), px=parseFloat(cs.paddingLeft)*2+4, py=parseFloat(cs.paddingTop)*2+4;
+  const box=Math.max(120,st.clientWidth-px), bh=Math.max(120,st.clientHeight-py); const n=[...text].length;
+  // the paper fills the stage; a tall stage (phone) writes top to bottom, like a menu strip, so the word can be bigger
   const vert=n>1&&n<=6&&bh>box*1.05;
-  const size=vert? clamp(Math.min(bh/(n*0.95+0.7), box/1.7, 260),50,260) : clamp(Math.min(box/(n*0.95+0.7), bh>100?bh/1.6:999, n<=2?260:200),50,260);
-  const res=textCanvas(document.getElementById('simc'),text,{seed:newSeed(),writer:w,size,surface:surf,pad:0.3,anim,speedup:1,vertical:vert});
+  const size=vert? clamp(Math.min(bh/(n*0.95+0.55), box/1.45, 320),50,320) : clamp(Math.min(box/(n*0.95+0.55), bh/1.45, 320),50,320);
+  const res=textCanvas(document.getElementById('simc'),text,{seed:newSeed(),writer:w,size,surface:surf,pad:0.22,minW:box,minH:bh,anim,speedup:1,vertical:vert});
   simTok=res.token||null; showSimWord(text); document.getElementById('sinfo').textContent=`${res.sim.dur.toFixed(1)} s`; }
 
 function showSimWord(text){ const el=document.getElementById('sword'); const w=WMAP[text];
@@ -2166,7 +2167,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 08:54 · 0ddf59</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 08:57 · 34e286</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2220,7 +2221,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 08:54 · 0ddf59';
+const BUILD='2026.11.25 · 08:57 · 34e286';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
