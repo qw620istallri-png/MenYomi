@@ -1210,8 +1210,13 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
 
 // ---------- SRS (SM-2 variant)
 const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,{cards:{},day:'',newToday:0,newPer:10});
-const MIN=60e3, DAY=864e5; const today=()=>new Date().toISOString().slice(0,10);
-if(S.day!==today()){S.day=today(); S.newToday=0; S.extraNew=0; S.todayIds=[]}
+const MIN=60e3, DAY=864e5;
+// days follow the local calendar and turn over at 4 AM (a late-night session still counts for the evening)
+const DAY0=4; const dayKey=t=>{ const d=new Date(t-DAY0*36e5); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+const today=()=>dayKey(Date.now());
+const dayStart=n=>{ const d=new Date(Date.now()-DAY0*36e5); d.setHours(0,0,0,0); d.setDate(d.getDate()+n); d.setHours(DAY0); return d.getTime(); };
+const dueIn=ivl=>dayStart(Math.max(1,Math.round(ivl)));
+function rollDay(){ if(S.day!==today()){ S.day=today(); S.newToday=0; S.extraNew=0; S.todayIds=[]; return true; } return false; } rollDay();
 S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null, TESTRES=null; let SKON=false; try{ SKON=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
 const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','饂飩','寿司'];
 function buildCards(){ const ids=[], seen=new Set(); const order=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w))];
@@ -1223,8 +1228,8 @@ function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endS
   if(due.length) return due[0]; const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); if(qd) return qd; if(S.newToday<S.newPer+S.extraNew){const n=CARDS.find(id=>!S.cards[id]&&canIntro(id)); if(n) return n;}
   const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon[0]||null; }
 function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now();
-  if(c.reps===0){ if(g===0)c.due=now+MIN; else if(g===1)c.due=now+6*MIN; else if(g===2){c.reps=1;c.ivl=1;c.due=now+DAY} else {c.reps=1;c.ivl=4;c.due=now+4*DAY} }
-  else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=now+c.ivl*DAY; } }
+  if(c.reps===0){ if(g===0)c.due=now+MIN; else if(g===1)c.due=now+6*MIN; else if(g===2){c.reps=1;c.ivl=1;c.due=dueIn(1)} else {c.reps=1;c.ivl=4;c.due=dueIn(4)} }
+  else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=dueIn(c.ivl); } }
   c.at=now; return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
 function grade(id,g){ cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
@@ -1232,7 +1237,7 @@ function grade(id,g){ cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.
   if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2); } store.set(SKEY,S); showCard(); }
 // one entry per day: [right at first try, cards seen]; the streak counts days in a row with at least one card
 function logDay(ok){ const d=S.days||(S.days={}); const k=today(); const e=d[k]||(d[k]=[0,0]); e[1]++; if(ok) e[0]++; const ks=Object.keys(d).sort(); while(ks.length>90) delete d[ks.shift()]; }
-function streakDays(){ const d=S.days||{}; const key=i=>new Date(Date.now()-i*DAY).toISOString().slice(0,10); let i=(d[today()]||[0,0])[1]?0:1, n=0; while(d[key(i)]&&d[key(i)][1]){ n++; i++; } return n; }
+function streakDays(){ const d=S.days||{}; const key=i=>dayKey(Date.now()-i*DAY); let i=(d[today()]||[0,0])[1]?0:1, n=0; while(d[key(i)]&&d[key(i)][1]){ n++; i++; } return n; }
 function redoToday(){ TESTRES=null; SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
 function nextSet(){ TESTRES=null; S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
 const PHONE=()=>matchMedia('(max-width:700px)').matches;
@@ -1284,7 +1289,7 @@ function centerDone(){ const el=document.getElementById('card'); if(!el.classLis
   const free=nb-(top-scrollY)-r.height-16; if(free>24) el.style.marginTop=Math.round(free/2)+'px'; }
 addEventListener('resize',()=>{ clearTimeout(centerDone._t); centerDone._t=setTimeout(centerDone,200); });
 function showCard(){
-  renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
+  if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard'); el.style.marginTop='';
   if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const st=streakDays();
     const nx=Math.min(...Object.values(S.cards).map(c=>c.due).filter(x=>x>now)); const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
@@ -2178,7 +2183,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:02 · faa12d</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:08 · 9c1623</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2232,7 +2237,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 09:02 · faa12d';
+const BUILD='2026.11.25 · 09:08 · 9c1623';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
@@ -2250,6 +2255,8 @@ function renderReminder(host){ if(!host) return; const can=document.querySelecto
     if(r==='denied'){ e.target.checked=false; m.textContent=tr('Notifications refusées dans les réglages du navigateur.','Notifications are blocked in the browser settings.'); }
     else if(r==='nosync'&&e.target.checked) m.textContent=tr('Ce navigateur ne réveille pas l’appli en arrière-plan : installe-la depuis Chrome.','This browser cannot wake the app in the background: install it from Chrome.'); else m.textContent=''; }; }
 document.addEventListener('visibilitychange',()=>{ if(document.hidden) pushDue(); }); setTimeout(pushDue,3000);
+// back in the app on a new day: fresh set without a reload
+document.addEventListener('visibilitychange',()=>{ if(document.hidden||!rollDay()) return; store.set(SKEY,S); renderStats(); if(document.getElementById('v-revisions').classList.contains('on')) showCard(); });
 // ---------- install + auto-update (site only)
 let INSTALL=null; const STANDALONE=()=>matchMedia('(display-mode: fullscreen),(display-mode: standalone),(display-mode: minimal-ui)').matches||navigator.standalone===true;
 addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); INSTALL=e; const h=document.getElementById('insthost'); if(h) renderInstall(h); });
