@@ -461,11 +461,13 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .comps{display:grid;gap:6px}
 .comp{display:flex;gap:12px;align-items:center;font-size:16px}
 .comp .k{font-family:var(--f-jp);font-weight:600;font-size:30px;width:48px;height:48px;display:grid;place-items:center;border:2px solid var(--rule);color:#121212;flex:none}
-.variants{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}
+.variants{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .variants figure{margin:0;display:grid;gap:4px}
 .variants figcaption{font-family:var(--f-mono);font-size:14px;text-transform:uppercase;text-align:center}
 .variants canvas,.variants .printed{width:100%;aspect-ratio:1;border:2px solid var(--rule);display:block}
 .variants .printed{display:grid;place-items:center;font-size:72px;background:#fff;color:#111;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}
+.variants figure{min-width:0}.variants .printed{overflow:hidden}
+@media (max-width:600px){.variants{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.variants figure:nth-child(5){display:none}.variants .printed{font-size:48px}.variants figcaption{font-size:14px;text-transform:none;line-height:1.15}}
 .dlghead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--sheet);border-bottom:2px solid var(--rule)}
 .dlghead #dlgslot{display:contents}
 /* simulator */
@@ -1524,7 +1526,7 @@ function openKanji(ch){ const body=document.getElementById('dlgbody'); const k=k
   const layer=document.createElement('canvas'); layer.width=layer.height=S0; drawRef(layer.getContext('2d'),ch,S0/2,S0/2,S0*0.86,{colors}); x.save(); x.globalCompositeOperation='multiply'; x.drawImage(layer,0,0); x.restore();
   const vr=()=>{ const box=body.querySelector('#dvar'); box.innerHTML=`<figure><div class="printed">${esc(ch)}</div><figcaption>${tr('imprimé','printed')}</figcaption></figure>`; const r=rng(newSeed());
     const opts=[['kaisho','brush','washi','pinceau soigné'],['hurry','brush','wood','pinceau pressé'],['gyosho','brush','kinari','semi-cursive'],['sosho','brush','washi','très cursive'],['hurry','chisel','yellow','feutre biseauté'],['hurry','marker','white','feutre rond'],['hurry','chalk','board','craie'],['gyosho','pen','cream','stylo']];
-    opts.forEach(([pr,tl,sf,cap])=>{ const f=document.createElement('figure'); const cv=document.createElement('canvas'); f.appendChild(cv); f.insertAdjacentHTML('beforeend',`<figcaption>${LANG==='en'?CAPEN[cap]:cap}</figcaption>`); box.appendChild(f);
+    shuffle(r,opts).slice(0,4).forEach(([pr,tl,sf,cap])=>{ const f=document.createElement('figure'); const cv=document.createElement('canvas'); f.appendChild(cv); f.insertAdjacentHTML('beforeend',`<figcaption>${LANG==='en'?CAPEN[cap]:cap}</figcaption>`); box.appendChild(f);
       textCanvas(cv,ch,{seed:(r()*1e9)|0,writer:makeWriter(r,pr,tl),size:96,surface:sf,pad:0.16}); cv.style.width=''; }); };
   vr(); body.querySelector('#dregen').onclick=vr; body.querySelector('#dwrite').onclick=()=>{atelierChar=ch; dlg.close()};
   dlg.showModal(); body.scrollTop=0; }
