@@ -389,3 +389,47 @@ T['izakaya']['sections'][5][1].append('生')
 T['sushi']['names'].append('鮓 {n}')
 NAMEPAT_R.update({'酒場':'さかば','地酒処':'じざけどころ','鮓':'すし'})
 MENTIONS=['税込','時価','各種','売切','品切れ','本日終了','限定','一人前','お代わり','大盛','特盛','並','〆','お通し','刺盛','唐揚','盛合','生','生中','鮨','鮓','燒鳥','飲み放題','ご飯大盛無料','単品']
+
+# ---- tea: Japanese teas, tea sweets, and a tea house type
+TEA_W = [
+ ('お茶','おちゃ','thé','tea'),
+ ('日本茶','にほんちゃ','thé japonais','Japanese tea'),
+ ('緑茶','りょくちゃ','thé vert','green tea'),
+ ('ほうじ茶','ほうじちゃ','thé vert torréfié','roasted green tea'),
+ ('玄米茶','げんまいちゃ','thé vert au riz grillé','green tea with roasted rice'),
+ ('番茶','ばんちゃ','thé vert de tous les jours','everyday green tea'),
+ ('玉露','ぎょくろ','thé vert de luxe, cultivé à l’ombre','premium shade-grown green tea'),
+ ('新茶','しんちゃ','thé de la première récolte','first-flush tea'),
+ ('茎茶','くきちゃ','thé de tiges','stem tea'),
+ ('麦茶','むぎちゃ','tisane d’orge grillée','roasted barley tea'),
+ ('冷茶','れいちゃ','thé vert froid','cold green tea'),
+ ('和紅茶','わこうちゃ','thé noir japonais','Japanese black tea'),
+ ('薄茶','うすちゃ','matcha léger','thin matcha'),
+ ('濃茶','こいちゃ','matcha épais','thick matcha'),
+ ('抹茶ラテ','まっちゃラテ','latte au matcha','matcha latte'),
+ ('ほうじ茶ラテ','ほうじちゃラテ','latte au thé torréfié','roasted tea latte'),
+ ('和菓子','わがし','pâtisseries japonaises','Japanese sweets'),
+ ('茶菓子','ちゃがし','douceur servie avec le thé','sweet served with tea'),
+ ('大福','だいふく','mochi fourré aux haricots rouges','mochi filled with red bean'),
+ ('最中','もなか','gaufrette fourrée aux haricots rouges','wafer filled with red bean'),
+ ('羊羹','ようかん','pâte de haricots rouges gélifiée','red bean jelly'),
+ ('わらび餅','わらびもち','gelée de fougère au kinako','bracken jelly with kinako'),
+ ('抹茶パフェ','まっちゃパフェ','parfait au matcha','matcha parfait'),
+ ('抹茶アイス','まっちゃアイス','glace au matcha','matcha ice cream'),
+ ('茶そば','ちゃそば','soba au thé vert','green tea soba'),
+]
+for w,r,f,e in TEA_W: W[w]=(r,f)
+NEW_W.extend(TEA_W)
+T['chaya']=dict(jp='日本茶カフェ', fr='Salon de thé', layouts=['sheet','tanzaku','card'],
+   names=['茶寮 {n}','日本茶 {n}','{n}園'],
+   sections=[('日本茶',['煎茶','玉露','ほうじ茶','玄米茶','番茶','茎茶','新茶','和紅茶','冷茶','麦茶'],(450,1200)),
+             ('抹茶',['薄茶','濃茶','抹茶ラテ','ほうじ茶ラテ'],(550,1400)),
+             ('和菓子',['大福','最中','羊羹','わらび餅','団子','白玉','茶菓子'],(250,700)),
+             ('甘味',['抹茶パフェ','抹茶アイス','餡蜜','宇治金時'],(600,1400)),
+             ('軽食',['茶そば','お茶漬け'],(800,1300))])
+T['kanmi']['sections'][0][1].extend(['大福','わらび餅','抹茶パフェ'])
+T['kanmi']['sections'][1][1].extend(['ほうじ茶','玄米茶'])
+T['teishoku']['sections'][2][1].append('麦茶')
+T['soba']['sections'][1][1].append('茶そば')
+R['kyoto']['items'].append('抹茶パフェ')
+NAMEPAT_R.update({'茶寮':'さりょう','日本茶':'にほんちゃ','園':'えん'})

@@ -90,3 +90,5 @@ TYPES_EN = {'izakaya':'Izakaya','yakitori':'Yakitori','ramen':'Ramen','soba':'So
 _m={}; exec(open('menudata.py',encoding='utf-8').read(),_m)
 for _w,_r,_f,_e in _m['NEW_W']: W_EN[_w]=_e
 TYPES_EN['sakaba']='Sake bar'
+TYPES_EN['chaya']='Tea house'
+FRO_EN['羹']='thick soup (in 羊羹)'

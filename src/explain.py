@@ -302,3 +302,40 @@ for line in """
 松葉|« Aiguilles de pin » : toujours vertes, symbole de constance.|“Pine needles”: evergreen, a sign of constancy.
 """.strip().splitlines():
     w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)
+
+# --- tea
+add("""
+お茶|Le thé, avec le お de politesse. Au restaurant, du thé vert est souvent servi gratuitement.|Tea, with the polite お. In restaurants, green tea is often free.
+日本茶|Le thé japonais en général, presque toujours du thé vert.|Japanese tea in general, almost always green tea.
+緑茶|Thé vert. Au Japon, les feuilles sont étuvées, ce qui donne un goût d’herbe fraîche.|Green tea. In Japan the leaves are steamed, which gives a fresh grassy taste.
+煎茶|Le thé vert le plus courant : feuilles étuvées puis roulées, infusées à l’eau pas trop chaude.|The most common green tea: steamed, rolled leaves brewed in water that is not too hot.
+ほうじ茶|Thé vert torréfié : brun, doux, au goût grillé, avec peu de caféine. On l’écrit aussi 焙じ茶.|Roasted green tea: brown, mellow and toasty, with little caffeine. Also written 焙じ茶.
+玄米茶|Thé vert mélangé à du riz complet grillé, parfois soufflé. Goût de pop-corn.|Green tea mixed with roasted brown rice, sometimes popped. Tastes a bit like popcorn.
+番茶|Thé vert de tous les jours, fait de grandes feuilles cueillies tard. Léger et bon marché.|Everyday green tea from large, late-picked leaves. Light and cheap.
+玉露|Thé vert de luxe : les théiers sont couverts quelques semaines avant la récolte. Très doux et riche en umami, infusé tiède.|Luxury green tea: the bushes are shaded for weeks before picking. Sweet and full of umami, brewed lukewarm.
+新茶|Thé de la première récolte du printemps (avril-mai). Frais et parfumé.|First tea of the spring harvest (April-May). Fresh and fragrant.
+茎茶|Thé fait des tiges et des nervures des feuilles. Léger et sucré.|Tea made from stems and leaf veins. Light and sweet.
+麦茶|Tisane d’orge grillée, sans caféine, bue froide l’été. Souvent servie gratuitement.|Roasted barley tea, caffeine-free, drunk cold in summer. Often served for free.
+冷茶|Thé vert servi froid.|Green tea served cold.
+和紅茶|Thé noir cultivé au Japon, plus doux et moins tannique que les thés indiens.|Black tea grown in Japan, softer and less tannic than Indian teas.
+薄茶|Matcha léger et mousseux, la préparation habituelle.|Light frothy matcha, the usual way it is made.
+濃茶|Matcha épais comme une crème, avec beaucoup de poudre, servi pendant la cérémonie du thé.|Matcha as thick as cream, made with lots of powder, served at the tea ceremony.
+抹茶ラテ|Matcha mélangé à du lait chaud ou froid, souvent sucré.|Matcha mixed with hot or cold milk, often sweetened.
+ほうじ茶ラテ|Thé torréfié avec du lait, doux et grillé.|Roasted tea with milk, mellow and toasty.
+和菓子|Pâtisseries japonaises traditionnelles, souvent à base de pâte de haricots rouges et de riz gluant.|Traditional Japanese sweets, often made with red bean paste and glutinous rice.
+茶菓子|Petite douceur servie avec le thé pour équilibrer son amertume.|A small sweet served with tea to balance its bitterness.
+大福|Boule de mochi fourrée de pâte de haricots rouges, parfois avec une fraise (苺大福).|A mochi ball filled with red bean paste, sometimes with a strawberry (苺大福).
+最中|Deux gaufrettes de riz croustillantes autour de pâte de haricots rouges.|Two crisp rice wafers around red bean paste.
+羊羹|Bloc de pâte de haricots rouges gélifiée à l’agar, coupé en tranches.|A block of red bean paste set with agar, cut into slices.
+わらび餅|Gelée tremblante d’amidon de fougère, roulée dans la poudre de soja grillé (kinako).|A wobbly bracken starch jelly rolled in roasted soy flour (kinako).
+抹茶パフェ|Grande coupe en couches : glace au matcha, gelée, haricots rouges, mochi et crème.|A tall layered glass: matcha ice cream, jelly, red beans, mochi and cream.
+抹茶アイス|Glace au matcha.|Matcha ice cream.
+茶そば|Nouilles de sarrasin parfumées au thé vert, d’un vert pâle, souvent servies froides.|Buckwheat noodles flavoured with green tea, pale green, often served cold.
+""")
+for line in """
+日本茶カフェ|« Café de thé japonais » : salon moderne où l’on goûte des thés et des douceurs.|“Japanese tea café”: a modern place to taste teas and sweets.
+茶寮|« Pavillon de thé » : 茶 thé, 寮 pavillon. Nom élégant pour un salon de thé.|“Tea pavilion”: 茶 tea, 寮 lodge. An elegant name for a tea house.
+日本茶|« Thé japonais » : la boutique vend et sert du thé.|“Japanese tea”: the shop sells and serves tea.
+園|« Jardin, plantation » : beaucoup de maisons de thé portent le nom de leur plantation, comme 〇〇園.|“Garden, plantation”: many tea houses are named after their plantation, like 〇〇園.
+""".strip().splitlines():
+    w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)
