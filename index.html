@@ -1317,7 +1317,7 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
     play(tool,sim.samples,i,j); i=j; paint(); compose(ctx,layer,o.writer.tool,o.color);
     // pen tip
     const s=sim.samples[Math.min(i,sim.samples.length-1)]; if(s && i<sim.samples.length){ ctx.save(); ctx.fillStyle=s.p>0.035?'rgba(255,82,50,.9)':'rgba(58,91,255,.7)'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(3,o.size*DPR*0.035),0,7); ctx.fill(); ctx.restore(); }
-    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const sheen=document.createElement('canvas');sheen.width=Wd;sheen.height=Hd;const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.max(0,1-(now-began)/6500);paint();compose(ctx,layer,o.writer.tool,o.color);Ambience.paintInk(sheen,layer,wet,now-began);ctx.drawImage(sheen,0,0);if(wet>0)requestAnimationFrame(dry);};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
+    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const sheen=document.createElement('canvas');sheen.width=Wd;sheen.height=Hd;const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.max(0,1-(now-began)/2200);paint();compose(ctx,layer,o.writer.tool,o.color);Ambience.paintInk(sheen,layer,wet,now-began);ctx.drawImage(sheen,0,0);if(wet>0)requestAnimationFrame(dry);};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
   requestAnimationFrame(frame); return {sim, layout:L, token};
 }
 
@@ -1424,7 +1424,7 @@ const Ambience=(()=>{
       const x=mask.getContext('2d');x.clearRect(0,0,mask.width,mask.height);sources.forEach(c=>x.drawImage(c,0,0,mask.width,mask.height));
       start=performance.now();paintInk(overlay,mask,1);cancelAnimationFrame(frame);
       if(matchMedia('(prefers-reduced-motion: reduce)').matches){paintInk(overlay,mask,0);return;}
-      const dry=now=>{if(disposed||!host.isConnected)return;if(document.hidden||(host.getClientRects&&!host.getClientRects().length)){clear();return;}const wet=Math.max(0,1-(now-start)/6500);paintInk(overlay,mask,wet,now-start);if(wet>0)frame=requestAnimationFrame(dry);};frame=requestAnimationFrame(dry);
+      const dry=now=>{if(disposed||!host.isConnected)return;if(document.hidden||(host.getClientRects&&!host.getClientRects().length)){clear();return;}const wet=Math.max(0,1-(now-start)/2200);paintInk(overlay,mask,wet,now-start);if(wet>0)frame=requestAnimationFrame(dry);};frame=requestAnimationFrame(dry);
     }
     function clear(){cancelAnimationFrame(frame);overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
     return {refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
@@ -2526,7 +2526,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 8902b34699</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 29eafb81c1</p>
   `; document.getElementById('settings-lesson').onclick=()=>openLesson();document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2563,7 +2563,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
   if(n===2){
     o.innerHTML=head+`<div class="ostage in vfirst s2"><div><p class="okick">見つける</p><h2>${tr('Où est le <em>bol de bœuf</em> ?','Where is the <em>beef bowl</em>?')}</h2>
       <p class="olead">${tr('Touche le bon plat sur le menu du comptoir.','Tap the right dish on the counter menu.')}</p><p class="ohint" id="ohint" aria-live="polite"></p>
-      <div class="orow" id="oend" hidden><button class="btn k" id="ostart">${tr('Commencer les révisions →','Start reviewing →')}</button><a class="btn" href="#menu" id="omenu">${tr('Voir un vrai menu','See a full menu')}</a></div></div>
+      <div class="orow" id="oend" hidden><button class="btn k" id="ostart">${tr('Mon premier izakaya →','My first izakaya →')}</button><a class="btn" href="#menu" id="omenu">${tr('Voir un vrai menu','See a full menu')}</a></div></div>
       <div class="omenu" id="ombd"><div class="ostamp" id="ostamp">合格</div></div></div>`;
     const host=o.querySelector('#ombd'); const r=rng(777); const opts=shuffle(r,[ONB.word,...ONB.others]); const wr=makeWriter(r,'hurry','brush'); const sz=Math.round(clamp(Math.min((innerHeight*.56)/(3*.95+.7),(host.clientWidth-36-14*3)/4/1.7),26,76));
     let tries=0, done=false;
@@ -2573,7 +2573,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
           o.querySelector('#ohint').textContent=tr('Bien vu : 牛丼, gyūdon. Ton premier plat lu !','Well spotted: 牛丼, gyūdon. Your first dish read!'); o.querySelector('#oend').hidden=false;
           o.querySelectorAll('.osteps span').forEach(x=>x.className='done'); }
         else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); o.querySelector('#ohint').textContent=tr('Pas celui-là. Cherche le 牛 que tu viens d’écrire.','Not that one. Look for the 牛 you just wrote.'); } }; });
-    o.querySelector('#ostart').onclick=()=>{ onbDone(); location.hash='#revisions'; route(); };
+    o.querySelector('#ostart').onclick=()=>{ onbDone(); location.hash='#revisions'; route(); openLesson(); };
     o.querySelector('#omenu').onclick=()=>onbDone();
   }
   o.querySelector('#oskip').onclick=onbDone; o.scrollTop=0; }
@@ -2652,7 +2652,7 @@ function lessonQuest(){
   q.querySelector('#lesson-exit').onclick=()=>{ stopLessonMenu(); newQuest(); };
 }
 
-const BUILD='2 · 8902b34699';
+const BUILD='2 · 29eafb81c1';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };

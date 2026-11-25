@@ -101,7 +101,7 @@ const Ambience=(()=>{
       const x=mask.getContext('2d');x.clearRect(0,0,mask.width,mask.height);sources.forEach(c=>x.drawImage(c,0,0,mask.width,mask.height));
       start=performance.now();paintInk(overlay,mask,1);cancelAnimationFrame(frame);
       if(matchMedia('(prefers-reduced-motion: reduce)').matches){paintInk(overlay,mask,0);return;}
-      const dry=now=>{if(disposed||!host.isConnected)return;if(document.hidden||(host.getClientRects&&!host.getClientRects().length)){clear();return;}const wet=Math.max(0,1-(now-start)/6500);paintInk(overlay,mask,wet,now-start);if(wet>0)frame=requestAnimationFrame(dry);};frame=requestAnimationFrame(dry);
+      const dry=now=>{if(disposed||!host.isConnected)return;if(document.hidden||(host.getClientRects&&!host.getClientRects().length)){clear();return;}const wet=Math.max(0,1-(now-start)/2200);paintInk(overlay,mask,wet,now-start);if(wet>0)frame=requestAnimationFrame(dry);};frame=requestAnimationFrame(dry);
     }
     function clear(){cancelAnimationFrame(frame);overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
     return {refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};

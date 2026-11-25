@@ -1199,7 +1199,7 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
     play(tool,sim.samples,i,j); i=j; paint(); compose(ctx,layer,o.writer.tool,o.color);
     // pen tip
     const s=sim.samples[Math.min(i,sim.samples.length-1)]; if(s && i<sim.samples.length){ ctx.save(); ctx.fillStyle=s.p>0.035?'rgba(255,82,50,.9)':'rgba(58,91,255,.7)'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(3,o.size*DPR*0.035),0,7); ctx.fill(); ctx.restore(); }
-    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const sheen=document.createElement('canvas');sheen.width=Wd;sheen.height=Hd;const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.max(0,1-(now-began)/6500);paint();compose(ctx,layer,o.writer.tool,o.color);Ambience.paintInk(sheen,layer,wet,now-began);ctx.drawImage(sheen,0,0);if(wet>0)requestAnimationFrame(dry);};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
+    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const sheen=document.createElement('canvas');sheen.width=Wd;sheen.height=Hd;const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.max(0,1-(now-began)/2200);paint();compose(ctx,layer,o.writer.tool,o.color);Ambience.paintInk(sheen,layer,wet,now-began);ctx.drawImage(sheen,0,0);if(wet>0)requestAnimationFrame(dry);};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
   requestAnimationFrame(frame); return {sim, layout:L, token};
 }
 
@@ -2334,7 +2334,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
   if(n===2){
     o.innerHTML=head+`<div class="ostage in vfirst s2"><div><p class="okick">見つける</p><h2>${tr('Où est le <em>bol de bœuf</em> ?','Where is the <em>beef bowl</em>?')}</h2>
       <p class="olead">${tr('Touche le bon plat sur le menu du comptoir.','Tap the right dish on the counter menu.')}</p><p class="ohint" id="ohint" aria-live="polite"></p>
-      <div class="orow" id="oend" hidden><button class="btn k" id="ostart">${tr('Commencer les révisions →','Start reviewing →')}</button><a class="btn" href="#menu" id="omenu">${tr('Voir un vrai menu','See a full menu')}</a></div></div>
+      <div class="orow" id="oend" hidden><button class="btn k" id="ostart">${tr('Mon premier izakaya →','My first izakaya →')}</button><a class="btn" href="#menu" id="omenu">${tr('Voir un vrai menu','See a full menu')}</a></div></div>
       <div class="omenu" id="ombd"><div class="ostamp" id="ostamp">合格</div></div></div>`;
     const host=o.querySelector('#ombd'); const r=rng(777); const opts=shuffle(r,[ONB.word,...ONB.others]); const wr=makeWriter(r,'hurry','brush'); const sz=Math.round(clamp(Math.min((innerHeight*.56)/(3*.95+.7),(host.clientWidth-36-14*3)/4/1.7),26,76));
     let tries=0, done=false;
@@ -2344,7 +2344,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
           o.querySelector('#ohint').textContent=tr('Bien vu : 牛丼, gyūdon. Ton premier plat lu !','Well spotted: 牛丼, gyūdon. Your first dish read!'); o.querySelector('#oend').hidden=false;
           o.querySelectorAll('.osteps span').forEach(x=>x.className='done'); }
         else { b.classList.remove('bad'); void b.offsetWidth; b.classList.add('bad'); o.querySelector('#ohint').textContent=tr('Pas celui-là. Cherche le 牛 que tu viens d’écrire.','Not that one. Look for the 牛 you just wrote.'); } }; });
-    o.querySelector('#ostart').onclick=()=>{ onbDone(); location.hash='#revisions'; route(); };
+    o.querySelector('#ostart').onclick=()=>{ onbDone(); location.hash='#revisions'; route(); openLesson(); };
     o.querySelector('#omenu').onclick=()=>onbDone();
   }
   o.querySelector('#oskip').onclick=onbDone; o.scrollTop=0; }
