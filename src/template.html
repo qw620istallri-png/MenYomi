@@ -82,6 +82,14 @@ html.night #logo{box-shadow:4px 4px 0 var(--blue)}
 .ainfo .r{font-family:var(--f-jp)}
 .ainfo .mono{color:var(--mute);font-size:14px;text-transform:uppercase}
 #ares:empty{display:none}
+.adetail{display:grid;gap:4px;min-width:0}
+.adetail .mn{font-family:var(--f-disp);font-stretch:80%;font-size:30px;font-weight:900;line-height:1.05;text-transform:uppercase;margin-top:6px}
+.adetail p{margin:4px 0 0;font-size:16px}
+.adetail h3{margin:16px 0 8px}
+.adetail .vtable{columns:1}
+.adetail .where{display:flex;flex-wrap:wrap;gap:6px}
+.adetail .where span{border:2px solid var(--rule);background:var(--sheet);padding:3px 9px;font-size:15px}
+.adetail .where span b{font-family:var(--f-jp);font-weight:600;margin-right:6px}
 @media (min-width:701px){
   /* on a computer the picker sits beside the pad, so the pad gets the height */
   #v-atelier.on{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:24px;align-items:start}
@@ -90,6 +98,7 @@ html.night #logo{box-shadow:4px 4px 0 var(--blue)}
   #v-atelier .acol{grid-column:1;grid-row:2/span 2;width:clamp(280px,calc(100vh / var(--z,1) - 350px),640px)}
   #v-atelier .apick{grid-column:2;grid-row:2}
   #v-atelier .padside{grid-column:2;grid-row:3;gap:10px;align-content:start}
+  #v-atelier .adetail{max-height:calc(100vh / var(--z,1) - 400px);overflow:auto;overscroll-behavior:contain;padding-right:8px}
   body:has(#v-atelier.on){padding-bottom:16px}
 }
 
@@ -691,7 +700,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
     </div>
     <div class="padside">
     <div class="arand" role="group"><span class="lab" data-en="Random">Hasard</span><button id="arknown" data-en="Mine">Mes mots</button><button id="arall" data-en="All">Tous</button></div>
-      <button class="ainfo" id="ainfo"></button><div class="result" id="ares"></div></div>
+      <button class="ainfo" id="ainfo"></button><div class="result" id="ares"></div><div class="adetail" id="adetail"></div></div>
   </div>
 </section>
 
@@ -1622,7 +1631,15 @@ function renderAtelier(){ if(!apad){ apad=new Pad(document.getElementById('apad'
 function setA(){ apad.setChar(atelierChar); const k=kInfo(atelierChar);
   document.getElementById('aselk').textContent=atelierChar; document.getElementById('aselm').textContent=k.mean;
   const inf=document.getElementById('ainfo'); inf.dataset.k=atelierChar; inf.innerHTML=`<span class="r">${esc(k.on)} · ${esc(k.kun)}</span><span class="mono">${k.strokes} ${tr('traits','strokes')}${k.jlpt?' · N'+k.jlpt:''}</span>`;
-  document.getElementById('ares').innerHTML=''; }
+  document.getElementById('ares').innerHTML=''; aDetail(atelierChar); }
+// under the pad: the meaning, how the kanji is built, and the menu words (and kinds of restaurants) where it shows up
+function aDetail(ch){ const box=document.getElementById('adetail'); if(!box) return; const k=kInfo(ch); const comps=topComps(ch); const words=WORDS.filter(w=>w[0].includes(ch));
+  const auto=comps.length>1? tr('Composé de ','Made of ')+comps.map(c=>`${c.e} (${compMean(c.e)||'?'})${c.pos&&POSFR[c.pos]?' '+POSFR[c.pos]:''}`).join(tr(' et ',' and '))+'.' : '';
+  const ws=new Set(words.map(w=>w[0])); const types=Object.values(TYPES).filter(t=>t.sections.some(q=>q[1].some(x=>ws.has(x))||ws.has(q[0])));
+  box.innerHTML=`<div class="mn">${esc(k.mean)}</div>${(k.note||auto)?`<p>${esc(k.note||auto)}</p>`:''}
+    <dl class="rdg" style="margin-top:8px"><dt>On</dt><dd>${esc(k.on)}<small>${esc(toRomaji(k.on.replace(/[—]/g,'')))}</small></dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${esc(toRomaji(k.kun.replace(/[()—.\-]/g,'')))}</small></dd>${k.grade?`<dt>${tr('École','School')}</dt><dd>${+k.grade<=6?tr('primaire, année ','primary, year ')+k.grade:tr('collège et après','secondary')}</dd>`:''}</dl>
+    ${comps.length?`<h3>${tr('Composants','Components')}</h3><div class="comps">${comps.map((c,i)=>`<div class="comp"><span class="k" style="background:${COLS[i%5]}">${esc(c.e)}</span><span><b>${esc(compMean(c.e)||tr('élément graphique','graphic element'))}</b>${c.pos&&POSFR[c.pos]?' · '+POSFR[c.pos]:''}</span></div>`).join('')}</div>`:''}
+    <h3>${tr('Sur les menus','On menus')}</h3>${words.length?`${types.length?`<div class="where">${types.map(t=>`<span><b>${esc(t.jp)}</b>${esc(LANG==='en'&&t.en?t.en:t.fr)}</span>`).join('')}</div>`:''}<div class="vtable" style="margin-top:8px">${words.map(vRow).join('')}</div>`:`<p style="color:var(--mute)">${tr('Pas encore dans les mots des menus.','Not in the menu words yet.')}</p>`}`; }
 // random draw among the kanji I know, or among all of them
 function aRandom(known){ let pool=known?WRITABLE.filter(knownKanji):WRITABLE; if(known&&!pool.length){ toast(tr('Aucun kanji appris pour l’instant : tirage parmi tous.','No kanji learned yet: drawing from all of them.')); pool=WRITABLE; }
   let c=atelierChar; for(let n=0;n<8&&c===atelierChar;n++) c=pool[Math.floor(Math.random()*pool.length)]; aPick(c); }
@@ -1658,7 +1675,8 @@ function bindAtelier(){ const $=id=>document.getElementById(id);
   $('aghost').onclick=()=>{ apad.ghostOn=!apad.ghostOn; apad.drawGuide(); $('aghost').setAttribute('aria-pressed',String(apad.ghostOn)); };
   $('aanim').onclick=()=>apad.animate(); $('ademo').onclick=()=>apad.demo();
   $('aundo').onclick=()=>{ apad.undo(); $('ares').innerHTML=''; }; $('aclear').onclick=()=>{ apad.clear(); $('ares').innerHTML=''; };
-  $('acheck').onclick=()=>{ $('ares').innerHTML=apad.check().html; }; }
+  $('acheck').onclick=()=>{ $('ares').innerHTML=apad.check().html; };
+  $('adetail').addEventListener('click',e=>{ if(e.target.closest('[data-k],.say')) return; const b=e.target.closest('.vrow'); if(b) openWord(b.dataset.w); }); }
 
 // ---------- the hand simulator
 const SIMTEXTS=['焼鳥','唐揚げ','刺身盛合せ','醤油ラーメン','本日のおすすめ','お品書き','味噌煮込み饂飩','生ビール','鯖味噌定食','天ざる','櫃まぶし','焼','書','鶏','麺'];
