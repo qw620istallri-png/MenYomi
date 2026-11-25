@@ -499,7 +499,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .variants figure{margin:0;display:grid;gap:4px}
 .variants figcaption{font-family:var(--f-mono);font-size:14px;text-transform:uppercase;text-align:center}
 .variants canvas,.variants .printed{width:100%;aspect-ratio:1;border:2px solid var(--rule);display:block}
-.variants .printed{display:grid;place-items:center;font-size:72px;background:#fff;color:#111;font-family:"Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif}
+.variants .printed{display:grid;place-items:center;font-size:72px;background:#fff;color:#111;font-family:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic","Noto Sans JP",sans-serif;font-weight:500}
 .variants figure{min-width:0}.variants .printed{overflow:hidden}
 @media (max-width:600px){.variants{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.variants figure:nth-child(5){display:none}.variants .printed{font-size:48px}.variants figcaption{font-size:14px;text-transform:none;line-height:1.15}}
 .dlghead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--sheet);border-bottom:2px solid var(--rule)}
@@ -1319,7 +1319,7 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
     play(tool,sim.samples,i,j); i=j; paint(); compose(ctx,layer,o.writer.tool,o.color);
     // pen tip
     const s=sim.samples[Math.min(i,sim.samples.length-1)]; if(s && i<sim.samples.length){ ctx.save(); ctx.fillStyle=s.p>0.035?'rgba(255,82,50,.9)':'rgba(58,91,255,.7)'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(3,o.size*DPR*0.035),0,7); ctx.fill(); ctx.restore(); }
-    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const sheen=document.createElement('canvas');sheen.width=Wd;sheen.height=Hd;const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.max(0,1-(now-began)/2200);paint();compose(ctx,layer,o.writer.tool,o.color);Ambience.paintInk(sheen,layer,wet,now-began);ctx.drawImage(sheen,0,0);if(wet>0)requestAnimationFrame(dry);};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
+    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const L=Ambience.wetLayer(layer);const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.pow(Math.max(0,1-(now-began)/3400),1.6);paint();compose(ctx,layer,o.writer.tool,o.color);if(wet>0){ctx.save();ctx.globalAlpha=wet;ctx.drawImage(L.body,0,0);ctx.drawImage(L.gloss,0,0);ctx.restore();requestAnimationFrame(dry);}};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
   requestAnimationFrame(frame); return {sim, layout:L, token};
 }
 
@@ -1448,7 +1448,7 @@ const Ambience=(()=>{
     function clear(){cancelAnimationFrame(frame);frame=0;list=[];overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
     return {add,refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
   }
-  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
+  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,wetLayer,attachInk,get view(){return currentView;}};
 })();
 if(typeof module!=='undefined')module.exports=Ambience;
 
@@ -1744,7 +1744,7 @@ class Pad{
     g.fillStyle=upto!=null?'rgba(40,40,40,.55)':'rgba(60,60,60,.12)'; drawRef(g,this.ch,s/2,s/2,s*0.9,{upto,partial}); }
   flashGhost(){ const was=this.ghostOn; this.ghostOn=true; this.drawGuide(); clearTimeout(this._fg); this._fg=setTimeout(()=>{this.ghostOn=was; this.drawGuide()},1300); }
   animate(){ const g=glyph(this.ch); if(!g) return; cancelAnimationFrame(this._raf); let i=0, t0=performance.now(); const dur=k=>380+g.strokes[k].length*9;
-    const tick=now=>{ const p=Math.min(1,(now-t0)/dur(i)); this.drawGuide(i+1,p); const gx=this.guide.getContext('2d'); gx.fillStyle='rgba(220,60,40,.95)'; gx.font=`700 ${Math.round(this.size*0.04)}px sans-serif`;
+    const tick=now=>{ const p=Math.min(1,(now-t0)/dur(i)); this.drawGuide(i+1,p); const gx=this.guide.getContext('2d'); gx.fillStyle='rgba(220,60,40,.95)'; gx.font=`600 ${Math.round(this.size*0.04)}px "IBM Plex Mono",monospace`;
       for(let k=0;k<=i;k++){const q=g.strokes[k][0]; gx.fillText(k+1,q[0]*this.size*0.9/109+this.size*0.05-this.size*0.04,q[1]*this.size*0.9/109+this.size*0.05)}
       if(p>=1){ i++; t0=now; if(i>=g.strokes.length){ setTimeout(()=>this.drawGuide(),900); return; } } this._raf=requestAnimationFrame(tick); };
     this._raf=requestAnimationFrame(tick); }
@@ -1822,7 +1822,7 @@ class Pad{
     for(let i=0;i<this.strokes.length;i++){ let col='#d0331c'; if(i<ref.length){ const a=res(this.strokes[i].map(T),20), b=res(ref[i],20), d=md(a,b), dr=md(a.slice().reverse(),b);
         if(dr<d*0.6&&dr<16){rev++;col='#c07a00'} else if(d<11){ok++;col='#14a35e'} else if(d<19){meh++;col='#e0a000'} }
       const p=this.strokes[i][0]; ox.fillStyle=col; ox.strokeStyle='#111'; ox.lineWidth=2*DPR; ox.beginPath(); ox.arc(p[0]*k,p[1]*k,s*0.03,0,7); ox.fill(); ox.stroke();
-      ox.fillStyle='#fff'; ox.font=`800 ${Math.round(s*0.034)}px sans-serif`; ox.textAlign='center'; ox.textBaseline='middle'; ox.fillText(i+1,p[0]*k,p[1]*k+1); }
+      ox.fillStyle='#fff'; ox.font=`600 ${Math.round(s*0.034)}px "IBM Plex Mono",monospace`; ox.textAlign='center'; ox.textBaseline='middle'; ox.fillText(i+1,p[0]*k,p[1]*k+1); }
     const tot=ref.length, cnt=this.strokes.length;
     let html=`<div>${tr('Traits','Strokes')} : <b>${cnt}</b> / ${tot} ${cnt===tot?'<span class="ok">✓</span>':'<span class="ko">'+tr('nombre différent','different count')+'</span>'}</div><div><span class="ok">${ok} ${tr('bien placés','well placed')}</span> · <span class="meh">${meh} ${tr('à affiner','to refine')}</span>${rev?` · <span class="meh">${rev} ${tr('à l’envers','reversed')}</span>`:''}</div>`;
     const sc=(ok+meh*0.5)/tot; return {html, suggest: cnt!==tot||sc<0.5?0: sc<0.8||rev?1: sc<1?2:3}; }
@@ -2566,7 +2566,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · c0824cb334</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · a5dbc3f1aa</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2645,7 +2645,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes travaillées','cards practised')} · ${es.filter(([,e])=>e.ok).length} ${tr('réussies au premier essai','right on the first try')}.</p>${wrong.length?`<p>${tr('À retrouver sans hésiter','Words to revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}.</p><button class="btn" id="review-difficult">${tr('Retravailler mes hésitations','Practise my difficult cards')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · c0824cb334';
+const BUILD='2 · a5dbc3f1aa';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };

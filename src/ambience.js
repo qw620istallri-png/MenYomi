@@ -123,6 +123,6 @@ const Ambience=(()=>{
     function clear(){cancelAnimationFrame(frame);frame=0;list=[];overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
     return {add,refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
   }
-  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
+  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,wetLayer,attachInk,get view(){return currentView;}};
 })();
 if(typeof module!=='undefined')module.exports=Ambience;
