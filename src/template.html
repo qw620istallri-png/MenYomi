@@ -44,7 +44,10 @@ html.night #logo{box-shadow:4px 4px 0 var(--blue)}
 @media (max-width:700px){#shade canvas{width:130vw}}
 .wrap{max-width:1320px;margin:0 auto;position:relative}
 /* a card in progress: no counters or set buttons, only the stop button of a practice or test */
-#v-revisions.busy #stats,#v-revisions.busy #skwrap{display:none}#v-revisions.busy:not(.sess) .vhead{display:none}#v-revisions.busy.sess .vhead{justify-content:flex-end}
+#v-revisions.busy .vhead,#v-revisions.busy #skwrap{display:none}
+body:not(:has(#v-revisions.on)) #hstop{display:none}#hstop .sm{display:none}@media (max-width:700px){#hstop .lg{display:none}#hstop .sm{display:inline}}
+/* never show scrollbars */
+*{scrollbar-width:none}*::-webkit-scrollbar{display:none;width:0;height:0}
 /* desktop cards: the drawing on the left at the height of the window, question, answer and grades on the right, so nothing needs scrolling */
 @media (min-width:1000px){
   #v-revisions.busy{--stH:clamp(260px,calc(100vh / var(--z,1) - 280px),760px)}
@@ -1211,7 +1214,8 @@ function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.fi
   document.getElementById('stats').innerHTML= SESSION? `<span class="stat"><b>${SESSION.q.length}</b><span>${SESSION.test?tr('à tester','to test'):tr('à refaire','to redo')}</span></span>${SESSION.test?`<span class="stat"><b>${SESSION.ok}<small>/${SESSION.n}</small></b><span>${tr('justes','right')}</span></span>`:`<span class="stat"><b>·</b><span>${tr('pratique','practice')}</span></span>`}${prog}`
     : `<span class="stat"><b>${due}</b><span>${tr('à revoir','due')}</span></span><span class="stat"><b>${nw}</b><span>${tr('nouvelles','new')}</span></span>${prog}`;
   const c=document.getElementById('rctl'); const known=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
-  c.innerHTML= SESSION? `<button class="btn" id="rstop">${SESSION.test?tr('Arrêter le test','Stop the test'):tr('Arrêter l’entraînement','Stop practice')}</button>`
+  { const hc=document.querySelector('.hctl'), old=document.getElementById('hstop'); if(old) old.remove(); if(SESSION&&hc){ const lab=SESSION.test?tr('Arrêter le test','Stop the test'):tr('Arrêter l’entraînement','Stop practice'); hc.insertAdjacentHTML('afterbegin',`<button class="btn" id="hstop" title="${lab}" aria-label="${lab}"><span class="lg">${lab}</span><span class="sm">✕</span></button>`); document.getElementById('hstop').onclick=()=>{ endSession(); showCard(); }; } }
+  c.innerHTML= SESSION? ''
     : `${t?`<button class="btn" id="rredo" title="${tr('Refaire les cartes du jour','Redo today’s cards')}">${tr('Refaire','Redo')} ${t}</button>`:''}<button class="btn" id="rnext" title="${tr('Ajouter des nouvelles cartes aujourd’hui','Add new cards today')}">+${S.newPer} ${tr('mots','words')}</button><button class="btn" id="rtest"${known?'':' disabled'} title="${tr('Des cartes au hasard parmi celles apprises','Random cards among the learned ones')}">${tr('Me tester','Test me')}</button>${TESTRES?`<span class="tres">${tr('Test','Test')} ${TESTRES.ok}/${TESTRES.n}</span>`:''}`;
   const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{ endSession(); showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; if(b('#rtest')) b('#rtest').onclick=testMe; }
 function endSession(){ if(SESSION&&SESSION.test&&SESSION.n) TESTRES={ok:SESSION.ok,n:SESSION.n}; SESSION=null; }
@@ -1230,10 +1234,15 @@ function centerDone(){ const el=document.getElementById('card'); if(!el.classLis
   const r=el.getBoundingClientRect(), nav=document.querySelector('nav.tabs'), nb=PHONE()&&nav?nav.getBoundingClientRect().top:innerHeight; const top=r.top+scrollY;
   const free=nb-(top-scrollY)-r.height-16; if(free>24) el.style.marginTop=Math.round(free/2)+'px'; }
 addEventListener('resize',()=>{ clearTimeout(centerDone._t); centerDone._t=setTimeout(centerDone,200); });
+// desktop: the drawing takes exactly the height left in the window under the card's top
+function fitStage(){ const vr=document.getElementById('v-revisions'); if(!DESK()||!vr.classList.contains('busy')){ vr.style.removeProperty('--stH'); return; }
+  if(scrollY>0&&vr.classList.contains('on')) scrollTo(0,0); const el=document.getElementById('card'); const z=parseFloat(getComputedStyle(document.querySelector('.wrap')).zoom)||1;
+  const top=el.getBoundingClientRect().top+scrollY; vr.style.setProperty('--stH',Math.round(clamp((innerHeight-top)/z-46,220,820))+'px'); }
+addEventListener('resize',()=>{ clearTimeout(fitStage._t); fitStage._t=setTimeout(()=>{ const vr=document.getElementById('v-revisions'); if(vr.classList.contains('busy')&&DESK()){ const before=vr.style.getPropertyValue('--stH'); fitStage(); if(vr.style.getPropertyValue('--stH')!==before&&!document.querySelector('#card .grades')) showCard(); } },250); });
 function showCard(){
   if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard'); el.style.marginTop='';
-  { const vr=document.getElementById('v-revisions'); vr.classList.toggle('busy',!!id); vr.classList.toggle('sess',!!SESSION); }
+  { const vr=document.getElementById('v-revisions'); vr.classList.toggle('busy',!!id); vr.classList.toggle('sess',!!SESSION); if(id) fitStage(); }
   if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const st=streakDays();
     const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
     el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2>
