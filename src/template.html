@@ -2299,8 +2299,12 @@ function renderSync(host){ if(!host||!document.body.contains(host)) return; cons
 // phone tab bar steps aside while typing (keyboard open) and while scrolling down
 (function(){ const mq=matchMedia('(max-width:700px)'); const B=document.body; let lastY=scrollY, base=window.visualViewport?visualViewport.height:innerHeight;
   const typing=()=>{ const a=document.activeElement; return !!a&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&!/^(button|checkbox|radio|range|submit)$/i.test(a.type))||a.isContentEditable); };
-  const upd=()=>{ if(!mq.matches){ B.classList.remove('kbd','navhide'); return; } const vv=window.visualViewport; const kb=typing()||(vv&&vv.height<base*0.78); B.classList.toggle('kbd',kb); };
-  document.addEventListener('focusin',upd); document.addEventListener('focusout',()=>setTimeout(upd,60));
+  // while typing, the card's stage grows to fill the room down to the keyboard (its CSS height assumes the tab bar and the grades below)
+  const fit=()=>{ const st=[...document.querySelectorAll('#card .stage')].find(e=>e.offsetParent); document.querySelectorAll('#card .stage[data-kfit]').forEach(e=>{ if(e!==st||!B.classList.contains('kbd')){ e.style.removeProperty('height'); delete e.dataset.kfit; } });
+    if(!st||!B.classList.contains('kbd')||!mq.matches||!document.querySelector('#card .answerbar input:focus')) return; const vv=window.visualViewport, vh=vv?vv.height:innerHeight, top=vv?vv.offsetTop:0;
+    const card=document.getElementById('card'), gap=vh+top-12-card.getBoundingClientRect().bottom; if(Math.abs(gap)<6) return; st.dataset.kfit=1; st.style.height=Math.round(clamp(st.offsetHeight+gap,150,520))+'px'; document.activeElement.scrollIntoView({block:'nearest'}); };
+  const upd=()=>{ if(!mq.matches){ B.classList.remove('kbd','navhide'); fit(); return; } const vv=window.visualViewport; const kb=typing()||(vv&&vv.height<base*0.78); B.classList.toggle('kbd',kb); requestAnimationFrame(()=>requestAnimationFrame(fit)); };
+  document.addEventListener('focusin',upd); document.addEventListener('focusout',()=>setTimeout(upd,60)); document.addEventListener('submit',()=>setTimeout(upd,60),true);
   if(window.visualViewport) visualViewport.addEventListener('resize',()=>{ if(!typing()&&visualViewport.height>base) base=visualViewport.height; upd(); });
   addEventListener('scroll',()=>{ if(!mq.matches) return; const y=scrollY, dy=y-lastY; if(Math.abs(dy)<8) return;
     const atEnd=innerHeight+y>=document.documentElement.scrollHeight-4; B.classList.toggle('navhide',dy>0&&y>60&&!atEnd); lastY=y; },{passive:true});
