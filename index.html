@@ -1278,9 +1278,14 @@ const MEDIA=[ // reading-card looks: surface, tool, color, vertical
 let curAnim=null;
 const HANDS={kaisho:'soignée',hurry:'pressée',gyosho:'semi-cursive',sosho:'très cursive'}, HANDS_EN={kaisho:'neat',hurry:'hurried',gyosho:'semi-cursive',sosho:'very cursive'};
 const MEDIA_EN=['paper, brush','paper strip, brush','wooden plaque, brush','yellow poster, chisel marker','poster, red marker','slate, chalk','card, pen','paper, chisel marker'];
+// the "all done" card is centred in the free height below the stats, to let it breathe
+function centerDone(){ const el=document.getElementById('card'); if(!el.classList.contains('donecard')) return; el.style.marginTop='';
+  const r=el.getBoundingClientRect(), nav=document.querySelector('nav.tabs'), nb=PHONE()&&nav?nav.getBoundingClientRect().top:innerHeight; const top=r.top+scrollY;
+  const free=nb-(top-scrollY)-r.height-16; if(free>24) el.style.marginTop=Math.round(free/2)+'px'; }
+addEventListener('resize',()=>{ clearTimeout(centerDone._t); centerDone._t=setTimeout(centerDone,200); });
 function showCard(){
   renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
-  const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard');
+  const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard'); el.style.marginTop='';
   if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const st=streakDays();
     const nx=Math.min(...Object.values(S.cards).map(c=>c.due).filter(x=>x>now)); const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
     el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2>
@@ -1288,7 +1293,7 @@ function showCard(){
     ${words.length?`<div class="dwords">${words.slice(0,24).map(w=>`<span lang="ja" title="${esc(WMAP[w][2])}">${esc(w)}</span>`).join('')}</div>`:''}
     <div class="row" style="margin-top:4px">${t?`<button class="btn" id="dredo">${tr('Refaire ceux du jour','Redo today’s')} (${t})</button>`:''}<button class="btn k" id="dnext">${tr('Set suivant','Next set')} +${S.newPer}</button><a class="btn r" href="#menu" id="dmenu">${tr('Défi menu','Menu challenge')}</a></div>`;
     el.querySelector('#dmenu').onclick=()=>{ window.MENU_FOCUS=words; qpool='known'; if(typeof menuDone!=='undefined'&&menuDone) setTimeout(()=>genMenu(),0); };
-    if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; return; }
+    if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard'); centerDone(); return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
   if(kind==='m' && !isNew && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
   if(kind==='m'){ showMeaning(el,id,key,isNew); return; }
@@ -1334,7 +1339,7 @@ function showCard(){
       <div class="padbox"><div id="rpad" class="padhost"></div><div class="padside">
         <div class="wtools"><button class="btn" id="worder"><span class="dt">${tr('Ordre des traits ▶','Stroke order ▶')}</span><span class="ph">${tr('Ordre ▶','Order ▶')}</span></button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo" aria-label="${tr('Annuler le dernier trait','Undo last stroke')}" title="${tr('Annuler (clic droit)','Undo (right-click)')}">↶</button><button class="btn" id="wclear" aria-label="${tr('Effacer','Clear')}" title="${tr('Effacer','Clear')}">✕</button><button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button></div><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
     el.classList.add('wcard'); if(PHONE()) requestAnimationFrame(()=>el.scrollIntoView({block:'start',behavior:'auto'}));
-    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
+    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,first:true,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
     el.querySelector('#worder').onclick=()=>pad.animate(); el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
     el.querySelector('#wcheck').onclick=()=>{ const res=pad.check(); el.querySelector('#wres').innerHTML=res.html; el.querySelector('#wgr').innerHTML=wordChips(key)+'<div style="height:12px"></div>'+gradeButtons(id,res.suggest);
       el.querySelectorAll('#wgr .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
@@ -1424,7 +1429,7 @@ function ribbon(c,raw,R,seed){ if(!raw.length) return; const gap=Math.max(1,R*0.
         if(d>0.2&&rr()<0.93){ c.globalAlpha=Math.min(0.55,d*0.65); on?c.lineTo(x,y):c.moveTo(x,y); on=true; } else on=false; }); c.stroke(); }
     c.restore(); } }
 class Pad{
-  constructor(host,ch,opt={}){ this.ch=ch; this.onFull=opt.onFull||null; this.ghostOn=opt.ghost??true; host.innerHTML=''; const d=document.createElement('div'); d.className='pad'; host.appendChild(d); this.el=d;
+  constructor(host,ch,opt={}){ this.ch=ch; this.onFull=opt.onFull||null; this.ghostOn=opt.ghost??true; this.firstHint=!!opt.first; host.innerHTML=''; const d=document.createElement('div'); d.className='pad'; host.appendChild(d); this.el=d;
     ['paper','guide','ink','wet','over'].forEach(n=>{const c=document.createElement('canvas'); c.className=n; d.appendChild(c); this[n]=c;});
     this.strokes=[]; this.snaps=[]; this.resize();
     this.ro=new ResizeObserver(()=>{ if(Math.round(this.el.clientWidth*DPR)!==this.size) this.resize(); }); this.ro.observe(d);
@@ -1434,7 +1439,8 @@ class Pad{
     p.beginPath(); p.moveTo(s/2,0); p.lineTo(s/2,s); p.moveTo(0,s/2); p.lineTo(s,s/2); p.stroke(); p.setLineDash([]); p.strokeStyle='rgba(200,60,45,.5)'; p.lineWidth=Math.max(1.5,s/220); p.strokeRect(s*0.02,s*0.02,s*0.96,s*0.96);
     this.strokes=[]; this.snaps=[]; this.drawGuide(); }
   setChar(ch){ this.ch=ch; this.clear(); this.drawGuide(); }
-  drawGuide(upto,partial){ const g=this.guide.getContext('2d'), s=this.size; g.clearRect(0,0,s,s); if(!this.ghostOn && upto==null) return;
+  drawGuide(upto,partial){ const g=this.guide.getContext('2d'), s=this.size; g.clearRect(0,0,s,s);
+    if(!this.ghostOn && upto==null){ if(this.firstHint){ g.fillStyle='rgba(60,60,60,.16)'; drawRef(g,this.ch,s/2,s/2,s*0.9,{upto:1}); } return; }
     g.fillStyle=upto!=null?'rgba(40,40,40,.55)':'rgba(60,60,60,.12)'; drawRef(g,this.ch,s/2,s/2,s*0.9,{upto,partial}); }
   flashGhost(){ const was=this.ghostOn; this.ghostOn=true; this.drawGuide(); clearTimeout(this._fg); this._fg=setTimeout(()=>{this.ghostOn=was; this.drawGuide()},1300); }
   animate(){ const g=glyph(this.ch); if(!g) return; cancelAnimationFrame(this._raf); let i=0, t0=performance.now(); const dur=k=>380+g.strokes[k].length*9;
@@ -1508,7 +1514,12 @@ class Pad{
     const ox=this.over.getContext('2d'), s=this.size, k=s/109; ox.clearRect(0,0,s,s); ox.strokeStyle='rgba(220,40,30,.65)'; ox.lineWidth=Math.max(2,s/200); ox.lineCap='round';
     ref.forEach(st=>{ox.beginPath(); st.forEach((p,i)=>i?ox.lineTo(p[0]*k,p[1]*k):ox.moveTo(p[0]*k,p[1]*k)); ox.stroke()});
     let ok=0,meh=0,rev=0;
-    for(let i=0;i<this.strokes.length;i++){ let col='#d0331c'; if(i<ref.length){ const a=res(this.strokes[i],20), b=res(ref[i],20), d=md(a,b), dr=md(a.slice().reverse(),b);
+    const nn=Math.min(this.strokes.length,ref.length); let T=p=>p;
+    if(nn>=2){ const bb=L=>{ let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9; L.forEach(st=>st.forEach(p=>{ x0=Math.min(x0,p[0]); y0=Math.min(y0,p[1]); x1=Math.max(x1,p[0]); y1=Math.max(y1,p[1]); })); return [x0,y0,x1,y1]; };
+      const A=bb(this.strokes.slice(0,nn)), B=bb(ref.slice(0,nn)); const sc=clamp(Math.max(B[2]-B[0],B[3]-B[1],8)/Math.max(A[2]-A[0],A[3]-A[1],8),0.7,1.4);
+      const ca=[(A[0]+A[2])/2,(A[1]+A[3])/2], cb=[(B[0]+B[2])/2,(B[1]+B[3])/2], tx=clamp(cb[0]-ca[0],-20,20), ty=clamp(cb[1]-ca[1],-20,20);
+      T=p=>[(p[0]-ca[0])*sc+ca[0]+tx,(p[1]-ca[1])*sc+ca[1]+ty]; }
+    for(let i=0;i<this.strokes.length;i++){ let col='#d0331c'; if(i<ref.length){ const a=res(this.strokes[i].map(T),20), b=res(ref[i],20), d=md(a,b), dr=md(a.slice().reverse(),b);
         if(dr<d*0.6&&dr<16){rev++;col='#c07a00'} else if(d<11){ok++;col='#14a35e'} else if(d<19){meh++;col='#e0a000'} }
       const p=this.strokes[i][0]; ox.fillStyle=col; ox.strokeStyle='#111'; ox.lineWidth=2*DPR; ox.beginPath(); ox.arc(p[0]*k,p[1]*k,s*0.03,0,7); ox.fill(); ox.stroke();
       ox.fillStyle='#fff'; ox.font=`800 ${Math.round(s*0.034)}px sans-serif`; ox.textAlign='center'; ox.textBaseline='middle'; ox.fillText(i+1,p[0]*k,p[1]*k+1); }
@@ -1874,7 +1885,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
   const tv=v==='main'?'atelier':v; document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+tv?'page':'false'));
   if(v==='revisions') showCard(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
-  if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', ({menu:.62,main:1.75,atelier:1.15,kanji:1.1})[v]||1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
+  if(v==='revisions') setTimeout(centerDone,60); if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', ({menu:.62,main:1.75,atelier:1.15,kanji:1.1})[v]||1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
 
 // ---------- window light: a shadow scene per tab behind a window frame; the slant follows the hour; at night the page dims and the window becomes a patch of moonlight
 (function shade(){ const A=document.getElementById('sunA'), B=document.getElementById('sunB'); const xa=A.getContext('2d'), xb=B.getContext('2d'); const root=document.documentElement;
@@ -2167,7 +2178,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 08:57 · 34e286</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 09:02 · faa12d</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2221,7 +2232,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 08:57 · 34e286';
+const BUILD='2026.11.25 · 09:02 · faa12d';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
