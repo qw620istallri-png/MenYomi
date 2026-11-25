@@ -95,6 +95,17 @@ html.night #logo{box-shadow:4px 4px 0 var(--blue)}
 .ainfo .r{font-family:var(--f-jp)}
 .ainfo .mono{color:var(--mute);font-size:14px;text-transform:uppercase}
 #ares:empty{display:none}
+/* atelier · the hand: same picker, write/replay/options on the stage, settings folded away */
+#v-main .stools svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+#v-main .stools svg .fill{fill:currentColor;stroke:none}
+#v-main .stools #sgo{background:var(--acc);color:var(--acc-ink)}
+#v-main .stools #sopt[aria-expanded="true"]{background:var(--ink);color:var(--paper)}
+#v-main .sside{display:grid;gap:10px;align-content:start;min-width:0}
+#v-main .spick{margin:0;position:relative}#v-main .spick .asel{width:100%}
+#v-main .sopts[hidden]{display:none}
+#v-main .simword{margin-top:6px}
+.alist.wl button{grid-template-columns:auto minmax(0,1fr) auto}
+.alist.wl button .k{font-size:22px}
 .adetail{display:grid;gap:4px;min-width:0}
 .adetail .mn{font-family:var(--f-disp);font-stretch:80%;font-size:30px;font-weight:900;line-height:1.05;text-transform:uppercase;margin-top:6px}
 .adetail p{margin:4px 0 0;font-size:16px}
@@ -444,8 +455,12 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .dlghead{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 16px;background:var(--sheet);border-bottom:2px solid var(--rule)}
 .dlghead #dlgslot{display:contents}
 /* simulator */
-.simgrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:20px;align-items:start}
-@media (max-width:900px){.simgrid{grid-template-columns:minmax(0,1fr)}}
+.simgrid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:20px;align-items:start}
+@media (max-width:900px){.simgrid{display:flex;flex-direction:column;align-items:stretch;gap:8px}#v-main .simgrid .sside{display:contents}.simgrid .spick{order:1}.simgrid .srand{order:2}.simgrid .scol{order:3}.simgrid .sopts{order:4}.simgrid .simword{order:5}
+  #v-main .srand{justify-self:stretch}#v-main .srand .lab{flex:none;padding:0 12px}#v-main .srand button{flex:1}
+  #v-main .simstage{min-height:0;height:clamp(200px,calc(100vh - 380px),520px);height:clamp(200px,calc(100dvh - 380px),520px);padding:10px}
+  #v-main .simstage canvas{max-height:100%;width:auto;max-width:100%}}
+@media (min-width:901px){#v-main .simstage{min-height:0;height:clamp(300px,calc(100vh / var(--z,1) - 330px),640px)} #v-main .simstage canvas{max-height:100%;width:auto} body:has(#v-main.on){padding-bottom:16px}}
 .sliders{display:grid;gap:14px}
 .sliders label{display:grid;gap:4px;font-family:var(--f-mono);font-size:14px;text-transform:uppercase;color:var(--mute)}
 .sliders select{color:var(--ink);font-family:var(--f-body);text-transform:none}
@@ -720,20 +735,22 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 <section class="view" id="v-main">
   <div class="modes asub" role="group" aria-label="Atelier"><button data-sub="atelier" aria-pressed="false"><span class="j">書く</span><b data-en="Write">Écrire</b></button><button data-sub="main" aria-pressed="true"><span class="j">運筆</span><b data-en="The hand">La main</b></button></div>
   <div class="simgrid">
-    <div><div class="simstage"><canvas id="simc"></canvas></div><div class="panel simword" id="sword"></div></div>
-    <div class="panel sliders">
-      <div class="picker"><span class="lab" data-en="Text">Texte</span>
-        <div class="pickcur" id="scur"></div>
-        <div class="pickrow"><input class="field" id="sfind" type="search" placeholder="yakitori, 焼鳥, poulet…" data-en-ph="yakitori, 焼鳥, chicken…" aria-label="Chercher un mot" data-en-al="Search a word"><button class="btn" id="srand" data-en="Random ↻">Hasard ↻</button></div>
-        <div class="plist" id="splist"></div></div>
-      <label><span data-en="Tool">Outil</span><select id="stool"><option value="brush" data-en="Brush">Pinceau</option><option value="chisel" data-en="Chisel marker">Feutre biseauté</option><option value="marker" data-en="Round marker">Feutre rond</option><option value="chalk" data-en="Chalk">Craie</option><option value="pen" data-en="Pen">Stylo</option></select></label>
-      <label><span data-en="Hand">Main</span><select id="spreset"><option value="kaisho" data-en="Neat · 楷書">Soignée · 楷書</option><option value="hurry" selected data-en="Hurried">Pressée</option><option value="gyosho">Semi-cursive · 行書</option><option value="sosho" data-en="Very cursive">Très cursive</option></select></label>
-      <label><span data-en="Speed">Vitesse</span><input type="range" id="sspeed" min="0.4" max="3" step="0.05"></label>
-      <label><span data-en="Ligatures">Liaisons</span><input type="range" id="scurs" min="0" max="1" step="0.02"></label>
-      <label><span data-en="Wrist stiffness">Raideur du poignet</span><input type="range" id="sstiff" min="5" max="22" step="0.5"></label>
-      <label><span data-en="Irregularity">Irrégularité</span><input type="range" id="smess" min="0" max="1" step="0.02"></label>
-      <div class="row"><button class="btn r" id="sgo" data-en="Write ▶">Écrire ▶</button><button class="btn" id="sinst" data-en="Result">Résultat</button></div>
-      <p class="mono" style="margin:0;color:var(--mute)" id="sinfo"></p>
+    <div class="scol"><div class="stwrap"><div class="simstage"><canvas id="simc"></canvas></div>
+      <div class="stools"><button class="ico" id="sgo"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M8 5.5l11 6.5-11 6.5z"/></svg></button><button class="ico" id="sinst"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="fill" d="M5 5.5l9 6.5-9 6.5z"/><path d="M18.5 5.5v13"/></svg></button><button class="ico" id="sopt" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h9M18 7h2M4 17h3M12 17h8"/><circle cx="15.5" cy="7" r="2.3"/><circle cx="9.5" cy="17" r="2.3"/></svg></button></div></div></div>
+    <div class="sside">
+      <div class="apick spick"><button class="asel" id="ssel" aria-haspopup="dialog" aria-expanded="false"><span class="k" id="sselk"></span><span class="m" id="sselm"></span><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.3-4.3"/></svg></button>
+        <div class="asearch" id="ssearch" hidden><input id="sq" type="search" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="go"><div class="alist wl" id="slist"></div></div></div>
+      <div class="arand srand" role="group"><span class="lab" data-en="Random">Hasard</span><button id="srknown" data-en="Mine">Mes mots</button><button id="srall" data-en="All">Tous</button></div>
+      <div class="panel sliders sopts" id="sopts" hidden>
+        <label><span data-en="Tool">Outil</span><select id="stool"><option value="brush" data-en="Brush">Pinceau</option><option value="chisel" data-en="Chisel marker">Feutre biseauté</option><option value="marker" data-en="Round marker">Feutre rond</option><option value="chalk" data-en="Chalk">Craie</option><option value="pen" data-en="Pen">Stylo</option></select></label>
+        <label><span data-en="Hand">Main</span><select id="spreset"><option value="kaisho" data-en="Neat · 楷書">Soignée · 楷書</option><option value="hurry" selected data-en="Hurried">Pressée</option><option value="gyosho">Semi-cursive · 行書</option><option value="sosho" data-en="Very cursive">Très cursive</option></select></label>
+        <label><span data-en="Speed">Vitesse</span><input type="range" id="sspeed" min="0.4" max="3" step="0.05"></label>
+        <label><span data-en="Ligatures">Liaisons</span><input type="range" id="scurs" min="0" max="1" step="0.02"></label>
+        <label><span data-en="Wrist stiffness">Raideur du poignet</span><input type="range" id="sstiff" min="5" max="22" step="0.5"></label>
+        <label><span data-en="Irregularity">Irrégularité</span><input type="range" id="smess" min="0" max="1" step="0.02"></label>
+        <p class="mono" style="margin:0;color:var(--mute)" id="sinfo"></p>
+      </div>
+      <div class="simword" id="sword"></div>
     </div>
   </div>
 </section>
@@ -1765,23 +1782,41 @@ function bindAtelier(){ const $=id=>document.getElementById(id);
 const SIMTEXTS=['焼鳥','唐揚げ','刺身盛合せ','醤油ラーメン','本日のおすすめ','お品書き','味噌煮込み饂飩','生ビール','鯖味噌定食','天ざる','櫃まぶし','焼','書','鶏','麺'];
 let simTok=null;
 let simText='焼鳥';
-function renderPick(){ const q=document.getElementById('sfind').value.trim().toLowerCase(), nq=normRo(q);
-  const list=WORDS.filter(w=>!q||w[0].includes(q)||toHira(w[1]).includes(toHira(q))||w[2].toLowerCase().includes(q)||(nq.length>0&&normRo(toRomaji(w[1])).includes(nq))).slice().sort((a,b)=>toRomaji(a[1]).localeCompare(toRomaji(b[1])));
-  document.getElementById('splist').innerHTML=list.slice(0,120).map(w=>`<button data-t="${esc(w[0])}" aria-pressed="${w[0]===simText}"><b>${esc(toRomaji(w[1]))}</b><span class="pj">${esc(w[0])}</span><span class="pm">${esc(w[2])}</span></button>`).join('')||`<p class="hint" style="margin:8px">${tr('Aucun mot ne correspond.','No matching word.')}</p>`; }
-function setSimText(t,run){ simText=t; const w=WMAP[t]; document.getElementById('scur').innerHTML=`<span class="pj">${esc(t)}</span><span class="pr">${esc(w?toRomaji(w[1]):'')}</span>`; renderPick(); const sel=document.querySelector('#splist [aria-pressed="true"]'); if(sel) sel.scrollIntoView({block:'nearest'}); if(run) runSim(true); }
-function setupSim(){ document.getElementById('sfind').oninput=renderPick;
-  document.getElementById('srand').onclick=()=>{ const l=WORDS.filter(w=>/[一-鿿]/.test(w[0])); setSimText(l[Math.floor(Math.random()*l.length)][0],true); };
-  document.getElementById('splist').onclick=e=>{ const b=e.target.closest('[data-t]'); if(b) setSimText(b.dataset.t,true); };
+function setSimText(t,run){ simText=t; const w=WMAP[t]; document.getElementById('sselk').textContent=t; document.getElementById('sselm').textContent=w?w[2]:''; sClose(); if(run) runSim(true); }
+function sList(){ const q=document.getElementById('sq').value.trim(), f=fold(q), kana=/[぀-ヿ]/.test(q)?toHira(q):null, nq=/^[a-z' -]+$/i.test(q)?normRo(q):'';
+  const sc=w=>{ if(!q) return 1; if(w[0]===q) return 100; if(w[0].includes(q)) return 80; let s=0; const m=fold(w[2]);
+    if(kana){ const h=toHira(w[1]); if(h===kana) s=90; else if(h.startsWith(kana)) s=60; else if(h.includes(kana)) s=30; }
+    if(nq.length>1){ const r=normRo(toRomaji(w[1])); if(r===nq) s=Math.max(s,85); else if(r.startsWith(nq)) s=Math.max(s,55); else if(r.includes(nq)) s=Math.max(s,25); }
+    if(f.length>1){ const ws=m.split(/[^a-z0-9]+/); if(ws.includes(f)) s=Math.max(s,70); else if(ws.some(x=>x.startsWith(f))) s=Math.max(s,45); else if(f.length>2&&m.includes(f)) s=Math.max(s,20); }
+    return s; };
+  const kn=w=>knownWord(w[0]); let L=WORDS.map(w=>[sc(w)+(kn(w)?5:0),w]).filter(x=>x[0]>(q?5:0));
+  L.sort((a,b)=>b[0]-a[0]||toRomaji(a[1][1]).localeCompare(toRomaji(b[1][1])));
+  const box=document.getElementById('slist'); box.innerHTML=L.slice(0,80).map(([,w],i)=>`<button data-t="${esc(w[0])}" class="${kn(w)?'kn':''}${i===0&&q?' on':''}"><span class="k">${esc(w[0])}</span><span class="m">${esc(w[2])}</span><span class="r">${esc(toRomaji(w[1]))}</span></button>`).join('')||`<div class="none">${tr('Aucun mot ne correspond.','No matching word.')}</div>`; box.scrollTop=0; }
+function sOpen(){ const p=document.getElementById('ssearch'), q=document.getElementById('sq'); p.hidden=false; document.getElementById('ssel').setAttribute('aria-expanded','true'); q.value=''; sList(); q.focus(); }
+function sClose(){ const p=document.getElementById('ssearch'); if(p.hidden) return; p.hidden=true; document.getElementById('ssel').setAttribute('aria-expanded','false'); }
+function sRandom(known){ let l=WORDS.filter(w=>/[一-鿿]/.test(w[0])); if(known){ const k=l.filter(w=>knownWord(w[0])); if(k.length) l=k; else toast(tr('Aucun mot appris pour l’instant : tirage parmi tous.','No word learned yet: drawing from all of them.')); }
+  let t=simText; for(let n=0;n<8&&t===simText;n++) t=l[Math.floor(Math.random()*l.length)][0]; setSimText(t,true); }
+function setupSim(){ const $=id=>document.getElementById(id);
+  for(const [id,fr,en] of [['sgo','Écrire','Write'],['sinst','Résultat','Result'],['sopt','Réglages','Settings']]){ $(id).title=tr(fr,en); $(id).setAttribute('aria-label',tr(fr,en)); }
+  $('sq').placeholder=tr('yakitori, 焼鳥, poulet…','yakitori, 焼鳥, chicken…'); $('ssel').title=tr('Chercher un mot','Search a word');
+  $('ssel').onclick=()=>$('ssearch').hidden?sOpen():sClose(); $('sq').oninput=sList;
+  $('sq').onkeydown=e=>{ if(e.key==='Escape'){ sClose(); $('ssel').focus(); } else if(e.key==='Enter'){ const b=$('slist').querySelector('button'); if(b) setSimText(b.dataset.t,true); } };
+  $('slist').onclick=e=>{ const b=e.target.closest('[data-t]'); if(b) setSimText(b.dataset.t,true); };
+  document.addEventListener('pointerdown',e=>{ if(!$('ssearch').hidden&&!e.target.closest('.spick')) sClose(); });
+  $('srknown').onclick=()=>sRandom(true); $('srall').onclick=()=>sRandom(false);
+  $('sopt').onclick=()=>{ const o=$('sopts'); o.hidden=!o.hidden; $('sopt').setAttribute('aria-expanded',String(!o.hidden)); };
   setSimText(simText,false);
-  const setP=()=>{ const p=PRESETS[document.getElementById('spreset').value]; sspeed.value=p.speed; scurs.value=p.cursive; sstiff.value=p.stiff; smess.value=p.mess; };
-  document.getElementById('spreset').onchange=()=>{setP(); runSim(false)}; setP();
-  ['stool','sspeed','scurs','sstiff','smess'].forEach(id=>document.getElementById(id).addEventListener('change',()=>runSim(false)));
-  document.getElementById('sgo').onclick=()=>runSim(true); document.getElementById('sinst').onclick=()=>runSim(false); }
+  const setP=()=>{ const p=PRESETS[$('spreset').value]; sspeed.value=p.speed; scurs.value=p.cursive; sstiff.value=p.stiff; smess.value=p.mess; };
+  $('spreset').onchange=()=>{setP(); runSim(false)}; setP();
+  ['stool','sspeed','scurs','sstiff','smess'].forEach(id=>$(id).addEventListener('change',()=>runSim(false)));
+  $('sgo').onclick=()=>runSim(true); $('sinst').onclick=()=>runSim(false); }
 function runSim(anim){ if(simTok) simTok.stop=true; const text=simText, tool=stool.value; const r=rng(newSeed());
   const pr=PRESETS[spreset.value]; const w=makeWriter(r,spreset.value,tool,{speed:+sspeed.value,cursive:+scurs.value,stiff:+sstiff.value,mess:+smess.value,flow:pr.flow,slant:0});
-  const surf={brush:'washi',chisel:'yellow',marker:'white',chalk:'board',pen:'cream'}[tool]; const box=document.querySelector('.simstage').clientWidth-40; const n=[...text].length;
-  const size=clamp(Math.min(box/(n*0.95+0.7), n<=2?260:200),50,260);
-  const res=textCanvas(document.getElementById('simc'),text,{seed:newSeed(),writer:w,size,surface:surf,pad:0.3,anim,speedup:1});
+  const surf={brush:'washi',chisel:'yellow',marker:'white',chalk:'board',pen:'cream'}[tool]; const st=document.querySelector('.simstage'), box=st.clientWidth-40, bh=st.clientHeight-30; const n=[...text].length;
+  // a tall stage (phone) writes top to bottom, like a menu strip, so the word can be bigger
+  const vert=n>1&&n<=6&&bh>box*1.05;
+  const size=vert? clamp(Math.min(bh/(n*0.95+0.7), box/1.7, 260),50,260) : clamp(Math.min(box/(n*0.95+0.7), bh>100?bh/1.6:999, n<=2?260:200),50,260);
+  const res=textCanvas(document.getElementById('simc'),text,{seed:newSeed(),writer:w,size,surface:surf,pad:0.3,anim,speedup:1,vertical:vert});
   simTok=res.token||null; showSimWord(text); document.getElementById('sinfo').textContent=`${res.sim.dur.toFixed(1)} s`; }
 
 function showSimWord(text){ const el=document.getElementById('sword'); const w=WMAP[text];
@@ -2131,7 +2166,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 08:49 · 0bd8f9</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2026.11.25 · 08:54 · 0ddf59</p>
   `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2185,7 +2220,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
-const BUILD='2026.11.25 · 08:49 · 0bd8f9';
+const BUILD='2026.11.25 · 08:54 · 0ddf59';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
