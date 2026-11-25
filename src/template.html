@@ -1715,7 +1715,9 @@ document.addEventListener('click',e=>{ const p=document.getElementById('minfo');
 let menuResize=null, menuW=innerWidth; addEventListener('resize',()=>{ clearTimeout(menuResize); menuResize=setTimeout(()=>{ if(Math.abs(innerWidth-menuW)<2) return; menuW=innerWidth; if(MENU && document.getElementById('v-menu').classList.contains('on')) renderMenu(); },400); });
 
 // ---------- atelier
-let atelierChar='焼', apad=null; const WRITABLE=[...new Set([...CARDS.filter(id=>id[0]==='w').map(id=>id.slice(2)), ...Object.keys(KVG).filter(c=>isKanji(c)&&c!=='〇')])];
+// glyphs also exist for bare components (so their sheet can be drawn); the writing lists keep to characters seen on menus
+const SEEN_TXT=[...WORDS.map(w=>w[0]), ...Object.values(DATA.types).flatMap(t=>[t.jp,...t.names]), ...DATA.names.map(n=>n[0]), ...Object.values(DATA.regions).map(r=>r.jp)].join('');
+let atelierChar='焼', apad=null; const WRITABLE=[...new Set([...CARDS.filter(id=>id[0]==='w').map(id=>id.slice(2)), ...Object.keys(KVG).filter(c=>isKanji(c)&&c!=='〇'&&SEEN_TXT.includes(c))])];
 function renderAtelier(){ if(!apad){ apad=new Pad(document.getElementById('apad'),atelierChar,{ghost:true,onFull:()=>document.getElementById('acheck').click()}); bindAtelier(); } setA(); }
 function setA(){ apad.setChar(atelierChar); const k=kInfo(atelierChar);
   document.getElementById('aselk').textContent=atelierChar; document.getElementById('aselm').textContent=k.mean;

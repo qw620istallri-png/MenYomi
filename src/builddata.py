@@ -61,6 +61,11 @@ def elems(nodes,acc):
         elems(n.get('c',[]),acc)
 compset=set()
 for ch,v in kvg.items(): elems(v['c'],compset)
+# components get their own stroke data too, so their sheet can be drawn by hand like any kanji
+for ch in sorted(compset):
+    if ch in kvg or len(ch)!=1: continue
+    p=parse(ch)
+    if p: kvg[ch]=p
 
 db=sqlite3.connect(os.path.join(HERE,'..','dl','jamdict.db'))
 def kinfo(ch):
