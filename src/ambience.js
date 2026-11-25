@@ -88,25 +88,40 @@ const Ambience=(()=>{
     if(spec.fold!=='none'){const el=document.createElement('span');el.className='paper-curl';el.setAttribute('aria-hidden','true');Object.assign(el.style,{width:s,height:s,left:spec.fold==='bl'?'0':'auto',right:spec.fold==='bl'?'auto':'0',top:spec.fold==='tr'?'0':'auto',bottom:spec.fold==='tr'?'auto':'0',transform:spec.fold==='bl'?'scaleX(-1)':spec.fold==='tr'?'scaleY(-1)':'none'});button.appendChild(el);}
     button.onpointerenter=()=>swing(button,.6);button.addEventListener('pointerdown',()=>swing(button));
   }
-  function paintInk(overlay,mask,wet,time=1700){
-    const x=overlay.getContext('2d'),W=overlay.width,H=overlay.height;x.clearRect(0,0,W,H);if(wet<=0)return;
-    x.globalCompositeOperation='source-over';x.drawImage(mask,0,0,W,H);x.globalCompositeOperation='source-in';
-    const drift=Math.sin(time*.00045)*W*.025,g=x.createLinearGradient(-W*.1+drift,0,W*.95+drift,H*.6);
-    for(const [stop,alpha] of [[0,.03],[.19,.03],[.215,.52],[.235,.16],[.26,.025],[.46,.025],[.48,.65],[.50,.18],[.53,.025],[.72,.025],[.745,.44],[.765,.08],[1,.025]])g.addColorStop(stop,'rgba(234,242,239,'+(alpha*wet)+')');
-    x.fillStyle=g;x.fillRect(0,0,W,H);x.globalCompositeOperation='source-over';
+  // fresh sumi: each new stroke stays glossy on its own and dries at its own pace; older strokes are never wetted again.
+  // The gloss is a soft light rim on the side facing the window (upper left) plus a faint darker body, both fading as the ink sinks in.
+  function wetLayer(src){
+    const W=src.width,H=src.height,d=Math.max(1.5,W/260),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
+    // light rim: the stroke minus itself nudged towards the light, softened
+    const rim=document.createElement('canvas');rim.width=W;rim.height=H;const r=rim.getContext('2d');
+    r.drawImage(src,0,0);r.globalCompositeOperation='destination-out';r.drawImage(src,d*1.2,d*1.6);r.globalCompositeOperation='source-in';r.fillStyle='rgba(236,240,236,1)';r.fillRect(0,0,W,H);
+    x.filter='blur('+(d*.7).toFixed(1)+'px)';x.globalAlpha=.55;x.drawImage(rim,0,0);x.filter='none';
+    // a few soft specular glints along the body where the ink pools
+    const g=document.createElement('canvas');g.width=W;g.height=H;const gx=g.getContext('2d');gx.drawImage(src,0,0);gx.globalCompositeOperation='destination-in';gx.filter='blur('+(d*3).toFixed(1)+'px)';gx.drawImage(src,-d*1.5,-d*2);gx.filter='none';
+    gx.globalCompositeOperation='source-in';const lg=gx.createLinearGradient(0,0,W,H);lg.addColorStop(0,'rgba(240,244,240,.20)');lg.addColorStop(.5,'rgba(240,244,240,.06)');lg.addColorStop(1,'rgba(240,244,240,.14)');gx.fillStyle=lg;gx.fillRect(0,0,W,H);
+    x.globalAlpha=1;x.drawImage(g,0,0);
+    // wet body: the ink is a touch deeper while it lies on the surface
+    const body=document.createElement('canvas');body.width=W;body.height=H;const b=body.getContext('2d');b.drawImage(src,0,0);b.globalCompositeOperation='source-in';b.fillStyle='rgba(8,6,4,.22)';b.fillRect(0,0,W,H);
+    return {gloss:c,body};
+  }
+  function paintInk(overlay,list,now){
+    const x=overlay.getContext('2d');x.clearRect(0,0,overlay.width,overlay.height);let live=false;
+    for(const w of list){const age=(now-w.at)/w.dry;if(age>=1)continue;live=true;const wet=Math.pow(1-age,1.6);
+      x.globalAlpha=wet;x.drawImage(w.layer.body,0,0);x.globalAlpha=wet*(.85+.15*Math.sin(now*.002+w.ph));x.drawImage(w.layer.gloss,0,0);}
+    x.globalAlpha=1;return live;
   }
   function attachInk(host,sources){
-    const overlay=document.createElement('canvas'),mask=document.createElement('canvas');overlay.className='ink-sheen';overlay.setAttribute('aria-hidden','true');host.appendChild(overlay);
-    let frame=0,start=0,disposed=false;
-    function refresh(){
-      if(disposed)return;const size=sources[0].width;if(!size)return;overlay.width=mask.width=size;overlay.height=mask.height=sources[0].height;
-      const x=mask.getContext('2d');x.clearRect(0,0,mask.width,mask.height);sources.forEach(c=>x.drawImage(c,0,0,mask.width,mask.height));
-      start=performance.now();paintInk(overlay,mask,1);cancelAnimationFrame(frame);
-      if(matchMedia('(prefers-reduced-motion: reduce)').matches){paintInk(overlay,mask,0);return;}
-      const dry=now=>{if(disposed||!host.isConnected)return;if(document.hidden||(host.getClientRects&&!host.getClientRects().length)){clear();return;}const wet=Math.max(0,1-(now-start)/2200);paintInk(overlay,mask,wet,now-start);if(wet>0)frame=requestAnimationFrame(dry);};frame=requestAnimationFrame(dry);
+    const overlay=document.createElement('canvas');overlay.className='ink-sheen';overlay.setAttribute('aria-hidden','true');host.appendChild(overlay);
+    let frame=0,disposed=false,list=[];const reduce=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const loop=now=>{if(disposed||!host.isConnected)return;if(document.hidden){frame=requestAnimationFrame(loop);return;}list=list.filter(w=>now-w.at<w.dry);if(!paintInk(overlay,list,now)){frame=0;return;}frame=requestAnimationFrame(loop);};
+    function add(src){
+      if(disposed||reduce()||!src||!src.width)return;if(overlay.width!==src.width||overlay.height!==src.height){overlay.width=src.width;overlay.height=src.height;list=[];}
+      list.push({layer:wetLayer(src),at:performance.now(),dry:3200+Math.random()*900,ph:Math.random()*6});if(list.length>6)list.shift();if(!frame)frame=requestAnimationFrame(loop);
     }
-    function clear(){cancelAnimationFrame(frame);overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
-    return {refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
+    // a whole drawing appears at once (the simulated hand): it is wet all over, once
+    function refresh(){const src=sources[0];if(src&&src.width)add(src);}
+    function clear(){cancelAnimationFrame(frame);frame=0;list=[];overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
+    return {add,refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
   }
   return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,attachInk,get view(){return currentView;}};
 })();
