@@ -87,7 +87,7 @@ FRO_EN = {'丼':'bowl of rice with topping','叉':'fork','哉':'exclamation (ah!
 TYPES_EN = {'izakaya':'Izakaya','yakitori':'Yakitori','ramen':'Ramen','soba':'Soba / udon','teishoku':'Teishoku (diner)','sushi':'Sushi','don':'Donburi','kissaten':'Retro café (kissaten)','kanmi':'Sweets parlour','okonomiyaki':'Okonomiyaki'}
 
 # v6 words come with their English gloss in menudata.NEW_W
-_m={}; exec(open('menudata.py',encoding='utf-8').read(),_m)
+_m={}; exec(open(__import__('pathlib').Path(__file__).with_name('menudata.py'),encoding='utf-8').read(),_m)
 for _w,_r,_f,_e in _m['NEW_W']: W_EN[_w]=_e
 TYPES_EN['sakaba']='Sake bar'
 TYPES_EN['chaya']='Tea house'

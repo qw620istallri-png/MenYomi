@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasAll(['s', 't', 'v'])
+        && request.resource.data.keys().hasOnly(['s', 't', 'v'])
+        && request.resource.data.s is string
+        && request.resource.data.s.size() <= 900000
+        && request.resource.data.t is int
+        && request.resource.data.t >= 0
+        && request.resource.data.v in [1, 2];
+    }
+  }
+}

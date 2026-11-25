@@ -9,7 +9,7 @@
 /* Layout: cream paper lit from a window on the right; ink rules, square blocks, mono metadata, vermilion + cobalt + yellow; the shadow outside the window changes with each tab */
 :root{
   --paper:#f7f0e1; --sheet:#fffaf1; --ink:#1b1814; --mute:#6a6056; --rule:#1b1814; --soft:#ece1c9; --stage:#dccfb2;
-  --acc:#e8452c; --acc-ink:#fffaf1; --blue:#173ebc; --lime:#f6d92f; --ok:#0b7a46; --bad:#cf2a1a; --warn:#9a5a00;
+  --acc:#bf3520; --acc-ink:#fffaf1; --blue:#173ebc; --lime:#f6d92f; --ok:#0b7a46; --bad:#cf2a1a; --warn:#9a5a00;
   --glow:#f5d7a6; --shadow:#1a1714;
   --f-disp:"Archivo","Zen Kaku Gothic New",system-ui,sans-serif;
   --f-jp:"Klee One","Zen Kaku Gothic New","Hiragino Sans",sans-serif;
@@ -696,8 +696,37 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
   #card.wcard #rpad.padhost{width:min(100%,calc(100vh - 190px));width:min(100%,calc(100dvh - 190px))}
   #card.wcard .padside{padding-inline:4px}
 }
+
+.learning-home{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:14px 0;margin:0 0 20px;border-block:1px solid var(--rule)}
+.learning-home>div{display:grid;gap:3px}.learning-home span{font-size:14px;color:var(--mute)}
+.lesson{display:grid;gap:16px;max-width:680px;margin:auto}.lesson>canvas{max-width:100%;justify-self:center}.lesson p{margin:0}.lesson-actions{display:flex;justify-content:space-between;gap:12px;margin-top:12px}
+.session-report{margin-top:24px;border-top:1px solid var(--rule);padding-top:18px}.session-report h3{margin:0 0 8px}.session-report p{margin:8px 0 14px}
+.menu-text{margin-bottom:16px}.menu-text[open]{padding:12px;border:1px solid var(--rule)}#menu-text-items{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.board .itm.note{isolation:isolate;box-shadow:2px 6px 9px #130b064d,0 1px 1px #130b0640}
+.board .itm.note::before{z-index:2;transform:rotate(var(--tape-rot,-4deg));background:linear-gradient(95deg,#e1d2b1b3,#f5e8c8d9 40%,#e1d2b1b3);border-inline:1px solid #c1ae872e}
+.board .itm.note::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 -2px 3px #66482126,inset 1px 0 2px #fff9}
+.board .itm.note-1::before{left:17%;width:32px;margin-left:0;transform:rotate(-18deg)}
+.board .itm.note-1::after{background:linear-gradient(145deg,transparent 94%,#b5a78b55 95%,#fcf5e3 96%)}
+.board .itm.note-2::before{left:auto;right:9%;width:38px;margin-left:0;transform:rotate(13deg)}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+::selection{background:var(--lime);color:#1b1814}
+@media(max-width:700px){.learning-home{align-items:flex-start;gap:10px}.learning-home .btn{white-space:nowrap}.learning-home span{max-width:25ch}.lesson-actions .btn{min-height:44px}}
+
+/* Soft daily materials sit behind the existing window light and foliage. */
+#ground{position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:var(--background-texture);background-size:512px 512px;opacity:.88}
+html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:soft-light}
+.board .itm.wood-plaque{isolation:isolate;border-radius:5px 5px 9px 8px;background:linear-gradient(90deg,#b98c55,#deb77e 10%,#d9b27a 63%,#bb9059 100%);box-shadow:5px 10px 5px #2e1c1740,1px 2px 2px #2e1c1750,inset -3px 0 3px #77502738;transform:rotate(var(--plate-angle,0deg));transform-origin:50% 2px}
+.board .itm.wood-plaque::before{content:"";position:absolute;inset:0;background:var(--wood-grain);opacity:.65;border-radius:inherit;pointer-events:none}
+.board .itm.wood-plaque canvas{position:relative;border-radius:inherit}
+.board .itm.note::before,.board .itm.note::after{content:none;display:none}
+.board .itm.note canvas{border-radius:1px}
+.board .itm.note:hover{transform:rotate(var(--rot,0deg))}
+.paper-tape{position:absolute;z-index:4;pointer-events:none;background:linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa);border-inline:1px solid #f0e3be65;box-shadow:0 1px 2px #35241125}
+.paper-curl{position:absolute;z-index:3;pointer-events:none;background:linear-gradient(135deg,#bbaa87 0%,#f8f1df 24%,#e7d8b9 83%);clip-path:polygon(0 0,100% 0,0 100%);border-top-left-radius:2px;filter:drop-shadow(-1px -1px 1px #553c2238)}
+.pad canvas.ink-sheen{z-index:3;pointer-events:none;mix-blend-mode:normal}.pad canvas.over{z-index:4;pointer-events:none}
 </style>
 
+<div id="ground" aria-hidden="true"></div>
 <div id="veil" aria-hidden="true"></div>
 <div id="light" aria-hidden="true"><div class="g"></div><div class="b"></div></div>
 <div id="shade" aria-hidden="true"><canvas id="sunA"></canvas><canvas id="sunB"></canvas></div>
@@ -705,7 +734,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 <header class="top">
   <canvas id="logo" width="152" height="152" aria-hidden="true"></canvas>
   <div class="mast"><h1><a class="home" href="#revisions" aria-label="Menyomi">Menyomi <span class="jp">めん読み</span></a></h1></div>
-  <div class="hctl"><button class="btn" id="langbtn" lang="en">EN</button><button class="btn" id="credbtn" aria-label="Crédits" data-en-al="Credits">i</button></div>
+  <div class="hctl"><button class="btn" id="langbtn" lang="en">EN</button><button class="btn" id="credbtn" aria-label="Réglages, progression et crédits" data-en-al="Settings, progress and credits" title="Réglages, progression et crédits">i</button></div>
 </header>
 <nav class="tabs" aria-label="Sections">
   <a href="#revisions"><span class="j">復習</span><span class="f" data-en="Reviews">Révisions</span><span class="s" data-en="Review">Revoir</span></a>
@@ -719,6 +748,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
   <div class="vhead"><div class="stats" id="stats"></div>
     <div class="rctl" id="rctl"></div></div>
   <div class="skwrap" id="skwrap" hidden><div class="skills" id="skills"></div><div class="skset"><label class="lab" for="newper" data-en="New cards per day">Nouvelles cartes par jour</label><select id="newper"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option><option value="30">30</option></select></div></div>
+  <div class="learning-home" id="learning-home"></div>
   <div class="panel card" id="card"></div>
 </section>
 
@@ -734,7 +764,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
     <button class="btn r" id="mnew" data-en="New menu ↻">Nouveau menu ↻</button>
   </div>
   </div>
-  <div id="mquest"></div>
+  <div id="mquest" aria-live="polite"></div><details class="more menu-text"><summary data-en="Text version of the menu">Version texte du menu</summary><p class="hint" data-en="Printed Japanese alternative to the handwriting exercise.">Alternative en japonais imprimé à l’exercice manuscrit.</p><div id="menu-text-items" lang="ja"></div></details>
   <div class="board" id="board"></div>
 </section>
 
@@ -806,6 +836,7 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 <svg id="measure" width="0" height="0" style="position:absolute;left:-9999px" aria-hidden="true"><path id="mpath" d="M0,0"></path></svg>
 
 <script>
+__PROGRESS__
 const DATA = __DATA__;
 const EN = __EN__;
 const EXPL = __EXPL__;
@@ -878,7 +909,8 @@ const WZ = (()=>{ try{ return parseFloat(getComputedStyle(document.querySelector
 const DPR = Math.min(2.5, (window.devicePixelRatio||1)*WZ);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const nextFrame = () => new Promise(r=>requestAnimationFrame(()=>r()));
-const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}, set(k,v,quiet){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){} if(k==='kanjipinceau.v2'&&!quiet&&window.SYNC) SYNC.queue();}};
+let storageWarning=false;
+const store = {get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}, set(k,v,quiet){try{localStorage.setItem(k,JSON.stringify(v)); storageWarning=false;}catch(e){if(!storageWarning){storageWarning=true;setTimeout(()=>toast(tr('Sauvegarde locale impossible. Exporte ta progression avec le bouton i.','Local save failed. Export your progress using the i button.')),0);} return false;} if(k==='kanjipinceau.v2'&&!quiet&&window.SYNC) SYNC.queue(); return true;}};
 
 // ---------- kana / romaji
 const KR={'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki','く':'ku','け':'ke','こ':'ko','さ':'sa','し':'shi','す':'su','せ':'se','そ':'so','た':'ta','ち':'chi','つ':'tsu','て':'te','と':'to','な':'na','に':'ni','ぬ':'nu','ね':'ne','の':'no','は':'ha','ひ':'hi','ふ':'fu','へ':'he','ほ':'ho','ま':'ma','み':'mi','む':'mu','め':'me','も':'mo','や':'ya','ゆ':'yu','よ':'yo','ら':'ra','り':'ri','る':'ru','れ':'re','ろ':'ro','わ':'wa','を':'o','ん':'n','が':'ga','ぎ':'gi','ぐ':'gu','げ':'ge','ご':'go','ざ':'za','じ':'ji','ず':'zu','ぜ':'ze','ぞ':'zo','だ':'da','ぢ':'ji','づ':'zu','で':'de','ど':'do','ば':'ba','び':'bi','ぶ':'bu','べ':'be','ぼ':'bo','ぱ':'pa','ぴ':'pi','ぷ':'pu','ぺ':'pe','ぽ':'po','ぁ':'a','ぃ':'i','ぅ':'u','ぇ':'e','ぉ':'o','ゔ':'vu','〆':'shime'};
@@ -1167,19 +1199,21 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
     play(tool,sim.samples,i,j); i=j; paint(); compose(ctx,layer,o.writer.tool,o.color);
     // pen tip
     const s=sim.samples[Math.min(i,sim.samples.length-1)]; if(s && i<sim.samples.length){ ctx.save(); ctx.fillStyle=s.p>0.035?'rgba(255,82,50,.9)':'rgba(58,91,255,.7)'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(3,o.size*DPR*0.035),0,7); ctx.fill(); ctx.restore(); }
-    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); o.onDone&&o.onDone(); } };
+    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const sheen=document.createElement('canvas');sheen.width=Wd;sheen.height=Hd;const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.max(0,1-(now-began)/6500);paint();compose(ctx,layer,o.writer.tool,o.color);Ambience.paintInk(sheen,layer,wet,now-began);ctx.drawImage(sheen,0,0);if(wet>0)requestAnimationFrame(dry);};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
   requestAnimationFrame(frame); return {sim, layout:L, token};
 }
 
+__AMBIENCE__
+
 // ---------- SRS (SM-2 variant)
-const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,{cards:{},day:'',newToday:0,newPer:10});
+const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,Progress.fresh()); if(!S||typeof S!=='object') S=Progress.fresh();
 const MIN=60e3, DAY=864e5;
 // days follow the local calendar and turn over at 4 AM (a late-night session still counts for the evening)
 const DAY0=4; const dayKey=t=>{ const d=new Date(t-DAY0*36e5); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 const today=()=>dayKey(Date.now());
 const dayStart=n=>{ const d=new Date(Date.now()-DAY0*36e5); d.setHours(0,0,0,0); d.setDate(d.getDate()+n); d.setHours(DAY0); return d.getTime(); };
 const dueIn=ivl=>dayStart(Math.max(1,Math.round(ivl)));
-function rollDay(){ if(S.day!==today()){ S.day=today(); S.newToday=0; S.extraNew=0; S.todayIds=[]; return true; } return false; } rollDay();
+function rollDay(){ if(S.day!==today()){ S.day=today(); S.newToday=0; S.newBase=0; S.extraNew=0; S.todayIds=[]; return true; } return false; } rollDay();
 S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null, TESTRES=null; let SKON=false; try{ SKON=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
 const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','饂飩','寿司'];
 // restaurant phrases: written notices and spoken formulas; kana-only ones get a meaning card only
@@ -1189,11 +1223,26 @@ const PH_FIRST=['いらっしゃいませ','すみません','ください','お
 function buildCards(){ const ids=[], seen=new Set(); const base=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w)&&!isPhrase(w))];
   const ph=[...new Set([...PH_FIRST,...PH.talk,...PH.signs])].filter(w=>WMAP[w]); const order=[];
   base.forEach((w,i)=>{ order.push(w); if(i>=5&&(i-5)%4===0&&ph.length) order.push(ph.shift()); }); order.push(...ph);
-  order.forEach(w=>{ if(!hasKanji(w)){ if(isPhrase(w)) ids.push('m:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
+  order.forEach(w=>{ if(!hasKanji(w)){ ids.push('m:'+w); if(!isPhrase(w)) ids.push('r:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
 const CARDS=buildCards();
+const validateState=v=>Progress.validate(v,CARDS,WORDS.map(w=>w[0]));
+{ const valid=validateState(S); if(!valid){ store.set('menyomi.recovery',S,true); S=Progress.fresh(); setTimeout(()=>toast(tr('Une sauvegarde illisible a été conservée pour récupération.','An unreadable save was kept for recovery.')),0); } else S=valid; rollDay(); }
+let LAST_GRADE=null, reviewPad=null, REPLAY_ID=null;
+const copySession=x=>x?{...x,q:x.q.slice(),...(x.seen?{seen:new Set(x.seen)}:{})}:null;
+function rememberGrade(id){ LAST_GRADE={id,state:structuredClone(S),session:copySession(SESSION)}; }
+function undoGrade(){
+  if(!LAST_GRADE) return; cancelAuto(); const u=LAST_GRADE; LAST_GRADE=null;
+  const now=Math.max(Date.now(),(S.cards[u.id]?.at||0)+1);
+  if(u.state.cards[u.id]) S.cards[u.id]={...u.state.cards[u.id],at:now};
+  else { delete S.cards[u.id]; S.removed[u.id]=now; }
+  S.newToday=u.state.newToday; S.todayIds=u.state.todayIds.slice(); S.days=u.state.days; S.activity=u.state.activity; if(!u.state.activity[today()]?.[u.id]&&!u.state.todayIds.includes(u.id)){ (S.activityRemoved[today()]||={})[u.id]=now; }
+  REPLAY_ID=u.id; SESSION=copySession(u.session); if(!SESSION) S.queue=[u.id,...S.queue.filter(id=>id!==u.id)];
+  store.set(SKEY,S); showCard(); toast(tr('Dernière évaluation annulée.','Last rating undone.'));
+}
+
 // meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
 const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
-function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endSession(); } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
+function nextCard(){ if(REPLAY_ID) return REPLAY_ID; if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endSession(); } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
   if(due.length) return due[0]; const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); if(qd) return qd; if(S.newToday<S.newPer+S.extraNew){const n=CARDS.find(id=>!S.cards[id]&&canIntro(id)); if(n) return n;}
   const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon[0]||null; }
 function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now();
@@ -1201,13 +1250,13 @@ function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const
   else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=dueIn(c.ivl); } }
   c.at=now; return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
-function grade(id,g){ cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
+function grade(id,g){ rememberGrade(id); REPLAY_ID=null; cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
     SESSION.q.shift(); if(g===0) SESSION.q.push(id); showCard(); return; }
-  if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2); } store.set(SKEY,S); showCard(); }
+  const introduced=S.cards[id]?.introduced||(!S.cards[id]?Date.now():undefined); if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(introduced) S.cards[id].introduced=introduced; if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2,id); } store.set(SKEY,S); showCard(); }
 // one entry per day: [right at first try, cards seen]; the streak counts days in a row with at least one card
-function logDay(ok){ const d=S.days||(S.days={}); const k=today(); const e=d[k]||(d[k]=[0,0]); e[1]++; if(ok) e[0]++; const ks=Object.keys(d).sort(); while(ks.length>90) delete d[ks.shift()]; }
+function logDay(ok,id){ if(id){ const entries=S.activity[today()]||(S.activity[today()]={}); entries[id]||={ok,at:Date.now()}; const dates=Object.keys(S.activity).sort(); while(dates.length>90) delete S.activity[dates.shift()]; } const d=S.days||(S.days={}); const k=today(); const e=d[k]||(d[k]=[0,0]); e[1]++; if(ok) e[0]++; const ks=Object.keys(d).sort(); while(ks.length>90) delete d[ks.shift()]; }
 function streakDays(){ const d=S.days||{}; const key=i=>dayKey(Date.now()-i*DAY); let i=(d[today()]||[0,0])[1]?0:1, n=0; while(d[key(i)]&&d[key(i)][1]){ n++; i++; } return n; }
-function redoToday(){ TESTRES=null; SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
+function redoToday(){ REPLAY_ID=null; LAST_GRADE=null; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
 function nextSet(){ TESTRES=null; S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
 const PHONE=()=>matchMedia('(max-width:700px)').matches; const DESK=()=>matchMedia('(min-width:1000px)').matches;
 // a right answer moves on by itself with the suggested grade; a tap on the card keeps it on screen
@@ -1235,16 +1284,19 @@ function toGrades(){ cancelAuto(); const s=document.querySelector('#card .grades
 function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?(SESSION.test?tr('remise en révision','back to reviews'):tr('encore une fois','once more')):(SESSION.test?tr('test','test'):tr('entraînement','practice'))):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
 function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const learned=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
   const nw=Math.max(0,Math.min(S.newPer+S.extraNew-S.newToday, CARDS.filter(id=>!S.cards[id]&&canIntro(id)).length)); const t=S.todayIds.length;
-  const prog=`<button class="stat stog${SKON?' on':''}" id="skbtn" aria-expanded="${SKON}" aria-controls="skwrap" title="${tr('Progression','Progress')}"><b>${learned}<small>/${CARDS.length}</small></b><span>${tr('apprises','learned')} <span class="car" aria-hidden="true">▾</span></span></button>`;
+  const prog=`<button class="stat stog${SKON?' on':''}" id="skbtn" aria-expanded="${SKON}" aria-controls="skwrap" title="${tr('Progression','Progress')}"><b>${learned}<small>/${CARDS.length}</small></b><span>${tr('cartes apprises','cards learned')} <span class="car" aria-hidden="true">▾</span></span></button>`;
   document.getElementById('stats').innerHTML= SESSION? `<span class="stat"><b>${SESSION.q.length}</b><span>${SESSION.test?tr('à tester','to test'):tr('à refaire','to redo')}</span></span>${SESSION.test?`<span class="stat"><b>${SESSION.ok}<small>/${SESSION.n}</small></b><span>${tr('justes','right')}</span></span>`:`<span class="stat"><b>·</b><span>${tr('pratique','practice')}</span></span>`}${prog}`
     : `<span class="stat"><b>${due}</b><span>${tr('à revoir','due')}</span></span><span class="stat"><b>${nw}</b><span>${tr('nouvelles','new')}</span></span>${prog}`;
   const c=document.getElementById('rctl'); const known=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
   { const hc=document.querySelector('.hctl'), old=document.getElementById('hstop'); if(old) old.remove(); if(SESSION&&hc){ const lab=SESSION.test?tr('Arrêter le test','Stop the test'):tr('Arrêter l’entraînement','Stop practice'); hc.insertAdjacentHTML('afterbegin',`<button class="btn" id="hstop" title="${lab}" aria-label="${lab}"><span class="lg">${lab}</span><span class="sm">✕</span></button>`); document.getElementById('hstop').onclick=()=>{ endSession(); showCard(); }; } }
   c.innerHTML= SESSION? ''
-    : `${t?`<button class="btn" id="rredo" title="${tr('Refaire les cartes du jour','Redo today’s cards')}">${tr('Refaire','Redo')} ${t}</button>`:''}<button class="btn" id="rnext" title="${tr('Ajouter des nouvelles cartes aujourd’hui','Add new cards today')}">+${S.newPer} ${tr('mots','words')}</button><button class="btn" id="rtest"${known?'':' disabled'} title="${tr('Des cartes au hasard parmi celles apprises','Random cards among the learned ones')}">${tr('Me tester','Test me')}</button>${TESTRES?`<span class="tres">${tr('Test','Test')} ${TESTRES.ok}/${TESTRES.n}</span>`:''}`;
+    : `${t?`<button class="btn" id="rredo" title="${tr('Refaire les cartes du jour','Redo today’s cards')}">${tr('Refaire','Redo')} ${t}</button>`:''}<button class="btn" id="rnext" title="${tr('Ajouter des nouvelles cartes aujourd’hui','Add new cards today')}">+${S.newPer} ${tr('cartes','cards')}</button><button class="btn" id="rtest"${known?'':' disabled'} title="${tr('Des cartes au hasard parmi celles apprises','Random cards among the learned ones')}">${tr('Me tester','Test me')}</button>${TESTRES?`<span class="tres">${tr('Test','Test')} ${TESTRES.ok}/${TESTRES.n}</span>`:''}`;
+  if(LAST_GRADE) c.insertAdjacentHTML('beforeend',`<button class="btn ghost" id="undo-grade">${tr('Annuler l’évaluation','Undo rating')}</button>`);
+  if(c.querySelector('#undo-grade')) c.querySelector('#undo-grade').onclick=undoGrade;
+  renderLearningHome();
   const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{ endSession(); showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; if(b('#rtest')) b('#rtest').onclick=testMe; }
 function endSession(){ if(SESSION&&SESSION.test&&SESSION.n) TESTRES={ok:SESSION.ok,n:SESSION.n}; SESSION=null; }
-function testMe(){ const pool=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0); if(!pool.length) return; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),pool).slice(0,20),test:true,ok:0,n:0,seen:new Set()}; showCard(); }
+function testMe(){ REPLAY_ID=null; LAST_GRADE=null; const pool=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0); if(!pool.length) return; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),pool).slice(0,20),test:true,ok:0,n:0,seen:new Set()}; showCard(); }
 const newper=document.getElementById('newper'); newper.value=String(S.newPer); newper.onchange=()=>{S.newPer=+newper.value; S.tp=Date.now(); store.set(SKEY,S); showCard();};
 function wordChips(word){ const cs=[...new Set([...word].filter(c=>isKanji(c)&&c!=='〇'))]; return `<div class="chips">${cs.map(c=>`<button class="chip" data-k="${c}"><span class="k">${c}</span><span class="m">${esc(kInfo(c).mean)}</span></button>`).join('')}</div>`; }
 const MEDIA=[ // reading-card looks: surface, tool, color, vertical
@@ -1263,8 +1315,9 @@ addEventListener('resize',()=>{ clearTimeout(centerDone._t); centerDone._t=setTi
 function fitStage(){ const vr=document.getElementById('v-revisions'); if(!DESK()||!vr.classList.contains('busy')){ vr.style.removeProperty('--stH'); return; }
   if(scrollY>0&&vr.classList.contains('on')) scrollTo(0,0); const el=document.getElementById('card'); const z=parseFloat(getComputedStyle(document.querySelector('.wrap')).zoom)||1;
   const top=el.getBoundingClientRect().top+scrollY; vr.style.setProperty('--stH',Math.round(clamp((innerHeight-top)/z-74,220,820))+'px'); }
-addEventListener('resize',()=>{ clearTimeout(fitStage._t); fitStage._t=setTimeout(()=>{ const vr=document.getElementById('v-revisions'); if(vr.classList.contains('busy')&&DESK()){ const before=vr.style.getPropertyValue('--stH'); fitStage(); if(vr.style.getPropertyValue('--stH')!==before&&!document.querySelector('#card .grades')) showCard(); } },250); });
+addEventListener('resize',()=>{ clearTimeout(fitStage._t); fitStage._t=setTimeout(()=>{ const vr=document.getElementById('v-revisions'); if(vr.classList.contains('busy')&&DESK()){ const before=vr.style.getPropertyValue('--stH'); fitStage(); /* Pad ResizeObserver preserves in-progress ink. */ } },250); });
 function showCard(){
+  if(reviewPad){ reviewPad.destroy(); reviewPad=null; }
   if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard'); el.style.marginTop='';
   { const vr=document.getElementById('v-revisions'); vr.classList.toggle('busy',!!id); vr.classList.toggle('sess',!!SESSION); if(id) fitStage(); }
@@ -1274,6 +1327,7 @@ function showCard(){
     <div class="stats dstats"><span class="stat"><b>${st}<small>${tr(' j',' d')}</small></b><span>連続 ${tr('série','streak')}</span></span>${dd[1]?`<span class="stat"><b>${Math.round(100*dd[0]/dd[1])}<small>%</small></b><span>${tr('justes','right')}</span></span>`:''}</div>
     ${words.length?`<div class="dwords">${words.slice(0,24).map(w=>`<span lang="ja" title="${esc(WMAP[w][2])}">${esc(w)}</span>`).join('')}</div>`:''}
     <div class="drow">${t?`<button class="btn" id="dredo">${tr('Refaire','Redo')}<span class="lg">${tr(' ceux du jour',' today’s')}</span> (${t})</button>`:''}<button class="btn k" id="dnext">Set<span class="lg">${tr(' suivant',' next')}</span> +${S.newPer}</button><a class="btn r" href="#menu" id="dmenu">${tr('Défi','Menu')}<span class="lg">${tr(' menu',' challenge')}</span></a></div>`;
+    el.insertAdjacentHTML('beforeend',dailyReport()); if(el.querySelector('#review-difficult')) el.querySelector('#review-difficult').onclick=reviewDifficult;
     el.querySelector('#dmenu').onclick=()=>{ window.MENU_FOCUS=words; qpool='known'; if(typeof menuDone!=='undefined'&&menuDone) setTimeout(()=>genMenu(),0); };
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard'); centerDone(); return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
@@ -1322,7 +1376,7 @@ function showCard(){
       <div class="padbox"><div id="rpad" class="padhost"></div><div class="padside">
         <div class="wtools"><button class="btn" id="worder"><span class="dt">${tr('Ordre des traits ▶','Stroke order ▶')}</span><span class="ph">${tr('Ordre ▶','Order ▶')}</span></button><button class="btn" id="whint">${tr('Indice','Hint')}</button><button class="btn" id="wundo" aria-label="${tr('Annuler le dernier trait','Undo last stroke')}" title="${tr('Annuler (clic droit)','Undo (right-click)')}">↶</button><button class="btn" id="wclear" aria-label="${tr('Effacer','Clear')}" title="${tr('Effacer','Clear')}">✕</button><button class="btn k" id="wcheck">${tr('Vérifier','Check')}</button></div><div class="result" id="wres"></div><div id="wgr"></div></div></div>`;
     el.classList.add('wcard'); if(PHONE()) requestAnimationFrame(()=>el.scrollIntoView({block:'start',behavior:'auto'}));
-    const pad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,first:true,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
+    const pad=reviewPad=new Pad(el.querySelector('#rpad'),key,{ghost:isNew,first:true,onFull:()=>{ const b=el.querySelector('#wcheck'); if(b&&!el.querySelector('#wgr .grades')) b.click(); }}); el.querySelector('#rpad').dataset.ready='1'; if(isNew) setTimeout(()=>{ if(document.body.contains(pad.el)) pad.animate(); },500);
     el.querySelector('#worder').onclick=()=>pad.animate(); el.querySelector('#whint').onclick=()=>pad.flashGhost(); el.querySelector('#wundo').onclick=()=>pad.undo(); el.querySelector('#wclear').onclick=()=>pad.clear();
     el.querySelector('#wcheck').onclick=()=>{ const res=pad.check(); el.querySelector('#wres').innerHTML=res.html; el.querySelector('#wgr').innerHTML=wordChips(key)+'<div style="height:12px"></div>'+gradeButtons(id,res.suggest);
       el.querySelectorAll('#wgr .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
@@ -1428,13 +1482,15 @@ function ribbon(c,raw,R,seed){ if(!raw.length) return; const gap=Math.max(1,R*0.
 class Pad{
   constructor(host,ch,opt={}){ this.ch=ch; this.onFull=opt.onFull||null; this.ghostOn=opt.ghost??true; this.firstHint=!!opt.first; host.innerHTML=''; const d=document.createElement('div'); d.className='pad'; host.appendChild(d); this.el=d;
     ['paper','guide','ink','wet','over'].forEach(n=>{const c=document.createElement('canvas'); c.className=n; d.appendChild(c); this[n]=c;});
-    this.strokes=[]; this.snaps=[]; this.resize();
+    this.strokes=[]; this.snaps=[]; this.resize(); this.finish=Ambience.attachInk(d,[this.ink,this.wet]);
     this.ro=new ResizeObserver(()=>{ if(Math.round(this.el.clientWidth*DPR)!==this.size) this.resize(); }); this.ro.observe(d);
     d.addEventListener('pointerdown',e=>{ if(e.button===2) return; this.down(e); }); d.addEventListener('contextmenu',e=>{ e.preventDefault(); if(!this.drawing){ this.undo(); d.dispatchEvent(new CustomEvent('padchange')); } }); d.addEventListener('pointermove',e=>this.move(e)); d.addEventListener('pointerup',e=>this.up(e)); d.addEventListener('pointercancel',()=>this.up()); }
-  resize(){ const s=Math.round(this.el.clientWidth*DPR)||800; this.size=s; ['paper','guide','ink','wet','over'].forEach(n=>{this[n].width=this[n].height=s});
+  resize(){ const s=Math.round(this.el.clientWidth*DPR)||800; if(this.drawing) this.up(); this.finish?.clear(); clearTimeout(this._full); cancelAnimationFrame(this._demo);
+    const old=this.size, saved=this.strokes||[], undo=this.snaps||[], ink=document.createElement('canvas'); ink.width=ink.height=old||s; if(old) ink.getContext('2d').drawImage(this.ink,0,0); this.size=s; ['paper','guide','ink','wet','over'].forEach(n=>{this[n].width=this[n].height=s});
     const p=this.paper.getContext('2d'); fillSurface(p,'washi',s,s); p.strokeStyle='rgba(200,60,45,.35)'; p.lineWidth=Math.max(1,s/300); p.setLineDash([s/60,s/60]);
     p.beginPath(); p.moveTo(s/2,0); p.lineTo(s/2,s); p.moveTo(0,s/2); p.lineTo(s,s/2); p.stroke(); p.setLineDash([]); p.strokeStyle='rgba(200,60,45,.5)'; p.lineWidth=Math.max(1.5,s/220); p.strokeRect(s*0.02,s*0.02,s*0.96,s*0.96);
-    this.strokes=[]; this.snaps=[]; this.drawGuide(); }
+    this.strokes=saved; this.snaps=undo.map(image=>{ const a=document.createElement('canvas'),b=document.createElement('canvas'); a.width=a.height=old; b.width=b.height=s; a.getContext('2d').putImageData(image,0,0); b.getContext('2d').drawImage(a,0,0,s,s); return b.getContext('2d').getImageData(0,0,s,s); }); if(old) this.ink.getContext('2d').drawImage(ink,0,0,s,s); this.drawGuide(); }
+  destroy(){ this.finish?.destroy(); this.ro.disconnect(); clearTimeout(this._full); clearTimeout(this._fg); cancelAnimationFrame(this._raf); cancelAnimationFrame(this._demo); this.onFull=null; }
   setChar(ch){ this.ch=ch; this.clear(); this.drawGuide(); }
   drawGuide(upto,partial){ const g=this.guide.getContext('2d'), s=this.size; g.clearRect(0,0,s,s);
     if(!this.ghostOn && upto==null){ if(this.firstHint){ g.fillStyle='rgba(60,60,60,.16)'; drawRef(g,this.ch,s/2,s/2,s*0.9,{upto:1}); } return; }
@@ -1472,9 +1528,9 @@ class Pad{
             P.forEach(q=>{ const d=(q.s-dryFrom)/(st.L-dryFrom+1); const x=q.x+q.nx*q.w*0.5*off, y=q.y+q.ny*q.w*0.5*off;
               if(d>0.25&&rr()<0.93){ ix.globalAlpha=Math.min(0.5,d*0.6); on?ix.lineTo(x,y):ix.moveTo(x,y); on=true; } else on=false; }); ix.stroke(); }
           ix.restore(); } } };
-    const t0=performance.now(); const fr=now=>{ const tt=(now-t0)/1000*0.8; let j=0; while(j<S.length&&S[j].t<=tt) j++; draw(j); if(j<S.length) this._demo=requestAnimationFrame(fr); }; this._demo=requestAnimationFrame(fr); }
-  clear(){ this.ink.getContext('2d').clearRect(0,0,this.size,this.size); this.over.getContext('2d').clearRect(0,0,this.size,this.size); this.strokes=[]; this.snaps=[]; }
-  undo(){ if(!this.snaps.length) return; this.ink.getContext('2d').putImageData(this.snaps.pop(),0,0); this.strokes.pop(); this.over.getContext('2d').clearRect(0,0,this.size,this.size); }
+    const t0=performance.now(); const fr=now=>{ const tt=(now-t0)/1000*0.8; let j=0; while(j<S.length&&S[j].t<=tt) j++; draw(j); if(j<S.length) this._demo=requestAnimationFrame(fr); else this.finish?.refresh(); }; this._demo=requestAnimationFrame(fr); }
+  clear(){ this.finish?.clear(); clearTimeout(this._full); this.ink.getContext('2d').clearRect(0,0,this.size,this.size); this.over.getContext('2d').clearRect(0,0,this.size,this.size); this.strokes=[]; this.snaps=[]; }
+  undo(){ if(!this.snaps.length) return; this.finish?.clear(); this.ink.getContext('2d').putImageData(this.snaps.pop(),0,0); this.strokes.pop(); this.over.getContext('2d').clearRect(0,0,this.size,this.size); }
   xy(e){ const b=this.el.getBoundingClientRect(); return [(e.clientX-b.left)*this.size/b.width,(e.clientY-b.top)*this.size/b.height]; }
   down(e){ e.preventDefault(); this.el.setPointerCapture(e.pointerId); this.over.getContext('2d').clearRect(0,0,this.size,this.size);
     const [x,y]=this.xy(e); this.drawing=true; this.lt=e.timeStamp; this.pos=[x,y]; this.last=[x,y]; this.v=0; this.vx=0; this.vy=0; this.pen=e.pointerType==='pen';
@@ -1503,7 +1559,7 @@ class Pad{
     this.render();
     const ix=this.ink.getContext('2d'); this.snaps.push(ix.getImageData(0,0,this.size,this.size)); if(this.snaps.length>40) this.snaps.shift();
     ix.save(); ix.shadowColor='rgba(22,18,13,.3)'; ix.shadowBlur=this.size*0.004; ix.globalAlpha=0.95; ix.drawImage(this.wet,0,0); ix.restore(); this.wet.getContext('2d').clearRect(0,0,this.size,this.size);
-    this.strokes.push(this.cur.length>1?this.cur:[this.cur[0],[this.cur[0][0]+0.5,this.cur[0][1]+0.5]]);
+    this.finish?.refresh(); this.strokes.push(this.cur.length>1?this.cur:[this.cur[0],[this.cur[0][0]+0.5,this.cur[0][1]+0.5]]);
     const gl=glyph(this.ch); if(this.onFull&&gl&&this.strokes.length===gl.strokes.length){ clearTimeout(this._full); this._full=setTimeout(()=>{ if(!this.drawing&&gl&&this.strokes.length===gl.strokes.length) this.onFull(); },420); } }
   check(){ const g=glyph(this.ch); const ref=g.strokes.map(st=>st.map(p=>[p[0]*0.9+5.45,p[1]*0.9+5.45]));
     const res=(a,n)=>{const c=[0];for(let i=1;i<a.length;i++)c.push(c[i-1]+Math.hypot(a[i][0]-a[i-1][0],a[i][1]-a[i-1][1]));const L=c[c.length-1]||1;const o=[];let j=0;for(let k=0;k<n;k++){const t=L*k/(n-1);while(j<c.length-2&&c[j+1]<t)j++;const f=(t-c[j])/((c[j+1]-c[j])||1);o.push([a[j][0]+(a[j+1][0]-a[j][0])*f,a[j][1]+(a[j+1][1]-a[j][1])*f])}return o};
@@ -1599,7 +1655,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-lf]'); if
 // a challenge answer counts for the matching card: clue in meaning → m:, clue in reading → r:
 function menuReview(w,ok){ const pref=mmode==='reading'?'r:':'m:'; let id=pref+w; if(!(S.cards[id]&&S.cards[id].reps>0)) id=firstId(w); const c=S.cards[id]; if(!c||!(c.reps>0)) return '';
   if(!ok){ S.cards[id]=schedule(c,0); store.set(SKEY,S); return tr(`${w} revient dans tes révisions`,`${w} goes back to your reviews`); }
-  if(c.due<=Date.now()){ S.cards[id]=schedule(c,2); if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(true); } store.set(SKEY,S); return tr(`${w} : révision comptée`,`${w}: counted as a review`); }
+  if(c.due<=Date.now()){ S.cards[id]=schedule(c,2); if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(true,id); } store.set(SKEY,S); return tr(`${w} : révision comptée`,`${w}: counted as a review`); }
   return ''; }
 function fillSelects(){
   const mt=document.getElementById('mtype'); mt.innerHTML=`<option value="">${tr('Au hasard','Random')}</option>`+Object.entries(TYPES).map(([k,t])=>`<option value="${k}">${t.jp} · ${esc(t.fr)}</option>`).join('');
@@ -1621,6 +1677,7 @@ function genMenu(){
   for(const [h,list,[a,b]] of t.sections){ if(count>=maxItems) break; const n=Math.min(list.length, Math.max(2,Math.round((maxItems-count)/ (t.sections.length>2?2.2:1.4))));
     const its=pref(list).slice(0,n).filter(w=>WMAP[w]); sections.push({h, items:its.map(w=>({w, price: (tk==='sushi'&&r()<0.18)?'時価':roundPrice(r,a,b)}))}); count+=its.length; }
   MENU={tk,t,rk,reg,layout,vertical,tool,writer,pstyle,sections,shop:shopName(r,t),seed:r()*1e9|0, tax:r()<0.6}; MENU.focus=F;
+  if(lessonRun){ MENU.sections=[{h:'一品料理',items:LESSON_WORDS.map((w,i)=>({w,price:320+i*80}))}]; MENU.reg=null; MENU.layout='wood'; MENU.vertical=true; MENU.tool='brush'; MENU.pstyle='digits'; }
   renderMenu(); newQuest();
 }
 async function renderMenu(){
@@ -1652,8 +1709,8 @@ async function renderMenu(){
     const hcolor = m.tool==='chalk'? pick(r,['#ffd84d','#ff9ccf','#9fe3ff']) : '#c8261a';
     const size = m.vertical? vsize : clamp(vw/20,30,50);
     const hw=Object.assign({},m.writer,{weight:m.writer.weight*1.1});
-    if(m.vertical){ const surf = m.layout==='wood'?'wood':m.layout==='sheet'?null: pick(r,['red','yellow']); const hcol = surf==='red'?'#f6f1e6':hcolor;
-      tasks.push(()=>textCanvas(hc,sec.h,{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,surface:surf||'washi',transparent:!surf,color:hcol,pad:0.32,minH:size*3.2})); }
+    if(m.vertical){ const surf = m.layout==='wood'?'wood':m.layout==='sheet'?null: pick(r,['red','yellow']); const hcol = surf==='red'?'#f6f1e6':hcolor; if(surf==='wood') Ambience.wood(hb,m.seed+si*101);
+      tasks.push(()=>textCanvas(hc,sec.h,{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',color:hcol,pad:0.32,minH:size*3.2})); }
     else tasks.push(()=>textCanvas(hc,sec.h,{seed:m.seed+si*101,writer:hw,size:size*1.15,surface:'washi',transparent:true,color:hcolor,pad:0.22,align:'start',minW:Math.min(560,vw-60),after:(lx,W,H)=>{lx.save(); lx.lineWidth=3*DPR; lx.beginPath(); lx.moveTo(size*DPR*0.3,H-size*DPR*0.15); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); lx.restore();}}));
     hb.onclick=()=>clickItem({w:sec.h,isHeader:true},hb);
     sec.items.forEach((it,ii)=>{ const btn=document.createElement('button'); btn.className='itm'; btn.setAttribute('aria-label',tr('Plat','Dish')); const cv=document.createElement('canvas'); btn.appendChild(cv); host.appendChild(btn);
@@ -1661,8 +1718,8 @@ async function renderMenu(){
       const pt=priceText(it.price, m.pstyle); const seed=m.seed+si*101+ii*7+3;
       if(m.vertical){
         const surf = m.layout==='wood'?'wood': m.layout==='sheet'? null : pick(r,['washi','kinari','white','washi']);
-        const text = it.w + '　' ; const ptxt = pt;
-        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,it.w+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,surface:surf||'washi',transparent:!surf,pad:0.28,valign:'start',color:ink,
+        if(surf==='wood') Ambience.wood(btn,seed); const text = it.w + '　' ; const ptxt = pt;
+        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,it.w+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
           after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
       else { const W0=Math.min(560,vw-60);
@@ -1687,11 +1744,11 @@ function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tas
   const clash=[['禁煙','全席禁煙','喫煙席'],['食券','券売機','食券制'],['お冷','お冷はセルフ'],['予約席','ご予約']];
   for(const w of shuffle(r,pool)){ if(picks.length>=(phone?2:3)) break; if(!WMAP[w]||clash.some(g=>g.includes(w)&&g.some(x=>picks.includes(x)))) continue; picks.push(w); }
   const nw=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['marker','brush','marker']));
-  picks.forEach((w,i)=>{ const n=[...w].length; const btn=document.createElement('button'); btn.className='itm note'; btn.style.setProperty('--rot',((r()-.5)*7).toFixed(1)+'deg'); btn.setAttribute('aria-label',tr('Écriteau','Notice'));
-    const cv=document.createElement('canvas'); btn.appendChild(cv); nb.appendChild(btn); const idx=MENU.flat.length; MENU.flat.push({w,btn,kind:'sign'}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
+  picks.forEach((w,i)=>{ const n=[...w].length; const btn=document.createElement('button'); btn.className='itm note note-'+(i%3); btn.style.setProperty('--tape-rot',((r()-.5)*12).toFixed(1)+'deg'); btn.style.setProperty('--rot',((r()-.5)*7).toFixed(1)+'deg'); btn.setAttribute('aria-label',tr('Écriteau','Notice'));
+    const cv=document.createElement('canvas'); btn.appendChild(cv); nb.appendChild(btn); Ambience.paper(btn,w,i); const idx=MENU.flat.length; MENU.flat.push({w,btn,kind:'sign'}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
     const surf=pick(r,['white','white','kinari','yellow','pink']); const vert=n<=4&&r()<.5; const color=(w.includes('禁')||r()<.25)?'#c8261a':null;
     const size=Math.round(vert? clamp(vw/16,26,40) : Math.min(clamp(vw/16,24,38),(Math.min(vw*.62,300))/(n+0.6)));
-    tasks.push(()=>textCanvas(cv,w,{seed:m.seed+500+i*13,writer:nw,size,vertical:vert,surface:surf,color,pad:0.42})); });
+    tasks.push(()=>textCanvas(cv,w,{seed:m.seed+500+i*13,writer:nw,size,vertical:vert,surface:surf,color,pad:0.48,after:(x,W,H)=>{ x.save(); x.globalAlpha=.16; x.strokeStyle='#80643c'; x.lineWidth=DPR; x.beginPath(); x.moveTo(W*.08,H*.12); x.lineTo(W*.92,H*.1); x.stroke(); x.restore(); }})); });
   // the exchange
   const sc=pick(r,PH.scenes); const dishes=MENU.flat.filter(x=>!x.kind&&[...x.w].length<=5); const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
   const bw=makeWriter(r,pick(r,['kaisho','hurry']),'pen'); const maxW=Math.min(vw*(phone?.8:.72),420);
@@ -1706,7 +1763,7 @@ function clickItem(it,btn){
   if(mmode==='explore' || it.isHeader){ const was=btn.classList.contains('sel'); clearSel(); if(!was){ btn.classList.add('sel'); document.getElementById('board').classList.add('hassel'); showInfo(it,undefined,btn); } return; }
   if(target==null) return; score.n++;
   const tw=MENU.flat[target].w;
-  if(it===MENU.flat[target]){ buzz(true); score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
+  if(it===MENU.flat[target]){ if(lessonRun){ S.lessonPassed[tw]=Date.now(); store.set(SKEY,S); renderLearningHome(); } buzz(true); score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
   else { buzz(false); streak=0; const note=qmiss?'':menuReview(tw,false); qmiss=true; btn.classList.remove('bad'); void btn.offsetWidth; btn.classList.add('bad'); showInfo(it,false,btn,note); }
   updScore(); }
 function clearSel(){ document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('sel')); const bd=document.getElementById('board'); if(bd) bd.classList.remove('hassel'); hidePop(); }
@@ -1728,17 +1785,19 @@ function priceBlock(it,m){ if(it.price==null) return '';
   return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">${it.price} ¥</span>${written!==it.price+'円'?`<span>${tr('écrit','written')} <b style="font-family:var(--f-jp);font-weight:600">${esc(written)}</b></span>`:''}<span>${esc(nr.kana)}</span><span class="mono" style="text-transform:none;color:var(--mute)">${esc(nr.romaji)}</span></div>`; }
 function showInfo(it,ok,btn,note){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
   showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}${note?`<p class="qnote">${esc(note)}</p>`:''}
-    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}${it.full?`<p class="full" lang="ja">${esc(it.full)}</p>`:''}<div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${hasKanji(w[0])?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}${it.full?`<p class="full" lang="ja">${esc(it.full)}</p>`:''}<div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${hasKanji(w[0])?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}<div class="row">${favoriteBtn(w[0])}${reviewBtn(firstId(w[0]))}</div>
     ${priceBlock(it,m)}
     ${sec?`<p class="hint" style="margin:10px 0 0">${tr('Rubrique','Section')} ${esc(sec[0])} · ${esc(toRomaji(sec[1]))} · ${esc(sec[2])}</p>`:''}
     <div style="height:12px"></div>${wordChips(w[0]+(typeof it.price==='number'&&m.vertical?priceText(it.price,m.pstyle):''))}`, btn||it.btn); }
 function showSign(btn){ const s=MENU.shop; clearSel(); const L=LANG==='en'?1:0;
   const parts=(s.parts||[]).map(([w,r])=>{ const x=NX[w]; return `<div class="spart"><div class="sh"><b>${esc(w)}</b><span class="rd2">${esc(r)}</span>${sayBtn(w,r)}</div>${x?`<p>${esc(x[L])}</p>`:''}</div>`; }).join('');
   showPop(`<p class="lab" style="margin:0">${tr('Enseigne','Shop sign')}</p><div class="w">${esc(s.jp)}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(s.rd)}${sayBtn((s.parts||[]).map(p=>p[0]).join('|'),s.rd)}</div><div class="ro">${esc(toRomaji(s.rd))}</div><div class="mn">${esc(MENU.t.jp)} · ${esc(MENU.t.fr)}${MENU.reg?' · '+esc(MENU.reg.fr):''}</div></div><div class="sparts">${parts}</div>${wordChips(s.jp)}`, btn); }
+function updateMenuLabels(){ if(!MENU) return; const host=document.getElementById('menu-text-items'); host.innerHTML=MENU.flat.map((it,i)=>`<button class="btn" type="button" data-menu-item="${i}">${esc(it.full||it.w)}</button>`).join(''); host.querySelectorAll('button').forEach(b=>b.onclick=()=>{const it=MENU.flat[+b.dataset.menuItem]; clickItem(it,it.btn);}); const readable=mmode==='explore'; MENU.flat.forEach((it,i)=>{ const title=readable?(it.full||it.w):tr('Élément ','Item ')+(i+1); it.btn.setAttribute('aria-label',title); it.btn.querySelector('canvas')?.setAttribute('aria-hidden','true'); }); }
 let QSET=false;
 function updScore(){ const s=document.querySelector('#mquest .sc'); if(s){ s.innerHTML=streak>1?`<span lang="ja">連</span>${streak}`:''; s.title=`${score.ok} / ${score.n}`; } }
 function newQuest(){ const q=document.getElementById('mquest'); target=null; document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('good','bad','sel')); clearSel();
   document.querySelectorAll('#v-menu .modes button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.m==='explore')===(mmode==='explore'))));
+  updateMenuLabels(); if(lessonRun){ lessonQuest(); return; }
   if(mmode==='explore'||!MENU||!MENU.flat.length){ q.innerHTML=''; return; }
   qmiss=false; const idx=MENU.flat.map((x,i)=>i); const kn=idx.filter(i=>knownWord(MENU.flat[i].w)); if(qpool==='known'&&!kn.length&&(newQuest.tries=(newQuest.tries||0)+1)<12){ genMenu(); return; } newQuest.tries=0; const base=qpool==='known'&&kn.length? kn : idx;
   // each word is asked once per menu; when none is left, a new menu is drawn
@@ -1753,8 +1812,9 @@ function newQuest(){ const q=document.getElementById('mquest'); target=null; doc
   updScore(); q.querySelector('#qskip').onclick=()=>{ streak=0; newQuest(); }; q.querySelector('#qsp').onclick=e=>e.currentTarget.classList.toggle('on');
   q.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ mmode=lastQ=b.dataset.q; newQuest(); });
   q.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ qpool=b.dataset.p; try{ localStorage.setItem('menyomi.qpool',qpool); }catch(e){} if(qpool==='known'&&!nk) genMenu(); else newQuest(); }); }
-document.querySelector('#v-menu .modes').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; mmode=b.dataset.m==='explore'?'explore':lastQ; score={ok:0,n:0}; streak=0; newQuest(); });
-document.getElementById('mnew').onclick=genMenu; document.getElementById('mtype').onchange=genMenu; document.getElementById('mreg').onchange=genMenu;
+document.querySelector('#v-menu .modes').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; if(lessonRun) stopLessonMenu(); mmode=b.dataset.m==='explore'?'explore':lastQ; score={ok:0,n:0}; streak=0; newQuest(); });
+const freeMenu=e=>{ const type=document.getElementById('mtype').value,region=document.getElementById('mreg').value; if(lessonRun) stopLessonMenu(); if(e?.target.id==='mtype') document.getElementById('mtype').value=type; if(e?.target.id==='mreg') document.getElementById('mreg').value=region; genMenu(); };
+document.getElementById('mnew').onclick=freeMenu; document.getElementById('mtype').onchange=freeMenu; document.getElementById('mreg').onchange=freeMenu;
 addEventListener('keydown',e=>{ if(e.key==='Escape') clearSel(); });
 // a tap anywhere outside the dish card closes it (tapping another dish opens that one instead)
 document.addEventListener('click',e=>{ const p=document.getElementById('minfo'); if(!p||p.hidden) return; if(e.target.closest('#minfo,.board .itm,#signbtn,dialog')) return; clearSel(); });
@@ -1872,24 +1932,25 @@ function vRow(w){ return `<button class="vrow${knownWord(w[0])?' kn':''}" data-w
 function vGroup(j,f,words){ if(LF!=='all') words=words.filter(w=>knownWord(w[0])===(LF==='kn')); if(!words.length) return ''; return `<div class="vgroup" data-j="${esc(j)}"><h3><span class="j">${esc(j)}</span><span>${esc(f)}</span><span class="c">${words.length}</span></h3><div class="vtable">${words.map(vRow).join('')}</div></div>`; }
 const byKana=(a,b)=>toHira(a[1]).localeCompare(toHira(b[1]),'ja');
 function renderVocab(){
-  const tabs=[['all','あ→ん',tr('Tous','All')],...Object.entries(TYPES).map(([k,t])=>[k,t.jp,t.fr.replace(/ \(.*\)/,'')]),['regions','名物',tr('Régions','Regions')],['mentions','表記',tr('Mentions et abréviations','Notices and short forms')],['phrases','店で',tr('Au restaurant','At the restaurant')]];
+  const tabs=[['all','あ→ん',tr('Tous','All')],['favorites','保存',tr('Mes favoris','Saved words')],...Object.entries(TYPES).map(([k,t])=>[k,t.jp,t.fr.replace(/ \(.*\)/,'')]),['regions','名物',tr('Régions','Regions')],['mentions','表記',tr('Mentions et abréviations','Notices and short forms')],['phrases','店で',tr('Au restaurant','At the restaurant')]];
   document.getElementById('vtabs').innerHTML=tabs.map(([k,j,f])=>`<button data-v="${k}" aria-pressed="${k===vTab}"><span class="j">${esc(j)}</span>${esc(f)}</button>`).join('');
   const q=document.getElementById('vsearch').value.trim().toLowerCase(), nq=normRo(q); let html='', n=0;
   const hit=w=>!q||w[0].includes(q)||w[1].includes(q)||toHira(w[1]).includes(toHira(q))||w[2].toLowerCase().includes(q)||(nq.length>1&&normRo(toRomaji(w[1])).includes(nq));
-  if(q){ const list=WORDS.filter(hit).sort(byKana); n=list.length; html=vGroup('検索',tr('Résultats','Results'),list)||'<p class="hint">'+tr('Aucun mot ne correspond.','No matching word.')+'</p>'; }
+  if(q){ const list=WORDS.filter(w=>hit(w)&&(vTab!=='favorites'||favorite(w[0]))).sort(byKana); n=list.length; html=vGroup('検索',tr('Résultats','Results'),list)||'<p class="hint">'+tr('Aucun mot ne correspond.','No matching word.')+'</p>'; }
+  else if(vTab==='favorites'){ const list=WORDS.filter(w=>favorite(w[0])).sort(byKana); n=list.length; html=vGroup('保存',tr('Mes favoris','Saved words'),list)||'<p class="hint">'+tr('Garde des mots depuis leur fiche ou depuis un menu pour préparer ta liste.','Save words from their details or from a menu to build your list.')+'</p>'; if(list.length) html='<button class="btn" id="review-favorites">'+tr('Réviser mes favoris','Practise saved words')+'</button>'+html; }
   else if(vTab==='all'){ const g={}; WORDS.forEach(w=>{(g[gojuRow(w[1])]??=[]).push(w)}); GOJU.forEach(k=>{ if(g[k]){ g[k].sort(byKana); n+=g[k].length; html+=vGroup(k+'行',GOJU_FR[k],g[k]); } }); }
   else if(vTab==='mentions'){ const l=(DATA.mentions||[]).map(x=>WMAP[x]).filter(Boolean); n=l.length; html=vGroup('表記',tr('Mentions et abréviations','Notices and short forms'),l); }
   else if(vTab==='phrases'){ const a=PH.signs.map(x=>WMAP[x]).filter(Boolean), b=PH.talk.map(x=>WMAP[x]).filter(Boolean); n=a.length+b.length; html=vGroup('貼り紙',tr('Écriteaux','Notices'),a)+vGroup('会話',tr('Formules','Phrases'),b); }
   else if(vTab==='regions'){ Object.values(REGIONS).forEach(r=>{ const l=r.items.map(x=>WMAP[x]).filter(Boolean); n+=l.length; html+=vGroup(r.jp,r.fr,l); }); }
   else { const t=TYPES[vTab]; const seen=new Set(); t.sections.forEach(sec=>{ const l=sec[1].map(x=>WMAP[x]).filter(w=>w&&!seen.has(w[0])&&seen.add(w[0])); const h=WMAP[sec[0]]; n+=l.length; html+=vGroup(sec[0],h?h[2]:'',l); }); }
   { const ix=document.getElementById('vidx'); const rows=vTab==='all'&&!q? [...html.matchAll(/data-j="(.)行"/g)].map(m=>m[1]) : []; ix.innerHTML=rows.map(r=>`<button type="button" lang="ja" data-ix="${r}">${r}</button>`).join(''); ix.hidden=rows.length<3; }
-  document.getElementById('vlf').innerHTML=lfBar(); document.getElementById('vbody').innerHTML=html; document.getElementById('vcount').textContent=`${n} ${tr('mots','words')}`; }
+  document.getElementById('vlf').innerHTML=lfBar(); document.getElementById('vbody').innerHTML=html; document.getElementById('vcount').textContent=`${n} ${tr('mots','words')}`; const personal=document.getElementById('review-favorites'); if(personal) personal.onclick=reviewPersonal; }
 document.getElementById('vtabs').addEventListener('click',e=>{ const b=e.target.closest('[data-v]'); if(!b) return; vTab=b.dataset.v; document.getElementById('vsearch').value=''; renderVocab(); });
 document.getElementById('vsearch').oninput=renderVocab;
 document.getElementById('vidx').addEventListener('click',e=>{ const b=e.target.closest('[data-ix]'); if(!b) return; const g=document.querySelector(`#vbody .vgroup[data-j="${b.dataset.ix}行"]`); if(g) g.scrollIntoView({block:'start',behavior:'auto'}); });
 document.getElementById('vbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(!b) return;
   const open=b.getAttribute('aria-expanded')==='true'; document.querySelectorAll('#vbody .vx').forEach(x=>x.remove()); document.querySelectorAll('#vbody .vrow').forEach(x=>x.setAttribute('aria-expanded','false')); if(open) return;
-  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+(knownWord(w[0])?'':reviewBtn(firstId(w[0])))+'</div></div>'; b.after(x);
+  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+favoriteBtn(w[0])+reviewBtn(firstId(w[0]))+'</div></div>'; b.after(x);
   const draw=()=>{ const r=rng(newSeed()); const v=pick(r,['kaisho','hurry','gyosho']); const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
     textCanvas(x.querySelector('canvas'),w[0],{seed:newSeed(),writer:makeWriter(r,v,tool),size:clamp((x.clientWidth-40)/([...w[0]].length+0.8),40,84),surface:surf,pad:0.3}); };
   x.querySelector('.btn').onclick=draw; draw(); });
@@ -1911,7 +1972,7 @@ const VIEWS=['revisions','menu','atelier','main','kanji','vocab']; let menuDone=
 function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'revisions';
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
   const tv=v==='main'?'atelier':v; document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+tv?'page':'false'));
-  if(v==='revisions') showCard(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
+  if(v==='revisions') showCard(); if(v!=='revisions') cancelAuto(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
   if(v==='revisions') setTimeout(centerDone,60); if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', ({menu:.62,main:1.75,atelier:1.15,kanji:1.1})[v]||1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
 
 // ---------- window light: a shadow scene per tab behind a window frame; the slant follows the hour; at night the page dims and the window becomes a patch of moonlight
@@ -1928,8 +1989,8 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   const dayNo=()=>window.SUN_DAY??Math.floor((Date.now()-new Date().getTimezoneOffset()*6e4)/864e5);
   let DAY=dayNo(); const dayFx=()=>{ const r=rng(DAY*7919+13); return {wind:.65+r()*.9, mull:.38+r()*.12, rail:.34+r()*.12, tilt:(r()-.5)*.16}; }; let DFX=dayFx();
   // the scenes slide one screen along every day: today's Menus scene is tomorrow's Révisions scene
-  const POOL=['momiji','sudare','bamboo','shoji','pine','fuji','ginkgo','noren','hanabira','furin','sakura','ame'], TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
-  const kindFor=v=>POOL[(((TABI[v]??0)+DAY)%POOL.length+POOL.length)%POOL.length]; let curTab='revisions';
+  const POOL=Ambience.shadows, TABI={revisions:0,menu:1,atelier:2,main:3,kanji:4,vocab:5};
+  const kindFor=v=>Ambience.selection(v).shadow; let curTab='revisions';
   const shapes={
     momiji(x){ const L=[[-1.5,.5],[-.78,.82],[0,1],[.78,.82],[1.5,.5]]; x.moveTo(0,0); x.lineTo(Math.cos(-2.1)*.16,Math.sin(-2.1)*.16);
       L.forEach(([a,r],i)=>{ const pa=i?L[i-1][0]:-2.1; const m=(pa+a)/2; x.lineTo(Math.cos(m)*.3,Math.sin(m)*.3); x.lineTo(Math.cos(a-.1)*r*.75,Math.sin(a-.1)*r*.75); x.lineTo(Math.cos(a)*r,Math.sin(a)*r); x.lineTo(Math.cos(a+.1)*r*.75,Math.sin(a+.1)*r*.75); });
@@ -1953,7 +2014,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       x.lineWidth=.95; x.beginPath(); for(let k=0;k<nn;k++){ const a=-Math.PI/2+lean+(k/(nn-1)-.5)*Math.PI*1.25+(r()-.5)*.08; const l=L*(.7+r()*.35)*(1-.25*Math.abs(Math.sin(a))*0); x.moveTo(cx,cy+2); x.lineTo(cx+Math.cos(a)*l,cy+2+Math.sin(a)*l*.85); } x.stroke();
       x.beginPath(); x.ellipse(cx,cy+2,L*.32,L*.22,0,0,6.3); x.fill(); }
     return {img:c,w:c.width/sc,h:c.height/sc}; }
-  function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];
+  function makeScene(kind,seed){ const r=rng(seed); const br=[]; const items=[];if(kind==='chochin'){const count=Ambience.selection(curTab).lanterns,anchors=count===3?[.25,.53,.81]:count===4?[.18,.40,.62,.84]:[.15,.325,.5,.675,.85];return{kind,br,items,lanterns:anchors.map((a,i)=>({x:W*(a+(r()-.5)*.02),y:H*(.08+(i%2)*.1+r()*.025),scale:(count===3?.76:count===4?.66:.56)+r()*.15,ph:r()*6.3}))};}
     if(kind==='sudare'||kind==='shoji') return {kind,br,items,off:r()};
     if(kind==='noren') return {kind,br,items,n:3+Math.floor(r()*2),len:H*(.3+r()*.08),x0:W*(.02+r()*.1),off:r()};
     if(kind==='fuji'){ const rac=[], lv=[]; for(let i=0;i<17;i++) rac.push({x:W*(.04+r()*1.0),y:14+r()*30,len:55+r()*75,ph:r()*6.3,n:14+Math.floor(r()*6)});
@@ -2073,6 +2134,17 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     if(fly){ const f=Math.sin(t*.06); x.beginPath(); x.moveTo(-3,-9); x.lineTo(-8+2*f,-9-15*f); x.lineTo(5,-10); x.fill(); }
     else { x.lineWidth=1.3; x.beginPath(); x.moveTo(0,-1.5); x.lineTo(-1,3); x.moveTo(4,-1.5); x.lineTo(5,3); x.stroke(); } }
   function drawScene(sc,t,alpha){ const x=xa; x.globalAlpha=alpha;
+    if(sc.kind==='chochin'){
+      for(const lamp of sc.lanterns){
+        x.save();x.setTransform(...BT);x.translate(lamp.x,lamp.y);x.rotate(Math.sin(t*.0004+lamp.ph)*.006);x.scale(lamp.scale,lamp.scale);
+        x.lineWidth=1.2;x.beginPath();x.moveTo(0,-100);x.lineTo(0,-15);x.stroke();
+        x.globalAlpha=alpha*.23;x.beginPath();x.ellipse(0,57,34,70,0,0,6.3);x.fill();
+        x.globalAlpha=alpha*.7;x.fillRect(-15,-15,30,7);x.fillRect(-15,122,30,7);
+        x.lineWidth=1;for(let y=-5;y<122;y+=12){const half=34*Math.sqrt(Math.max(0,1-((y-57)/70)**2));x.beginPath();x.moveTo(-half,y);x.quadraticCurveTo(0,y+5,half,y);x.stroke();}
+        x.globalAlpha=alpha*.5;x.lineWidth=.9;x.beginPath();x.ellipse(0,57,34,70,0,0,6.3);x.stroke();x.restore();
+      }return;
+    }
+
     if(sc.kind==='sudare'){ x.setTransform(...BT); const sw=Math.sin(t*.0004)*4; for(let y=10;y<H*.62;y+=9) x.fillRect(-10,y+sw*(y/H),W+20,4.6); x.fillRect(-10,H*.62+sw*.6,W+20,16); for(const cx of [W*.3,W*.75]) x.fillRect(cx+sw*.5,0,2,H*.66); return; }
     if(sc.kind==='shoji'){ x.setTransform(...BT); // kumiko lattice of two sliding panels; the right one is half open on a gap of plain light
       const gap0=W*(.5+sc.off*.12), gap1=gap0+W*.17, cw=W*.13, rh=H*.075, top=-10, bot=H*.8;
@@ -2115,7 +2187,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
       if(it.shape==='sprite'){ x.drawImage(it.spr.img,-it.spr.w/2,-it.spr.h/2,it.spr.w,it.spr.h); continue; } x.beginPath(); shapes[it.shape](x); if(it.line){ x.lineWidth=(it.lw||1.3)/it.s; x.stroke(); } else x.fill(); }
     if(sc.petals) for(const q of sc.petals){ const L=H+80, y=((t*q.v*DFX.wind+q.off)%L)-40; const px=q.x0-(y+40)*q.dr*DFX.wind+Math.sin(t*.0011+q.ph)*9;
       const fl=.35+.65*Math.abs(Math.sin(t*.0019+q.ph)); x.setTransform(...BT); x.translate(px,y); x.rotate(q.ph+t*.0012*q.sp); x.scale(q.s,q.s*fl); x.beginPath(); shapes.petal(x); x.fill(); } }
-  const NOCROSS=new Set(['sakura','hanabira']); // cherry scenes: an open window, no cross bars
+  const NOCROSS=new Set(['sakura','hanabira','chochin']); // cherry scenes: an open window, no cross bars
   function frame(t){ const {st,night}=ph; const sk=ph.sk+DFX.tilt; BT=[KS,0,KS*sk*.55,KS*st,-KS*sk*H*.16,0];
     // slant and stretch can leave the canvas edges bare: zoom the scene about its centre until it covers the whole canvas, with a little to spare
     // fit the scene to what is on screen: the window's footprint in scene space is centred on the scene and just covered by it, so the whole scene shows, edges included
@@ -2130,7 +2202,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
     xa.setTransform(1,0,0,1,0,0); xa.globalAlpha=1; xa.globalCompositeOperation='source-over';
     xb.clearRect(0,0,W,H); xb.drawImage(A,0,0,W,H); }
   let last=0; function loop(t){ requestAnimationFrame(loop); if(document.hidden||t-last<66) return; last=t; frame(t); }
-  window.setShade=v=>{ curTab=v in TABI?v:'revisions'; const kind=kindFor(curTab); if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+kind.charCodeAt(0)*17+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
+  window.setShade=v=>{ curTab=v in TABI?v:'revisions'; Ambience.apply(curTab); const kind=kindFor(curTab); if(cur&&cur.kind===kind) return; prev=cur; cur=cache[kind]||(cache[kind]=makeScene(kind,kind.length*131+7+kind.charCodeAt(0)*17+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
   // review hooks: show one scene by name, or pin the hour
   window.SHADE_POOL=POOL; window.setShadeKind=k=>{ if(cur&&cur.kind===k) return; prev=cur; cur=cache[k]||(cache[k]=makeScene(k,k.length*131+7+k.charCodeAt(0)*17+DAY*7919)); t0=performance.now(); if(reduce) frame(performance.now()); };
   window.SHADE_DBG=()=>({BT,cur,A:[A.width,A.height]});
@@ -2143,52 +2215,61 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
 const langbtn=document.getElementById('langbtn'); langbtn.textContent=LANG==='en'?'FR':'EN'; langbtn.lang=LANG==='en'?'fr':'en'; langbtn.title=LANG==='en'?'Passer en français':'Switch to English';
 langbtn.onclick=()=>{ try{localStorage.setItem('menyomi.lang',LANG==='en'?'fr':'en')}catch(e){} location.reload(); };
 function progressCode(){ return 'MENYOMI1:'+btoa(unescape(encodeURIComponent(JSON.stringify(S)))); }
-function readCode(txt){ txt=String(txt||'').trim(); try{ const j=txt.startsWith('MENYOMI1:')? JSON.parse(decodeURIComponent(escape(atob(txt.slice(9))))) : JSON.parse(txt); if(j&&typeof j.cards==='object') return j; }catch(e){} return null; }
-function bindProgress(body){ const out=body.querySelector('#pcode'), msg=body.querySelector('#pmsg'); let pending=null;
-  body.querySelector('#pcopy').onclick=async()=>{ out.value=progressCode(); out.hidden=false; out.select(); try{ await navigator.clipboard.writeText(out.value); msg.textContent=tr('Code copié. Collez-le sur l’autre appareil.','Code copied. Paste it on the other device.'); }catch(e){ msg.textContent=tr('Copiez le code ci-dessus.','Copy the code above.'); } };
-  body.querySelector('#pdl').onclick=()=>{ try{ const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'})); a.download='menyomi-progression-'+today()+'.json'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){ msg.textContent=tr('Téléchargement impossible ici : utilisez le code.','Download not possible here: use the code.'); } };
-  const stage=j=>{ if(!j){ msg.textContent=tr('Code ou fichier illisible.','Unreadable code or file.'); return; } pending=j; const n=Object.keys(j.cards).length; const b=body.querySelector('#pimp'); b.textContent=tr(`Remplacer ma progression par celle-ci (${n} cartes)`,`Replace my progress with this one (${n} cards)`); b.classList.add('r'); msg.textContent=''; };
-  body.querySelector('#pfile').onchange=e=>{ const f=e.target.files[0]; if(!f) return; f.text().then(t=>stage(readCode(t))); };
-  body.querySelector('#pimp').onclick=e=>{ if(!pending){ stage(readCode(body.querySelector('#ppaste').value)); return; }
-    S=Object.assign({cards:{},day:'',newToday:0,newPer:10,todayIds:[],extraNew:0},pending); store.set(SKEY,S); pending=null; e.target.classList.remove('r'); e.target.textContent=tr('Importé ✓','Imported ✓'); renderStats(); if(location.hash==='#revisions'||!location.hash) showCard(); }; }
+function readCode(txt){
+  txt=String(txt||'').trim(); if(txt.length>1500000) return null;
+  try{ const json=txt.startsWith('MENYOMI1:')?decodeURIComponent(escape(atob(txt.slice(9)))):txt; return validateState(JSON.parse(json)); }catch(e){ return null; }
+}
+function bindProgress(body){
+  const out=body.querySelector('#pcode'), msg=body.querySelector('#pmsg'), button=body.querySelector('#pimp'); let pending=null;
+  const reset=()=>{pending=null; button.classList.remove('r'); button.textContent=tr('Importer','Import');};
+  body.querySelector('#ppaste').oninput=reset;
+  body.querySelector('#pcopy').onclick=async()=>{out.value=progressCode();out.hidden=false;out.select();try{await navigator.clipboard.writeText(out.value);msg.textContent=tr('Code copié. Collez-le sur l’autre appareil.','Code copied. Paste it on the other device.');}catch(e){msg.textContent=tr('Copiez le code ci-dessus.','Copy the code above.');}};
+  body.querySelector('#pdl').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='menyomi-progression-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};
+  const stage=j=>{reset();if(!j){msg.textContent=tr('Progression invalide : vérifie le code ou le fichier. Rien n’a été modifié.','Invalid progress: check the code or file. Nothing was changed.');return;} pending=j;button.textContent=tr(`Fusionner cette progression (${Object.keys(j.cards).length} cartes)`,`Merge this progress (${Object.keys(j.cards).length} cards)`);button.classList.add('r');msg.textContent=tr('Tes cartes sont conservées. Une copie locale sera gardée avant la fusion.','Your cards are kept. A local copy will be saved before merging.');};
+  body.querySelector('#pfile').onchange=async e=>{reset(); const f=e.target.files[0];if(!f)return;if(f.size>1500000){stage(null);return;}try{stage(readCode(await f.text()));}catch(e){stage(null);}};
+  button.onclick=()=>{if(!pending){stage(readCode(body.querySelector('#ppaste').value));return;} if(!store.set('menyomi.beforeImport',S,true)){msg.textContent=tr('Impossible de créer la copie de sécurité. Exporte ta progression avant de réessayer.','Could not create the backup. Export your progress before retrying.');return;} cancelAuto();LAST_GRADE=null;SESSION=null;S=mergeState(S,pending);rollDay();store.set(SKEY,S);reset();msg.textContent=tr('Progressions fusionnées.','Progress merged.');renderStats();if(location.hash==='#revisions'||!location.hash)showCard();};
+}
 
 // ---------- Google sign-in (Firebase) keeps the progress in sync across devices; the SDK loads only when needed
 const FBCONF={apiKey:"AIzaSyDrb2gnC9PYalYAFzv8oJwpJ6Bimonvy-Q",authDomain:"menyomi.firebaseapp.com",projectId:"menyomi",storageBucket:"menyomi.firebasestorage.app",messagingSenderId:"1098890822588",appId:"1:1098890822588:web:4ba5dd878b283afacf21b9"};
 const SITE_URL='https://qw620istallri-png.github.io/MenYomi/';
-function mergeState(a,b){ if(!b||!b.cards) return a; const out={...a,cards:{...a.cards}}; const lt=c=>c.at||(c.due-(c.ivl||0)*DAY);
-  for(const [id,c] of Object.entries(b.cards)){ const m=out.cards[id]; if(!m||lt(c)>lt(m)) out.cards[id]=c; }
-  if(b.day===a.day){ out.newToday=Math.max(a.newToday||0,b.newToday||0); out.extraNew=Math.max(a.extraNew||0,b.extraNew||0); out.todayIds=[...new Set([...(a.todayIds||[]),...(b.todayIds||[])])]; }
-  if(b.days){ out.days={...(a.days||{})}; for(const [k,v] of Object.entries(b.days)){ const m=out.days[k]; out.days[k]=m?[Math.max(m[0],v[0]),Math.max(m[1],v[1])]:v; } }
-  if((b.tp||0)>(a.tp||0)){ out.newPer=b.newPer; out.tp=b.tp; }
-  return out; }
-const SYNC=window.SYNC=(()=>{ let M=null, auth=null, db=null, user=null, timer=null, busy=false, last=0, err='', ld=null; const subs=new Set();
-  const emit=()=>subs.forEach(f=>{ try{f()}catch(e){} });
-  const load=()=> ld||(ld=Promise.all([import('./fb/firebase-app.js'),import('./fb/firebase-auth.js'),import('./fb/firebase-firestore-lite.js')]).then(([A,U,F])=>{
-      const app=A.initializeApp(FBCONF); auth=U.getAuth(app); db=F.getFirestore(app); M={U,F};
-      U.onAuthStateChanged(auth,u=>{ user=u; try{ localStorage.setItem('menyomi.sync',u?'1':'0'); }catch(e){} emit(); if(u) pull(); }); return M; }).catch(e=>{ ld=null; throw e; }));
-  const ref=()=>M.F.doc(db,'users',user.uid);
-  async function push(){ if(!user) return; clearTimeout(timer); await M.F.setDoc(ref(),{s:JSON.stringify(S),t:Date.now(),v:1}); last=Date.now(); err=''; emit(); }
-  async function pull(){ if(!user||busy) return; busy=true;
-    try{ const snap=await M.F.getDoc(ref()); let remote=null; if(snap.exists()){ try{ remote=JSON.parse(snap.data().s); }catch(e){} }
-      const merged=mergeState(S,remote); const a=JSON.stringify(merged);
-      if(a!==JSON.stringify(S)){ S=merged; store.set(SKEY,S,true); renderStats(); }
-      if(!remote||a!==JSON.stringify(remote)) await push(); last=Date.now(); err=''; }
-    catch(e){ err=String(e&&e.code||e); console.warn('sync',e); }
-    busy=false; emit(); }
-  document.addEventListener('visibilitychange',()=>{ if(!user) return; if(document.visibilityState==='visible') pull(); else if(timer) push().catch(()=>{}); });
-  let on=false; try{ on=localStorage.getItem('menyomi.sync')==='1'; }catch(e){} if(on) load().catch(()=>{});
-  return { get user(){return user}, get last(){return last}, get err(){return err}, sub(f){subs.add(f); return ()=>subs.delete(f);},
-    async signIn(){ err=''; await load(); const p=new M.U.GoogleAuthProvider(); p.setCustomParameters({prompt:'select_account'}); await M.U.signInWithPopup(auth,p); },
-    async signOut(){ if(M&&auth){ await push().catch(()=>{}); await M.U.signOut(auth); } },
-    queue(){ if(!user) return; clearTimeout(timer); timer=setTimeout(()=>push().catch(e=>{ err=String(e&&e.code||e); emit(); }),2500); },
-    pull }; })();
+function mergeState(a,b){ return Progress.merge(a,b,dayKey); }
+const SYNC=window.SYNC=(()=>{
+  let M=null,auth=null,db=null,user=null,timer=null,flight=null,last=0,err='',ld=null,dirty=false;
+  const subs=new Set(),emit=()=>subs.forEach(f=>{try{f()}catch(e){}});
+  const load=()=>ld||(ld=Promise.all([import('./fb/firebase-app.js'),import('./fb/firebase-auth.js'),import('./fb/firebase-firestore-lite.js')]).then(([A,U,F])=>{
+    const app=A.initializeApp(FBCONF);auth=U.getAuth(app);db=F.getFirestore(app);M={U,F};
+    U.onAuthStateChanged(auth,u=>{user=u;try{localStorage.setItem('menyomi.sync',u?'1':'0');}catch(e){}emit();if(u)pull();});return M;
+  }).catch(e=>{ld=null;throw e;}));
+  async function push(){
+    if(!user)return; if(flight){dirty=true;return flight;} clearTimeout(timer);timer=null;
+    const uid=user.uid, local=structuredClone(S),reference=M.F.doc(db,'users',uid);dirty=false;
+    flight=(async()=>{
+      try{
+        const committed=await Progress.commit(M.F,db,reference,local,readCode,dayKey);
+        if(user?.uid!==uid)return;
+        const current=mergeState(S,committed); if(JSON.stringify(current)!==JSON.stringify(committed))dirty=true;
+        S=current;rollDay();store.set(SKEY,S,true);renderStats();last=Date.now();err='';
+      }catch(e){err=String(e&&e.code||e);dirty=true;}
+      finally{flight=null;emit();if(dirty&&user?.uid===uid&&!err)timer=setTimeout(()=>push(),2500);}
+    })(); return flight;
+  }
+  async function pull(){return push();}
+  document.addEventListener('visibilitychange',()=>{if(!user)return;if(!document.hidden||timer)push();});
+  addEventListener('online',()=>{if(user)push();});
+  let on=false;try{on=localStorage.getItem('menyomi.sync')==='1';}catch(e){}if(on)load().catch(()=>{});
+  return {get user(){return user},get last(){return last},get err(){return err},get busy(){return !!flight||!!timer||dirty},sub(f){subs.add(f);return()=>subs.delete(f);},
+    async signIn(){err='';await load();const p=new M.U.GoogleAuthProvider();p.setCustomParameters({prompt:'select_account'});await M.U.signInWithPopup(auth,p);},
+    async signOut(){if(M&&auth){await push();if(err)throw new Error(err);await M.U.signOut(auth);}},
+    queue(){if(!user)return;dirty=true;clearTimeout(timer);timer=setTimeout(()=>push(),2500);emit();},pull};
+})();
 const GLOGO='<svg viewBox="0 0 48 48" width="20" height="20" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>';
 function renderSync(host){ if(!host||!document.body.contains(host)) return; const u=SYNC.user;
   const onSite=/github\.io$|^localhost$|^127\./.test(location.hostname);
   const errMsg=e=>/popup-blocked|popup-closed|cancelled-popup/.test(e)? tr('Fenêtre de connexion fermée ou bloquée.','The sign-in window was closed or blocked.') : /unauthorized-domain|operation-not-supported|web-storage/.test(e)? tr('La connexion Google ne marche pas ici.','Google sign-in does not work here.') : /permission-denied/.test(e)? tr('Accès refusé par la base. Vérifie les règles Firestore.','The database refused access. Check the Firestore rules.') : e? tr('Synchronisation impossible pour l’instant.','Sync is not possible right now.') : '';
   if(u){ const t=SYNC.last? new Date(SYNC.last).toLocaleTimeString(LANG==='en'?'en-GB':'fr-FR',{hour:'2-digit',minute:'2-digit'}) : '…';
-    host.innerHTML=`<div class="syncbox on">${u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:GLOGO}<div><b>${esc(u.displayName||u.email||'Google')}</b><span>${tr('Synchronisé','Synced')} ${t}${SYNC.err?` · <span class="bad">${esc(errMsg(SYNC.err))}</span>`:''}</span></div><button class="btn" id="gsyncnow" title="${tr('Synchroniser maintenant','Sync now')}">↻</button><button class="btn ghost" id="gout">${tr('Déconnexion','Sign out')}</button></div>`;
-    host.querySelector('#gout').onclick=()=>SYNC.signOut(); host.querySelector('#gsyncnow').onclick=()=>SYNC.pull(); return; }
+    host.innerHTML=`<div class="syncbox on">${u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:GLOGO}<div><b>${esc(u.displayName||u.email||'Google')}</b><span>${SYNC.busy?tr('En attente de synchronisation','Waiting to sync'):tr('Synchronisé','Synced')} ${t}${SYNC.err?` · <span class="bad">${esc(errMsg(SYNC.err))}</span>`:''}</span></div><button class="btn" id="gsyncnow" title="${tr('Synchroniser maintenant','Sync now')}">↻</button><button class="btn ghost" id="gout">${tr('Déconnexion','Sign out')}</button></div>`;
+    host.querySelector('#gout').onclick=()=>SYNC.signOut().catch(()=>toast(tr('Synchronisation en échec. Exporte ta progression avant de te déconnecter.','Sync failed. Export your progress before signing out.'))); host.querySelector('#gsyncnow').onclick=()=>SYNC.pull(); return; }
   host.innerHTML=`<div class="syncbox"><button class="btn gbtn" id="gin">${GLOGO}<span>${tr('Se connecter avec Google','Sign in with Google')}</span></button></div>${!onSite?`<p class="hint" style="margin:6px 0 0">${tr('Dans cet aperçu, Google bloque souvent la connexion. Elle marche sur','In this preview Google often blocks sign-in. It works on')} <a href="${SITE_URL}" target="_blank" rel="noopener">${tr('le site','the site')}</a>.</p>`:''}<p class="hint bad" id="gerr" style="margin:6px 0 0">${esc(errMsg(SYNC.err))}</p>`;
   host.querySelector('#gin').onclick=async e=>{ const b=e.currentTarget; b.disabled=true; try{ await SYNC.signIn(); }catch(er){ const m=host.querySelector('#gerr'); if(m) m.textContent=errMsg(String(er&&er.code||er)||'x'); } b.disabled=false; }; }
 
@@ -2201,8 +2282,8 @@ function renderSync(host){ if(!host||!document.body.contains(host)) return; cons
   addEventListener('scroll',()=>{ if(!mq.matches) return; const y=scrollY, dy=y-lastY; if(Math.abs(dy)<8) return;
     const atEnd=innerHeight+y>=document.documentElement.scrollHeight-4; B.classList.toggle('navhide',dy>0&&y>60&&!atEnd); lastY=y; },{passive:true});
   addEventListener('hashchange',()=>B.classList.remove('navhide')); })();
-document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslot').innerHTML=`<button class="btn k" id="otour">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button>`; document.getElementById('dlgbody').innerHTML=`<div id="insthost"></div><h2>${tr('Progression','Progress')}</h2>
-  <div id="synchost"></div>
+document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslot').innerHTML=`<button class="btn k" id="otour">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button>`; document.getElementById('dlgbody').innerHTML=`<h2>${tr('Réglages et progression','Settings and progress')}</h2><div class="row"><button class="btn" id="settings-lesson">${tr('Mon premier izakaya','My first izakaya')}</button><button class="btn" id="settings-favorites">${tr('Mes favoris','Saved words')}</button></div><div id="insthost"></div><h2>${tr('Progression','Progress')}</h2>
+  <div id="synchost"></div><p class="hint">${tr('Une carte est un exercice ; un mot peut avoir plusieurs cartes. La progression reste ici sans connexion.','A card is an exercise; one word can have several cards. Progress stays here without an account.')}</p>
   <details class="more"><summary>${tr('Transférer par code','Transfer with a code')}</summary><div class="moreb">
   <p style="margin:0">${tr('Sans compte, elle reste dans ce navigateur. Pour la passer à un autre appareil, copiez le code ici et collez-le là-bas.','Without an account it stays in this browser. To move it to another device, copy the code here and paste it there.')}</p>
   <div class="row"><button class="btn k" id="pcopy">${tr('Copier le code','Copy the code')}</button><button class="btn" id="pdl"${document.querySelector('link[rel=manifest]')?'':' hidden'}>${tr('Télécharger','Download')}</button></div>
@@ -2217,7 +2298,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
   <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version __BUILD__</p>
-  `; bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
+  `; document.getElementById('settings-lesson').onclick=()=>openLesson();document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
 const ONB={ch:'牛', word:'牛丼', others:['親子丼','カツ丼','天丼']};
@@ -2270,6 +2351,7 @@ function tourStep(n){ const o=document.getElementById('onb'); const w=WMAP[ONB.w
 addEventListener('hashchange',route);
 // ---------- small toast
 function toast(msg){ const d=document.createElement('div'); d.className='toast'; d.setAttribute('role','status'); d.textContent=msg; document.body.appendChild(d); requestAnimationFrame(()=>d.classList.add('in')); setTimeout(()=>{ d.classList.remove('in'); setTimeout(()=>d.remove(),400); },3200); }
+__LEARNING__
 const BUILD='__BUILD__';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache

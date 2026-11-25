@@ -5,6 +5,7 @@ on:
   # Runs on pushes targeting the default branch
   push:
     branches: ["main"]
+  pull_request:
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -29,13 +30,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npm ci --ignore-scripts
+      - name: Verify generated app and test behaviour
+        run: |
+          python src/build.py --check
+          npm test
+          npm run test:rules
       - name: Setup Pages
+        if: github.event_name != 'pull_request'
         uses: actions/configure-pages@v5
+      - name: Package only public assets
+        if: github.event_name != 'pull_request'
+        run: python src/package.py
       - name: Upload artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v4
         with:
-          path: '.'
+          path: 'artifacts/site'
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     environment:
       name: github-pages
