@@ -378,6 +378,20 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .board.h .itm.sel{transform:scale(1.03)}
 .board.slate .items{flex-direction:column;align-items:center;gap:4px}
 .board.slate{border:12px solid #6b4a2b;outline:2px solid var(--rule)}
+.board .scene{display:flex;flex-wrap:wrap;gap:26px 34px;justify-content:center;align-items:center;margin:30px auto 0;max-width:900px}
+.board .notes{display:flex;flex-wrap:wrap;gap:22px 18px;justify-content:center;align-items:flex-start}
+.board .itm.note{transform:rotate(var(--rot,0deg));box-shadow:2px 5px 12px rgba(0,0,0,.3)}
+.board .itm.note::before{content:"";position:absolute;top:-9px;left:50%;width:46px;height:18px;margin-left:-23px;background:rgba(240,232,205,.82);transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.board .itm.note:hover{transform:rotate(var(--rot,0deg)) translateY(-3px)}.board .itm.note.sel,.board .itm.note.good{transform:rotate(0) scale(1.05)}
+.board .talk{display:grid;gap:12px;width:min(100%,480px)}
+.board .trow{display:flex;align-items:flex-end;gap:8px;justify-self:start;max-width:100%}
+.board .trow.c{justify-self:end;flex-direction:row-reverse}
+.board .who{flex:none;width:34px;height:34px;display:grid;place-items:center;border:2px solid var(--ink);border-radius:50%;background:var(--ink);color:var(--paper);font-family:var(--f-jp);font-size:16px;font-weight:700}
+.board .trow.s .who{background:#1d2a6b;border-color:#f5f1e8;color:#f5f1e8}.board .trow.c .who{background:#ffe27a;color:var(--ink)}
+.board .itm.bub{background:#fbf8ef;border:2px solid var(--ink);border-radius:16px;padding:4px 10px;min-width:0;max-width:calc(100% - 42px)}
+.board .trow.s .itm.bub{border-bottom-left-radius:3px}.board .trow.c .itm.bub{background:#fff3c4;border-bottom-right-radius:3px}
+.board .trow.c .itm.bub:hover,.board .trow.s .itm.bub:hover{transform:translateY(-2px)}
+#minfo .full{font-family:var(--f-jp);font-size:16px;margin:0 0 2px;color:var(--mute)}
 .board .caption{font-family:var(--f-mono);font-size:14px;text-transform:uppercase;text-align:center;margin:16px 0 0;}
 .board .caption span{display:inline-block;background:var(--ink);color:var(--paper);padding:4px 10px}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
@@ -1168,11 +1182,17 @@ const dueIn=ivl=>dayStart(Math.max(1,Math.round(ivl)));
 function rollDay(){ if(S.day!==today()){ S.day=today(); S.newToday=0; S.extraNew=0; S.todayIds=[]; return true; } return false; } rollDay();
 S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null, TESTRES=null; let SKON=false; try{ SKON=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
 const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','饂飩','寿司'];
-function buildCards(){ const ids=[], seen=new Set(); const order=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w))];
-  order.forEach(w=>{ if(!/[一-鿿]/.test(w)) return; ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
+// restaurant phrases: written notices and spoken formulas; kana-only ones get a meaning card only
+const PH=DATA.phrases||{signs:[],talk:[],scenes:[]}; const PHSET=new Set([...PH.signs,...PH.talk]);
+const isPhrase=w=>PHSET.has(w), hasKanji=w=>/[一-鿿]/.test(w), firstId=w=>(hasKanji(w)?'r:':'m:')+w;
+const PH_FIRST=['いらっしゃいませ','すみません','ください','お会計','いただきます','ごちそうさまでした','お冷','禁煙','お会計お願いします','営業中','食券','少々お待ちください','ありがとうございました','現金のみ','お持ち帰り','以上です'];
+function buildCards(){ const ids=[], seen=new Set(); const base=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w)&&!isPhrase(w))];
+  const ph=[...new Set([...PH_FIRST,...PH.talk,...PH.signs])].filter(w=>WMAP[w]); const order=[];
+  base.forEach((w,i)=>{ order.push(w); if(i>=5&&(i-5)%4===0&&ph.length) order.push(ph.shift()); }); order.push(...ph);
+  order.forEach(w=>{ if(!hasKanji(w)){ if(isPhrase(w)) ids.push('m:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
 const CARDS=buildCards();
 // meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
-const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
+const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
 function nextCard(){ if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endSession(); } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
   if(due.length) return due[0]; const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); if(qd) return qd; if(S.newToday<S.newPer+S.extraNew){const n=CARDS.find(id=>!S.cards[id]&&canIntro(id)); if(n) return n;}
   const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon[0]||null; }
@@ -1257,7 +1277,7 @@ function showCard(){
     el.querySelector('#dmenu').onclick=()=>{ window.MENU_FOCUS=words; qpool='known'; if(typeof menuDone!=='undefined'&&menuDone) setTimeout(()=>genMenu(),0); };
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard'); centerDone(); return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
-  if(kind==='m' && !isNew && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
+  if(kind==='m' && !isNew && !isPhrase(key) && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
   if(kind==='m'){ showMeaning(el,id,key,isNew); return; }
   if(kind==='k'){ showKanjiPick(el,id,key,isNew); return; }
   if(kind==='p'){ const w=WMAP[key];
@@ -1311,26 +1331,26 @@ function showCard(){
 
 // ---------- meaning card: the handwritten word, four meanings to choose from
 function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed());
-  const pool=[...new Set([...huntPool(key),...WORDS.map(x=>x[0])])].filter(x=>WMAP[x]&&WMAP[x][2]!==w[2]); const ds=[]; const seenM=new Set([w[2]]);
+  const pool=(isPhrase(key)? [...PH.talk.includes(key)?PH.talk:PH.signs] : [...new Set([...huntPool(key),...WORDS.map(x=>x[0])])]).filter(x=>WMAP[x]&&WMAP[x][2]!==w[2]); const ds=[]; const seenM=new Set([w[2]]);
   for(const x of shuffle(r,pool)){ const m=WMAP[x][2]; if(!seenM.has(m)){ seenM.add(m); ds.push(m); } if(ds.length>=3) break; }
   const opts=shuffle(r,[w[2],...ds]);
   el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Sens','Meaning')}</span><span class="mono" id="mhand" style="color:var(--mute)"></span></div>
     <div class="stage" id="mst" style="min-height:0;padding-block:22px"><canvas id="mc"></canvas></div>
-    <div class="quest mq" style="margin:14px 0 12px;grid-template-columns:minmax(0,1fr)"><span class="q">${tr('Que veut dire ce mot ?','What does this word mean?')}</span></div>
+    <div class="quest mq" style="margin:14px 0 12px;grid-template-columns:minmax(0,1fr)"><span class="q">${PH.talk.includes(key)?tr('Que veut dire cette phrase ?','What does this phrase mean?'):tr('Que veut dire ce mot ?','What does this word mean?')}</span></div>
     <div class="choices" id="mch">${opts.map((m,i)=>`<button type="button" data-i="${i}"><kbd class="k">${i+1}</kbd><span>${esc(m)}</span></button>`).join('')}</div><div id="mans" style="margin-top:16px"></div>`;
   const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','gyosho']); const box=el.querySelector('#mst').clientWidth-52; const n=[...key].length;
-  const mvh=PHONE()? el.querySelector('#mst').clientHeight-20 : DESK()? el.querySelector('#mst').clientHeight-64 : innerHeight*0.36; const size=Math.floor(clamp(m.v? Math.min(120,mvh/(n*0.95+0.6)) : Math.min(160,box/(n*0.95+0.6)),44,160));
+  const mvh=PHONE()? el.querySelector('#mst').clientHeight-20 : DESK()? el.querySelector('#mst').clientHeight-64 : innerHeight*0.36; const size=Math.floor(clamp(m.v? Math.min(120,mvh/(n*0.95+0.6)) : Math.min(160,box/(n*0.95+0.6)),n>6?24:44,160));
   textCanvas(el.querySelector('#mc'),key,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35});
   let tries=0, done=false;
   const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
-    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${hasKanji(key)?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===w[2];
     if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(w[2])}"]`).classList.add('good'); finish(false); } } }); }
 
 // from the sound to the spelling: hear or read the word, pick how it is written among look-alikes
 function showKanjiPick(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed()); const kk=[...key].filter(c=>isKanji(c)), n=[...key].length;
-  const cand=WORDS.filter(x=>x[0]!==key&&/[一-鿿]/.test(x[0])&&x[1]!==w[1]).map(x=>{ const cs=[...x[0]]; return [x[0], cs.filter(c=>kk.includes(c)).length*3+(cs.length===n?1:0)+(x[0][0]===key[0]?1:0)+r()*1.5]; }).sort((a,b)=>b[1]-a[1]);
+  const cand=WORDS.filter(x=>x[0]!==key&&/[一-鿿]/.test(x[0])&&x[1]!==w[1]).map(x=>{ const cs=[...x[0]]; return [x[0], cs.filter(c=>kk.includes(c)).length*3+(cs.length===n?1:0)+(x[0][0]===key[0]?1:0)+(isPhrase(x[0])===isPhrase(key)?2.5:0)+r()*1.5]; }).sort((a,b)=>b[1]-a[1]);
   const ds=[]; for(const [x] of cand){ if(!ds.some(d=>d===x)) ds.push(x); if(ds.length>=9) break; } const opts=shuffle(r,[key,...shuffle(r,ds).slice(0,3)]);
   el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Kanji','Kanji')}</span></div>
     <div class="quest kq" style="margin:0 0 12px"><span class="q">${tr('Comment s’écrit','How do you write')}</span><b lang="ja">${esc(w[1])}<small>${esc(toRomaji(w[1]))}</small></b>${sayBtn(w[0],w[1])}</div>
@@ -1577,7 +1597,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-addrev]')
 let LF='all'; const lfBar=()=>`<div class="qmode lf" role="group" aria-label="${tr('Filtre','Filter')}">${[['all',tr('Tous','All')],['kn',tr('Appris','Learned')],['new',tr('À apprendre','To learn')]].map(([k,l])=>`<button data-lf="${k}" aria-pressed="${LF===k}">${l}</button>`).join('')}</div>`;
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-lf]'); if(!b) return; LF=b.dataset.lf; renderKList(); renderVocab(); });
 // a challenge answer counts for the matching card: clue in meaning → m:, clue in reading → r:
-function menuReview(w,ok){ const pref=mmode==='reading'?'r:':'m:'; let id=pref+w; if(!(S.cards[id]&&S.cards[id].reps>0)) id='r:'+w; const c=S.cards[id]; if(!c||!(c.reps>0)) return '';
+function menuReview(w,ok){ const pref=mmode==='reading'?'r:':'m:'; let id=pref+w; if(!(S.cards[id]&&S.cards[id].reps>0)) id=firstId(w); const c=S.cards[id]; if(!c||!(c.reps>0)) return '';
   if(!ok){ S.cards[id]=schedule(c,0); store.set(SKEY,S); return tr(`${w} revient dans tes révisions`,`${w} goes back to your reviews`); }
   if(c.due<=Date.now()){ S.cards[id]=schedule(c,2); if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(true); } store.set(SKEY,S); return tr(`${w} : révision comptée`,`${w}: counted as a review`); }
   return ''; }
@@ -1607,7 +1627,7 @@ async function renderMenu(){
   const gen=++menuGen; const m=MENU, b=document.getElementById('board'); const L=LAYOUTS[m.layout];
   b.className='board'+(m.vertical?'':' h')+(m.layout==='slate'?' slate':'')+(m.layout==='card'?' card':'');
   b.style.backgroundImage=`url(${surfaceURL(L.wall)})`; b.style.backgroundSize='256px 256px';
-  b.innerHTML=`<div class="sign"><button id="signbtn" aria-label="${tr('Enseigne','Shop sign')}"><canvas id="signc"></canvas></button></div><div class="items" id="mitems"></div><p class="caption"><span>${esc(m.t.jp)} ${esc(m.t.fr)}${m.reg?' · '+esc(m.reg.jp)+' '+esc(m.reg.fr):''} · ${esc(tr(L.label,L.en))}</span></p><div class="pop" id="minfo" hidden></div>`;
+  b.innerHTML=`<div class="sign"><button id="signbtn" aria-label="${tr('Enseigne','Shop sign')}"><canvas id="signc"></canvas></button></div><div class="items" id="mitems"></div><div class="scene" id="mscene"><div class="notes"></div><div class="talk"></div></div><p class="caption"><span>${esc(m.t.jp)} ${esc(m.t.fr)}${m.reg?' · '+esc(m.reg.jp)+' '+esc(m.reg.fr):''} · ${esc(tr(L.label,L.en))}</span></p><div class="pop" id="minfo" hidden></div>`;
   const vw=b.clientWidth-40; const r=rng(m.seed);
   // sign: noren for brush shops, painted board for the others
   const signW=makeWriter(r,'kaisho', m.layout==='slate'?'chalk':'brush',{weight:1.25});
@@ -1654,8 +1674,34 @@ async function renderMenu(){
     });
   });
   if(!m.vertical && m.tax){ const nb=document.createElement('p'); nb.className='hint'; nb.style.cssText='margin:0;font-size:15px;color:#333'; const hosts=box.querySelectorAll('.rows'); if(hosts.length){ const tc=document.createElement('canvas'); hosts[hosts.length-1].appendChild(tc); tasks.push(()=>textCanvas(tc,'税込',{seed:m.seed+999,writer:m.writer,size:22,surface:'washi',transparent:true,pad:0.2,align:'end',minW:Math.min(560,vw-60),color:ink})); } }
+  sceneTasks(b,m,vw,ink).forEach(t=>tasks.push(t));
   for(const tk of tasks){ if(gen!==menuGen) return; tk(); await nextFrame(); }
 }
+// notices pinned around the menu, and a short exchange between staff and customer
+const TICKET_SHOPS=['ramen','soba','teishoku','don'];
+function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tasks; const r=rng(m.seed+77); const phone=vw<520;
+  const nb=b.querySelector('#mscene .notes'), tb=b.querySelector('#mscene .talk');
+  const pool=['禁煙','全席禁煙','現金のみ','お冷はセルフ','ご自由にどうぞ','ラストオーダー','お持ち帰り','定休日','営業時間','お手洗い','予約席','お一人様','お会計','ご注文','お冷','喫煙席','ご予約'];
+  if(TICKET_SHOPS.includes(m.tk)) pool.unshift('食券','券売機','食券制');
+  const picks=[]; if(r()<.4) picks.push(pick(r,['営業中','営業中','満席']));
+  const clash=[['禁煙','全席禁煙','喫煙席'],['食券','券売機','食券制'],['お冷','お冷はセルフ'],['予約席','ご予約']];
+  for(const w of shuffle(r,pool)){ if(picks.length>=(phone?2:3)) break; if(!WMAP[w]||clash.some(g=>g.includes(w)&&g.some(x=>picks.includes(x)))) continue; picks.push(w); }
+  const nw=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['marker','brush','marker']));
+  picks.forEach((w,i)=>{ const n=[...w].length; const btn=document.createElement('button'); btn.className='itm note'; btn.style.setProperty('--rot',((r()-.5)*7).toFixed(1)+'deg'); btn.setAttribute('aria-label',tr('Écriteau','Notice'));
+    const cv=document.createElement('canvas'); btn.appendChild(cv); nb.appendChild(btn); const idx=MENU.flat.length; MENU.flat.push({w,btn,kind:'sign'}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
+    const surf=pick(r,['white','white','kinari','yellow','pink']); const vert=n<=4&&r()<.5; const color=(w.includes('禁')||r()<.25)?'#c8261a':null;
+    const size=Math.round(vert? clamp(vw/16,26,40) : Math.min(clamp(vw/16,24,38),(Math.min(vw*.62,300))/(n+0.6)));
+    tasks.push(()=>textCanvas(cv,w,{seed:m.seed+500+i*13,writer:nw,size,vertical:vert,surface:surf,color,pad:0.42})); });
+  // the exchange
+  const sc=pick(r,PH.scenes); const dishes=MENU.flat.filter(x=>!x.kind&&[...x.w].length<=5); const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
+  const bw=makeWriter(r,pick(r,['kaisho','hurry']),'pen'); const maxW=Math.min(vw*(phone?.8:.72),420);
+  sc.forEach(([who,line],i)=>{ const [pre,w]=line.includes('|')? line.split('|') : ['',line]; const full=pre.replace('{d}',dish)+w; if(!WMAP[w]) return; const n=[...full].length;
+    const row=document.createElement('div'); row.className='trow '+who; row.innerHTML=`<span class="who" lang="ja" aria-hidden="true">${who==='s'?'店':'客'}</span>`;
+    const btn=document.createElement('button'); btn.className='itm bub'; btn.setAttribute('aria-label',tr('Réplique','Line')); const cv=document.createElement('canvas'); btn.appendChild(cv); row.appendChild(btn); tb.appendChild(row);
+    const idx=MENU.flat.length; MENU.flat.push({w,btn,kind:'talk',full:full!==w?full:null}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
+    const size=Math.round(Math.min(clamp(vw/20,22,30),(maxW-30)/(n*0.98+0.3)));
+    tasks.push(()=>textCanvas(cv,full,{seed:m.seed+700+i*17,writer:bw,size,surface:'washi',transparent:true,pad:0.2,align:'start',color:who==='s'?'#1d2a6b':null})); });
+  return tasks; }
 function clickItem(it,btn){
   if(mmode==='explore' || it.isHeader){ const was=btn.classList.contains('sel'); clearSel(); if(!was){ btn.classList.add('sel'); document.getElementById('board').classList.add('hassel'); showInfo(it,undefined,btn); } return; }
   if(target==null) return; score.n++;
@@ -1682,7 +1728,7 @@ function priceBlock(it,m){ if(it.price==null) return '';
   return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">${it.price} ¥</span>${written!==it.price+'円'?`<span>${tr('écrit','written')} <b style="font-family:var(--f-jp);font-weight:600">${esc(written)}</b></span>`:''}<span>${esc(nr.kana)}</span><span class="mono" style="text-transform:none;color:var(--mute)">${esc(nr.romaji)}</span></div>`; }
 function showInfo(it,ok,btn,note){ const w=WMAP[it.w]||[it.w,'','']; const m=MENU; const sec=it.sec?WMAP[it.sec]:null;
   showPop(`${ok===false?`<p class="feedback ko" style="margin:0 0 8px">${tr('Raté · voici ce que vous avez touché','Missed · here is what you tapped')}</p>`:ok?`<p class="feedback ok" style="margin:0 0 8px">${tr('Trouvé !','Found it!')}</p>`:''}${note?`<p class="qnote">${esc(note)}</p>`:''}
-    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}<div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
+    ${ok===true?`<button class="btn k qnext" type="button">${tr('Mot suivant →','Next word →')}</button>`:''}${it.full?`<p class="full" lang="ja">${esc(it.full)}</p>`:''}<div class="w">${esc(w[0])}</div><div class="answer" style="margin-top:6px"><div class="rd">${hasKanji(w[0])?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(w[0])}
     ${priceBlock(it,m)}
     ${sec?`<p class="hint" style="margin:10px 0 0">${tr('Rubrique','Section')} ${esc(sec[0])} · ${esc(toRomaji(sec[1]))} · ${esc(sec[2])}</p>`:''}
     <div style="height:12px"></div>${wordChips(w[0]+(typeof it.price==='number'&&m.vertical?priceText(it.price,m.pstyle):''))}`, btn||it.btn); }
@@ -1698,10 +1744,10 @@ function newQuest(){ const q=document.getElementById('mquest'); target=null; doc
   // each word is asked once per menu; when none is left, a new menu is drawn
   const asked=MENU.asked||(MENU.asked=new Set()); let pool=base.filter(i=>!asked.has(i)); if(!pool.length){ genMenu(); return; } const fp=pool.filter(i=>MENU.focus&&MENU.focus.has(MENU.flat[i].w)); if(fp.length) pool=fp;
   let t=0; for(let k=0;k<6;k++){ t=pool[Math.floor(Math.random()*pool.length)]; if(t!==lastTarget||pool.length<2) break; } asked.add(t); lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
-  const main = mmode==='meaning'? w[2] : w[1]; const hidden = mmode==='meaning'? `${w[1]} · ${toRomaji(w[1])}` : w[2];
+  const kanaOnly=!hasKanji(w[0]); const main = mmode==='meaning'? w[2] : kanaOnly? toRomaji(w[1]) : w[1]; const hidden = mmode==='meaning'? `${w[1]} · ${toRomaji(w[1])}` : w[2];
   const nk=MENU.flat.filter(x=>knownWord(x.w)).length;
   q.innerHTML=`<div class="quest">
-    <b>${esc(main)}${mmode==='reading'?` <span class="mono" style="font-size:16px;text-transform:none;opacity:.8">${esc(toRomaji(w[1]))}</span>`:''}</b>
+    <b>${esc(main)}${mmode==='reading'&&!kanaOnly?` <span class="mono" style="font-size:16px;text-transform:none;opacity:.8">${esc(toRomaji(w[1]))}</span>`:''}</b>
     <button class="spoiler" id="qsp" title="${tr('Afficher l’indice','Show the hint')}">${esc(hidden)}</button><span class="sc"></span><button class="qset" id="qset" aria-expanded="${QSET}" aria-label="${tr('Réglages du défi','Challenge settings')}" title="${tr('Réglages du défi','Challenge settings')}">⚙</button><button class="btn" id="qskip">${tr('Passer','Skip')}</button><div class="qgroups"${QSET?'':' hidden'}><div class="qmode" role="group" aria-label="${tr('Indice donné','Clue')}"><button data-q="meaning" aria-pressed="${mmode==='meaning'}">${tr('Sens','Meaning')}</button><button data-q="reading" aria-pressed="${mmode==='reading'}">${tr('Lecture','Reading')}</button></div><div class="qmode" role="group" aria-label="${tr('Mots demandés','Words asked')}"><button data-p="known" aria-pressed="${qpool==='known'}" title="${tr('Mots déjà appris sur ce menu','Words you have learned on this menu')}">${tr('Mes mots','My words')} ${nk}</button><button data-p="all" aria-pressed="${qpool==='all'}">${tr('Tous','All')}</button></div></div></div>`;
   q.querySelector('#qset').onclick=e=>{ QSET=!QSET; e.currentTarget.setAttribute('aria-expanded',QSET); q.querySelector('.qgroups').hidden=!QSET; };
   updScore(); q.querySelector('#qskip').onclick=()=>{ streak=0; newQuest(); }; q.querySelector('#qsp').onclick=e=>e.currentTarget.classList.toggle('on');
@@ -1826,13 +1872,14 @@ function vRow(w){ return `<button class="vrow${knownWord(w[0])?' kn':''}" data-w
 function vGroup(j,f,words){ if(LF!=='all') words=words.filter(w=>knownWord(w[0])===(LF==='kn')); if(!words.length) return ''; return `<div class="vgroup" data-j="${esc(j)}"><h3><span class="j">${esc(j)}</span><span>${esc(f)}</span><span class="c">${words.length}</span></h3><div class="vtable">${words.map(vRow).join('')}</div></div>`; }
 const byKana=(a,b)=>toHira(a[1]).localeCompare(toHira(b[1]),'ja');
 function renderVocab(){
-  const tabs=[['all','あ→ん',tr('Tous','All')],...Object.entries(TYPES).map(([k,t])=>[k,t.jp,t.fr.replace(/ \(.*\)/,'')]),['regions','名物',tr('Régions','Regions')],['mentions','表記',tr('Mentions et abréviations','Notices and short forms')]];
+  const tabs=[['all','あ→ん',tr('Tous','All')],...Object.entries(TYPES).map(([k,t])=>[k,t.jp,t.fr.replace(/ \(.*\)/,'')]),['regions','名物',tr('Régions','Regions')],['mentions','表記',tr('Mentions et abréviations','Notices and short forms')],['phrases','店で',tr('Au restaurant','At the restaurant')]];
   document.getElementById('vtabs').innerHTML=tabs.map(([k,j,f])=>`<button data-v="${k}" aria-pressed="${k===vTab}"><span class="j">${esc(j)}</span>${esc(f)}</button>`).join('');
   const q=document.getElementById('vsearch').value.trim().toLowerCase(), nq=normRo(q); let html='', n=0;
   const hit=w=>!q||w[0].includes(q)||w[1].includes(q)||toHira(w[1]).includes(toHira(q))||w[2].toLowerCase().includes(q)||(nq.length>1&&normRo(toRomaji(w[1])).includes(nq));
   if(q){ const list=WORDS.filter(hit).sort(byKana); n=list.length; html=vGroup('検索',tr('Résultats','Results'),list)||'<p class="hint">'+tr('Aucun mot ne correspond.','No matching word.')+'</p>'; }
   else if(vTab==='all'){ const g={}; WORDS.forEach(w=>{(g[gojuRow(w[1])]??=[]).push(w)}); GOJU.forEach(k=>{ if(g[k]){ g[k].sort(byKana); n+=g[k].length; html+=vGroup(k+'行',GOJU_FR[k],g[k]); } }); }
   else if(vTab==='mentions'){ const l=(DATA.mentions||[]).map(x=>WMAP[x]).filter(Boolean); n=l.length; html=vGroup('表記',tr('Mentions et abréviations','Notices and short forms'),l); }
+  else if(vTab==='phrases'){ const a=PH.signs.map(x=>WMAP[x]).filter(Boolean), b=PH.talk.map(x=>WMAP[x]).filter(Boolean); n=a.length+b.length; html=vGroup('貼り紙',tr('Écriteaux','Notices'),a)+vGroup('会話',tr('Formules','Phrases'),b); }
   else if(vTab==='regions'){ Object.values(REGIONS).forEach(r=>{ const l=r.items.map(x=>WMAP[x]).filter(Boolean); n+=l.length; html+=vGroup(r.jp,r.fr,l); }); }
   else { const t=TYPES[vTab]; const seen=new Set(); t.sections.forEach(sec=>{ const l=sec[1].map(x=>WMAP[x]).filter(w=>w&&!seen.has(w[0])&&seen.add(w[0])); const h=WMAP[sec[0]]; n+=l.length; html+=vGroup(sec[0],h?h[2]:'',l); }); }
   { const ix=document.getElementById('vidx'); const rows=vTab==='all'&&!q? [...html.matchAll(/data-j="(.)行"/g)].map(m=>m[1]) : []; ix.innerHTML=rows.map(r=>`<button type="button" lang="ja" data-ix="${r}">${r}</button>`).join(''); ix.hidden=rows.length<3; }
@@ -1842,7 +1889,7 @@ document.getElementById('vsearch').oninput=renderVocab;
 document.getElementById('vidx').addEventListener('click',e=>{ const b=e.target.closest('[data-ix]'); if(!b) return; const g=document.querySelector(`#vbody .vgroup[data-j="${b.dataset.ix}行"]`); if(g) g.scrollIntoView({block:'start',behavior:'auto'}); });
 document.getElementById('vbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(!b) return;
   const open=b.getAttribute('aria-expanded')==='true'; document.querySelectorAll('#vbody .vx').forEach(x=>x.remove()); document.querySelectorAll('#vbody .vrow').forEach(x=>x.setAttribute('aria-expanded','false')); if(open) return;
-  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+(knownWord(w[0])?'':reviewBtn('r:'+w[0]))+'</div></div>'; b.after(x);
+  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+(knownWord(w[0])?'':reviewBtn(firstId(w[0])))+'</div></div>'; b.after(x);
   const draw=()=>{ const r=rng(newSeed()); const v=pick(r,['kaisho','hurry','gyosho']); const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
     textCanvas(x.querySelector('canvas'),w[0],{seed:newSeed(),writer:makeWriter(r,v,tool),size:clamp((x.clientWidth-40)/([...w[0]].length+0.8),40,84),surface:surf,pad:0.3}); };
   x.querySelector('.btn').onclick=draw; draw(); });

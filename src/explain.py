@@ -248,6 +248,61 @@ add("""
 """)
 
 # Shop signs: what the words of a restaurant's name mean (type word or the shop's own name)
+
+add("""
+# --- notices posted in the shop
+営業中|Pancarte accrochée à la porte : on peut entrer. Souvent sur un panneau en bois réversible.|Sign hung on the door: you can come in. Often a reversible wooden board.
+準備中|Le revers de 営業中 : le service n’a pas commencé, ou c’est la pause entre midi et soir.|The back of 営業中: service hasn’t started, or it’s the break between lunch and dinner.
+本日休業|« Aujourd’hui, fermé » : 本日 aujourd’hui, 休業 relâche.|“Closed today”: 本日 today, 休業 suspension of business.
+定休日|Le jour où le restaurant ferme chaque semaine, souvent suivi du jour : 定休日 月曜.|The day the restaurant closes every week, often followed by the day: 定休日 月曜.
+営業時間|Suivi des heures : 11:00〜15:00 pour le midi, 17:00〜 pour le soir.|Followed by the hours: 11:00–15:00 for lunch, 17:00– for dinner.
+満席|« Places pleines » : posé à l’entrée quand on ne peut plus vous asseoir.|“Seats full”: put at the entrance when there’s no room left.
+禁煙|禁 interdit, 煙 fumée. Presque partout aujourd’hui.|禁 forbidden, 煙 smoke. Nearly everywhere today.
+全席禁煙|全席 toutes les places : aucune table fumeur.|全席 every seat: no smoking table at all.
+喫煙席|喫煙 fumer, 席 place. De plus en plus rare, parfois une petite pièce à part.|喫煙 smoking, 席 seat. Increasingly rare, sometimes a small separate room.
+現金のみ|« Espèces seulement » : fréquent dans les petites échoppes. のみ veut dire « uniquement ».|“Cash only”: common in small places. のみ means “only”.
+食券|On l’achète au distributeur à l’entrée, puis on le tend au comptoir. Courant pour les rāmen, soba et gyūdon.|Bought at the machine by the door, then handed over at the counter. Common for ramen, soba and gyudon.
+券売機|La machine à tickets : on choisit le plat, on paie, le ticket tombe.|The ticket machine: pick the dish, pay, the ticket drops out.
+食券制|« Système de tickets » : on ne commande pas à table, on passe par le distributeur.|“Ticket system”: no ordering at the table, you go through the machine.
+お持ち帰り|« Emporter » en version polie. Le contraire est 店内, sur place.|Polite “takeaway”. The opposite is 店内, eat in.
+店内|店 boutique, 内 dedans. À la caisse on vous demande 店内 ou お持ち帰り.|店 shop, 内 inside. At the till you’re asked 店内 or お持ち帰り.
+予約席|Petit chevalet posé sur une table : elle est déjà prise.|Small stand on a table: it’s already taken.
+ご予約|ご rend le mot poli. ご予約の方 : « les personnes qui ont réservé ».|ご makes the word polite. ご予約の方: “guests with a booking”.
+お一人様|Façon polie de dire « une personne ». お一人様歓迎 : les clients seuls sont bienvenus.|Polite way to say “one person”. お一人様歓迎: solo diners welcome.
+お手洗い|« Se laver les mains » : le mot poli pour les toilettes. On voit aussi トイレ.|“Hand washing”: the polite word for the toilet. You also see トイレ.
+お会計|L’addition. On le dit au personnel, ou on le lit au-dessus de la caisse.|The bill. You say it to the staff, or read it above the till.
+ご注文|La commande. ご注文はお決まりですか : « avez-vous choisi ? »|The order. ご注文はお決まりですか: “are you ready to order?”
+お冷|L’eau fraîche servie d’office et gratuite. Mot de restaurant, on ne dit pas お水 au comptoir d’un ancien.|The cold water served automatically and free. A restaurant word.
+お冷はセルフ|« L’eau, c’est self » : une carafe et des verres sont posés quelque part, on se sert soi-même.|“Water is self-service”: a jug and glasses are set out somewhere, help yourself.
+ご自由にどうぞ|À côté des condiments ou de l’ail : servez-vous autant que vous voulez.|Next to condiments or garlic: take as much as you like.
+ラストオーダー|Heure de la dernière commande, souvent 30 minutes avant la fermeture. Abrégé L.O.|Time of last orders, often 30 minutes before closing. Shortened to L.O.
+# --- what is said
+いらっしゃいませ|Lancé par tout le personnel quand on entre. On ne répond pas, un petit signe de tête suffit.|Called out by all the staff when you walk in. No need to answer, a small nod is enough.
+何名様ですか|La première question : combien êtes-vous ? On peut répondre en montrant les doigts.|The first question: how many of you? You can answer by holding up fingers.
+二人です|二人 deux personnes. Attention : 一人 ひとり, 二人 ふたり, puis 三人 さんにん.|二人 two people. Careful: 一人 hitori, 二人 futari, then 三人 sannin.
+一人です|一人 une personne : ひとり, lecture irrégulière.|一人 one person: hitori, an irregular reading.
+こちらへどうぞ|こちら par ici, どうぞ je vous en prie. On suit la personne jusqu’à la table.|こちら this way, どうぞ please. Follow them to the table.
+お決まりですか|Version courte de ご注文はお決まりですか : « vous avez choisi ? »|Short for ご注文はお決まりですか: “have you decided?”
+すみません|Pour appeler le personnel, à voix haute, main levée. Au Japon, c’est normal.|To call the staff, out loud with a hand raised. Perfectly normal in Japan.
+ください|Se colle après ce qu’on veut avec を : ラーメンをください. Ajouter un nombre : ビールを二つください.|Goes after what you want, with を: ラーメンをください. Add a number: ビールを二つください.
+おすすめは何ですか|おすすめ recommandation, 何 quoi. Réponse fréquente : la rubrique 本日のおすすめ.|おすすめ recommendation, 何 what. Common answer: the 本日のおすすめ section.
+これは何ですか|これ ceci. Pratique en montrant la carte du doigt.|これ this. Handy while pointing at the menu.
+以上です|« C’est tout » : pour finir sa commande. Le serveur répète souvent la liste.|“That’s all”: to close your order. The server often repeats the list.
+少々お待ちください|少々 un petit peu, お待ちください veuillez attendre. Réponse classique du personnel.|少々 a little, お待ちください please wait. The staff’s standard reply.
+お待たせしました|Dit en posant le plat, même s’il est arrivé vite.|Said while setting down the dish, even if it came fast.
+ごゆっくりどうぞ|« Prenez votre temps » : dit après avoir tout servi.|“Take your time”: said once everything is served.
+いただきます|Mains jointes, avant la première bouchée : « je reçois ». On le dit pour soi.|Hands together, before the first bite: “I humbly receive”. Said to yourself.
+美味しい|Se dit pendant le repas, aussi en kana おいしい. Au comptoir, ça fait plaisir au cuisinier.|Said during the meal, also written おいしい. At the counter, the cook will be pleased.
+お水ください|Si l’eau n’est pas servie. Dans un restaurant, on peut aussi dire お冷ください.|If water isn’t served. In a restaurant you can also say お冷ください.
+持ち帰りで|« À emporter » en commandant. Pour manger sur place : 店内で.|“To go” when ordering. To eat in: 店内で.
+お会計お願いします|L’addition, s’il vous plaît. Souvent on paie à la caisse près de la porte, pas à table.|The bill, please. You usually pay at the till by the door, not at the table.
+別々で|Pour payer chacun sa part. Pas toujours accepté aux heures de pointe.|To pay separately. Not always accepted at rush hour.
+カードで|« Par carte ». Si on vous répond 現金のみ, c’est espèces seulement.|“By card”. If the answer is 現金のみ, it’s cash only.
+ごちそうさまでした|Dit en partant ou en reposant les baguettes : merci pour ce festin.|Said when leaving or putting down your chopsticks: thanks for the feast.
+ありがとうございました|Le merci du personnel quand vous partez, au passé : « merci d’être venus ».|The staff’s thanks as you leave, in the past: “thank you for coming”.
+またお越しください|« Revenez » : souvent lancé juste après ありがとうございました.|“Come again”: often called out right after ありがとうございました.
+""")
+
 NX = {}
 for line in """
 居酒屋|« Maison où l’on reste boire » : 居 rester, 酒 alcool, 屋 boutique. Bistrot japonais où l’on boit et partage des petits plats.|“A shop where you stay to drink”: 居 stay, 酒 alcohol, 屋 shop. A Japanese pub where you drink and share small plates.

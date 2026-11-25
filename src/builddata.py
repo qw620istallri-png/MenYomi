@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as ET, json, os, re, sqlite3, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from menudata import W, T, R, NAMES, NAMEPAT_R, MENTIONS
+from menudata import W, T, R, NAMES, NAMEPAT_R, MENTIONS, PHRASES
 HERE=os.path.dirname(os.path.abspath(__file__))
 KV=os.path.join(HERE,'kvgall','kanji')
 
@@ -88,7 +88,7 @@ for ch in sorted(set(kvg)|compset):
         i=kinfo(ch)
         if i: kd[ch]=i
 words=[[w,r,f] for w,(r,f) in W.items()]
-data={'kvg':kvg,'kd':kd,'words':words,'types':T,'regions':R,'names':NAMES,'namepat':NAMEPAT_R,'mentions':MENTIONS}
+data={'kvg':kvg,'kd':kd,'words':words,'types':T,'regions':R,'names':NAMES,'namepat':NAMEPAT_R,'mentions':MENTIONS,'phrases':PHRASES}
 out=json.dumps(data,ensure_ascii=False,separators=(',',':'))
 open(os.path.join(HERE,'data.json'),'w',encoding='utf-8').write(out)
 print('kvg',len(kvg),'kd',len(kd),'words',len(words),'bytes',len(out.encode()))

@@ -433,3 +433,73 @@ T['teishoku']['sections'][2][1].append('麦茶')
 T['soba']['sections'][1][1].append('茶そば')
 R['kyoto']['items'].append('抹茶パフェ')
 NAMEPAT_R.update({'茶寮':'さりょう','日本茶':'にほんちゃ','園':'えん'})
+
+# ---------- restaurant phrases: notices posted in the shop, and what staff and customers say
+SIGN_W = [
+ ('営業中','えいぎょうちゅう','ouvert','open'),
+ ('準備中','じゅんびちゅう','en préparation, pas encore ouvert','getting ready, not open yet'),
+ ('本日休業','ほんじつきゅうぎょう','fermé aujourd’hui','closed today'),
+ ('定休日','ていきゅうび','jour de fermeture habituel','regular day off'),
+ ('営業時間','えいぎょうじかん','horaires d’ouverture','opening hours'),
+ ('満席','まんせき','complet','full'),
+ ('禁煙','きんえん','non-fumeur','no smoking'),
+ ('全席禁煙','ぜんせききんえん','non-fumeur à toutes les places','no smoking at any seat'),
+ ('喫煙席','きつえんせき','places fumeurs','smoking seats'),
+ ('現金のみ','げんきんのみ','espèces uniquement','cash only'),
+ ('食券','しょっけん','ticket repas','meal ticket'),
+ ('券売機','けんばいき','distributeur de tickets','ticket machine'),
+ ('食券制','しょっけんせい','on paie au distributeur avant de commander','pay at the ticket machine first'),
+ ('お持ち帰り','おもちかえり','à emporter','takeaway'),
+ ('店内','てんない','sur place, dans la salle','inside, eat in'),
+ ('予約席','よやくせき','table réservée','reserved table'),
+ ('ご予約','ごよやく','réservation','reservation'),
+ ('お一人様','おひとりさま','une personne, client seul','one person, solo diner'),
+ ('お手洗い','おてあらい','toilettes','restroom'),
+ ('お会計','おかいけい','l’addition, la caisse','the bill, checkout'),
+ ('ご注文','ごちゅうもん','commande','order'),
+ ('お冷','おひや','eau fraîche offerte','free cold water'),
+ ('お冷はセルフ','おひやはセルフ','l’eau est en libre-service','water is self-service'),
+ ('ご自由にどうぞ','ごじゆうにどうぞ','servez-vous librement','help yourself'),
+ ('ラストオーダー','ラストオーダー','dernière commande','last orders'),
+]
+TALK_W = [
+ ('いらっしゃいませ','いらっしゃいませ','bienvenue (accueil du personnel)','welcome (staff greeting)'),
+ ('何名様ですか','なんめいさまですか','combien de personnes ?','how many people?'),
+ ('二人です','ふたりです','nous sommes deux','two of us'),
+ ('一人です','ひとりです','je suis seul','just me'),
+ ('こちらへどうぞ','こちらへどうぞ','par ici, je vous prie','this way, please'),
+ ('お決まりですか','おきまりですか','vous avez choisi ?','ready to order?'),
+ ('すみません','すみません','excusez-moi (pour appeler)','excuse me (to call staff)'),
+ ('ください','ください','… s’il vous plaît (pour demander)','… please (to ask for something)'),
+ ('おすすめは何ですか','おすすめはなんですか','que recommandez-vous ?','what do you recommend?'),
+ ('これは何ですか','これはなんですか','qu’est-ce que c’est ?','what is this?'),
+ ('以上です','いじょうです','ce sera tout','that’s all'),
+ ('少々お待ちください','しょうしょうおまちください','un instant, s’il vous plaît','one moment, please'),
+ ('お待たせしました','おまたせしました','merci d’avoir patienté (en servant)','sorry to keep you waiting'),
+ ('ごゆっくりどうぞ','ごゆっくりどうぞ','prenez votre temps','take your time, enjoy'),
+ ('いただきます','いただきます','formule avant de manger','said before eating'),
+ ('美味しい','おいしい','délicieux','delicious'),
+ ('お水ください','おみずください','de l’eau, s’il vous plaît','water, please'),
+ ('持ち帰りで','もちかえりで','à emporter (en commandant)','to go'),
+ ('お会計お願いします','おかいけいおねがいします','l’addition, s’il vous plaît','the bill, please'),
+ ('別々で','べつべつで','séparément (pour payer)','separately (to pay)'),
+ ('カードで','カードで','par carte','by card'),
+ ('ごちそうさまでした','ごちそうさまでした','formule après le repas, merci','said after eating, thanks'),
+ ('ありがとうございました','ありがとうございました','merci beaucoup (au départ du client)','thank you very much'),
+ ('またお越しください','またおこしください','revenez nous voir','please come again'),
+]
+for w,r,f,e in SIGN_W+TALK_W: W[w]=(r,f)
+NEW_W.extend(SIGN_W+TALK_W)
+# who says it: s staff, c customer. {d} is a dish from the menu on the wall
+SCENES = [
+ [('s','いらっしゃいませ'),('s','何名様ですか'),('c','二人です'),('s','こちらへどうぞ')],
+ [('s','いらっしゃいませ'),('s','何名様ですか'),('c','一人です'),('s','こちらへどうぞ')],
+ [('s','お決まりですか'),('c','{d}を|ください'),('c','以上です'),('s','少々お待ちください')],
+ [('c','すみません'),('c','おすすめは何ですか'),('c','{d}を|ください'),('s','少々お待ちください')],
+ [('c','すみません'),('c','これは何ですか'),('c','お水ください'),('s','少々お待ちください')],
+ [('s','お待たせしました'),('s','ごゆっくりどうぞ'),('c','いただきます'),('c','美味しい')],
+ [('c','{d}を|ください'),('c','持ち帰りで'),('s','少々お待ちください'),('s','ありがとうございました')],
+ [('c','お会計お願いします'),('c','別々で'),('c','カードで'),('c','ごちそうさまでした'),('s','ありがとうございました')],
+ [('c','ごちそうさまでした'),('s','ありがとうございました'),('s','またお越しください')],
+]
+PHRASES = dict(signs=[x[0] for x in SIGN_W], talk=[x[0] for x in TALK_W], scenes=SCENES)
