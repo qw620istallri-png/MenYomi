@@ -13,7 +13,7 @@ def render():
     template = (HERE / 'template.html').read_text(encoding='utf-8')
     data = json.loads((HERE / 'data.json').read_text(encoding='utf-8'))
     menu = runpy.run_path(str(HERE / 'menudata.py'))
-    data.update(words=[[w, *v] for w, v in menu['W'].items()], types=menu['T'], regions=menu['R'], names=menu['NAMES'], namepat=menu['NAMEPAT_R'], mentions=menu['MENTIONS'], phrases=menu['PHRASES'])
+    data.update(words=[[w, *v] for w, v in menu['W'].items()], types=menu['T'], regions=menu['R'], names=menu['NAMES'], namepat=menu['NAMEPAT_R'], mentions=menu['MENTIONS'], phrases=menu['PHRASES'], prices=menu['PRICES'])
     en = runpy.run_path(str(HERE / 'en.py'))
     explanations = runpy.run_path(str(HERE / 'explain.py'))
     values = {'DATA': data, 'K': json.loads((HERE / 'kanji.json').read_text(encoding='utf-8')), 'EN': {k: en[v] for k, v in dict(w='W_EN', k='K_EN', rad='RAD_EN', fro='FRO_EN', types='TYPES_EN').items()}, 'EXPL': explanations['X'], 'NX': explanations['NX'], 'TZ': json.loads((HERE / 'tz.json').read_text(encoding='utf-8')), 'VOICE': json.loads((HERE / 'voice' / 'voice.json').read_text(encoding='utf-8'))}
