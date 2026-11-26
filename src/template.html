@@ -1252,9 +1252,19 @@ function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const
   else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=dueIn(c.ivl); } }
   c.at=now; return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
-function grade(id,g){ rememberGrade(id); REPLAY_ID=null; cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
-    SESSION.q.shift(); if(g===0) SESSION.q.push(id); showCard(); return; }
-  const introduced=S.cards[id]?.introduced||(!S.cards[id]?Date.now():undefined); if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(introduced) S.cards[id].introduced=introduced; if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2,id); } store.set(SKEY,S); showCard(); }
+// next card: the old one fades up and out, the new one settles in (short, so the flow stays quick)
+let SWAP=false;
+function swapCard(){ const el=document.getElementById('card'); const still=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(still||!el.offsetParent||!el.animate){ showCard(); return; } SWAP=true; el.getAnimations().forEach(a=>a.cancel());
+  if(scrollY>0) scrollTo({top:0,behavior:'smooth'});
+  const out=el.animate([{opacity:1,transform:'none',filter:'blur(0)'},{opacity:0,transform:'translateY(-8px)',filter:'blur(1.5px)'}],{duration:140,easing:'cubic-bezier(.4,0,1,1)',fill:'forwards'});
+  const go=()=>{ const h=el.offsetHeight; try{ showCard(); } finally { SWAP=false; } if(scrollY>0) scrollTo(0,0);
+    el.animate([{opacity:0,transform:'translateY(10px)',filter:'blur(1.5px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'}); out.cancel();
+    const h2=el.offsetHeight; if(Math.abs(h2-h)>4&&!PHONE()&&!el.classList.contains('donecard')) el.animate([{minHeight:h+'px'},{minHeight:h2+'px'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'}); };
+  out.onfinish=go; out.oncancel=()=>{ if(SWAP){ SWAP=false; showCard(); } }; }
+function grade(id,g){ if(SWAP) return; rememberGrade(id); REPLAY_ID=null; cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
+    SESSION.q.shift(); if(g===0) SESSION.q.push(id); swapCard(); return; }
+  const introduced=S.cards[id]?.introduced||(!S.cards[id]?Date.now():undefined); if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(introduced) S.cards[id].introduced=introduced; if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2,id); } store.set(SKEY,S); swapCard(); }
 // one entry per day: [right at first try, cards seen]; the streak counts days in a row with at least one card
 function logDay(ok,id){ if(id){ const entries=S.activity[today()]||(S.activity[today()]={}); entries[id]||={ok,at:Date.now()}; const dates=Object.keys(S.activity).sort(); while(dates.length>90) delete S.activity[dates.shift()]; } const d=S.days||(S.days={}); const k=today(); const e=d[k]||(d[k]=[0,0]); e[1]++; if(ok) e[0]++; const ks=Object.keys(d).sort(); while(ks.length>90) delete d[ks.shift()]; }
 function streakDays(){ const d=S.days||{}; const key=i=>dayKey(Date.now()-i*DAY); let i=(d[today()]||[0,0])[1]?0:1, n=0; while(d[key(i)]&&d[key(i)][1]){ n++; i++; } return n; }
