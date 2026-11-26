@@ -90,5 +90,5 @@ TYPES_EN = {'izakaya':'Izakaya','yakitori':'Yakitori','ramen':'Ramen','soba':'So
 _m={}; exec(open(__import__('pathlib').Path(__file__).with_name('menudata.py'),encoding='utf-8').read(),_m)
 for _w,_r,_f,_e in _m['NEW_W']: W_EN[_w]=_e
 TYPES_EN['sakaba']='Sake bar'
-TYPES_EN['chaya']='Tea house'; TYPES_EN['cafe']='Modern café'; TYPES_EN['patisserie']='Pastry shop'; TYPES_EN['bakery']='Bakery'
+TYPES_EN['chaya']='Tea house'; TYPES_EN['cafe']='Modern café'; TYPES_EN['patisserie']='Pastry shop'; TYPES_EN['bakery']='Bakery'; TYPES_EN['konbini']='Convenience store'
 FRO_EN['羹']='thick soup (in 羊羹)'

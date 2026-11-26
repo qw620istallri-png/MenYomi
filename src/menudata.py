@@ -633,6 +633,131 @@ T['bakery']=dict(jp='パン屋', fr='Boulangerie', layouts=['card','poster','sla
              ('ドリンク',['コーヒー','カフェオレ','牛乳','オレンジジュース'],(150,380))])
 NAMEPAT_R.update({'ベーカリー':'ベーカリー','パン工房':'パンこうぼう'})
 SIGN_W.append(('焼きたて','やきたて','tout juste sorti du four','freshly baked'))
+# ---------- konbini (コンビニ): the menu is the till receipt, with handwritten POP cards on the counter.
+# No real brands: generic products and a made-up chain. Seasonal goods only change how often they show up.
+KONBINI_W = [
+ ('コンビニ','コンビニ','supérette ouverte 24 h/24 (konbini)','convenience store'),
+ ('ホットスナック','ホットスナック','snacks chauds du comptoir','hot counter snacks'),
+ ('フライドチキン','フライドチキン','poulet frit','fried chicken'),
+ ('アメリカンドッグ','アメリカンドッグ','saucisse en beignet sur bâton','corn dog'),
+ ('コロッケ','コロッケ','croquette de pomme de terre','potato croquette'),
+ ('フランクフルト','フランクフルト','saucisse de Francfort sur bâton','frankfurter on a stick'),
+ ('フライドポテト','フライドポテト','frites','French fries'),
+ ('中華まん','ちゅうかまん','brioches cuites à la vapeur','steamed buns'),
+ ('肉まん','にくまん','brioche vapeur à la viande','pork bun'),
+ ('あんまん','あんまん','brioche vapeur aux haricots rouges','red bean steamed bun'),
+ ('ピザまん','ピザまん','brioche vapeur façon pizza','pizza steamed bun'),
+ ('カレーまん','カレーまん','brioche vapeur au curry','curry steamed bun'),
+ ('おにぎり','おにぎり','boulette de riz (onigiri)','rice ball'),
+ ('梅','うめ','prune salée (umeboshi)','pickled plum'),
+ ('昆布','こんぶ','algue kombu','kelp'),
+ ('ツナマヨ','ツナマヨ','thon-mayonnaise','tuna mayo'),
+ ('赤飯','せきはん','riz gluant aux haricots rouges','red bean rice'),
+ ('弁当','べんとう','repas en boîte (bentō)','boxed meal'),
+ ('幕の内弁当','まくのうちべんとう','bentō assorti (makunouchi)','assorted bento'),
+ ('のり弁','のりべん','bentō au nori et poisson pané','seaweed bento'),
+ ('唐揚げ弁当','からあげべんとう','bentō au poulet frit','fried chicken bento'),
+ ('生姜焼き弁当','しょうがやきべんとう','bentō au porc sauté au gingembre','ginger pork bento'),
+ ('ハンバーグ弁当','ハンバーグべんとう','bentō au steak haché','hamburg steak bento'),
+ ('カップ麺','カップめん','nouilles instantanées en pot','cup noodles'),
+ ('パスタ','パスタ','pâtes','pasta'),
+ ('サラダ','サラダ','salade','salad'),
+ ('おでん','おでん','pot-au-feu japonais (oden)','oden stew'),
+ ('大根','だいこん','radis blanc (daikon)','daikon radish'),
+ ('ちくわ','ちくわ','tube de pâte de poisson grillée','grilled fish cake tube'),
+ ('はんぺん','はんぺん','galette moelleuse de poisson','fluffy fish cake'),
+ ('こんにゃく','こんにゃく','gelée de konjac','konjac jelly'),
+ ('牛すじ','ぎゅうすじ','tendons de bœuf','beef tendon'),
+ ('ドリンク','ドリンク','boissons','drinks'),
+ ('ミネラルウォーター','ミネラルウォーター','eau minérale','mineral water'),
+ ('ホットコーヒー','ホットコーヒー','café chaud','hot coffee'),
+ ('缶コーヒー','かんコーヒー','café en canette','canned coffee'),
+ ('野菜ジュース','やさいジュース','jus de légumes','vegetable juice'),
+ ('缶ビール','かんビール','bière en canette','canned beer'),
+ ('缶チューハイ','かんチューハイ','chūhai en canette (alcool pétillant)','canned chūhai'),
+ ('エナジードリンク','エナジードリンク','boisson énergisante','energy drink'),
+ ('スイーツ','スイーツ','desserts','sweets'),
+ ('レジ袋','レジぶくろ','sac en plastique (payant)','plastic bag'),
+ # the receipt
+ ('レジ','レジ','caisse','till'),
+ ('領収証','りょうしゅうしょう','reçu','receipt'),
+ ('小計','しょうけい','sous-total','subtotal'),
+ ('合計','ごうけい','total','total'),
+ ('値引','ねびき','remise','discount'),
+ ('現金','げんきん','espèces','cash'),
+ ('お預り','おあずかり','somme reçue du client','amount tendered'),
+ ('お釣り','おつり','monnaie rendue','change'),
+ ('消費税','しょうひぜい','taxe sur la consommation (TVA)','consumption tax'),
+ ('軽減税率','けいげんぜいりつ','taux de TVA réduit','reduced tax rate'),
+ ('電子マネー','でんしマネー','paiement par carte IC (monnaie électronique)','e-money'),
+ ('電話','でんわ','téléphone','phone'),
+ ('担当','たんとう','employé en caisse','staff on duty'),
+ ('駅前店','えきまえてん','magasin devant la gare','station-front branch'),
+ ('東口店','ひがしぐちてん','magasin sortie est','east exit branch'),
+ ('中央店','ちゅうおうてん','magasin du centre','central branch'),
+ # handwritten POP cards
+ ('揚げたて','あげたて','tout juste frit','freshly fried'),
+ ('新発売','しんはつばい','nouveauté','new'),
+ ('全品','ぜんぴん','tous les articles','all items'),
+ ('割引','わりびき','réduction','discount'),
+ ('半額','はんがく','moitié prix','half price'),
+ ('はじめました','はじめました','c’est reparti, on en a de nouveau','now serving again'),
+]
+KONBINI_TALK = [
+ ('温めますか','あたためますか','je vous le réchauffe ?','shall I heat it up?'),
+ ('お願いします','おねがいします','oui, s’il vous plaît','yes, please'),
+ ('大丈夫です','だいじょうぶです','non merci, ça ira','no thanks, I’m fine'),
+ ('お箸おつけしますか','おはしおつけしますか','je vous mets des baguettes ?','would you like chopsticks?'),
+ ('袋はご利用ですか','ふくろはごりようですか','il vous faut un sac ?','do you need a bag?'),
+ ('ポイントカードはお持ちですか','ポイントカードはおもちですか','vous avez une carte de fidélité ?','do you have a point card?'),
+ ('以上でよろしいですか','いじょうでよろしいですか','ce sera tout ?','will that be all?'),
+ ('はい','はい','oui','yes'),
+]
+for w,r,f,e in KONBINI_W: W[w]=(r,f)
+NEW_W.extend(KONBINI_W)
+TALK_W.extend(KONBINI_TALK)
+T['konbini']=dict(jp='コンビニ', fr='Konbini', layouts=['receipt'],
+   names=['{n}マート','{n}ストア','{n}マート'],
+   sections=[('ホットスナック',['フライドチキン','唐揚げ','アメリカンドッグ','コロッケ','フランクフルト','フライドポテト','焼鳥'],(150,260)),
+             ('中華まん',['肉まん','あんまん','ピザまん','カレーまん'],(140,200)),
+             ('おにぎり',['鮭','梅','昆布','ツナマヨ','明太子','赤飯','焼おにぎり'],(130,190)),
+             ('弁当',['幕の内弁当','のり弁','唐揚げ弁当','生姜焼き弁当','ハンバーグ弁当','カップ麺','冷やし中華','パスタ','サラダ','サンドイッチ'],(250,650)),
+             ('おでん',['大根','ちくわ','はんぺん','こんにゃく','牛すじ','昆布'],(80,160)),
+             ('ドリンク',['緑茶','お茶','ミネラルウォーター','ホットコーヒー','缶コーヒー','野菜ジュース','牛乳','缶ビール','缶チューハイ','エナジードリンク'],(110,280)),
+             ('スイーツ',['プリン','シュークリーム','ロールケーキ','エクレア','大福','団子','メロンパン','カレーパン','あんパン'],(130,330))],
+   # printed line when it is not the bare word ('{w}' is the word)
+   line={**{w:'おにぎり　{w}' for w in ['鮭','梅','昆布','ツナマヨ','明太子','赤飯']},**{w:'おでん　{w}' for w in ['大根','ちくわ','はんぺん','こんにゃく','牛すじ']},'唐揚げ':'{w}　5個入','焼鳥':'{w}　もも'},
+   # winter goods are more frequent from October to March, summer goods from June to August; all show up all year
+   season={**{w:'w' for w in ['肉まん','あんまん','ピザまん','カレーまん','大根','ちくわ','はんぺん','こんにゃく','牛すじ','ホットコーヒー']},'冷やし中華':'s','缶ビール':'s'},
+   rate10=['缶ビール','缶チューハイ','レジ袋'],
+   names_n=[('サンライズ','サンライズ'),('グリーン','グリーン'),('デイリー','デイリー'),('ハッピー','ハッピー'),('フレッシュ','フレッシュ'),('スマイル','スマイル'),('エブリ','エブリ'),('ニコニコ','ニコニコ'),('ハロー','ハロー'),('まんぷく','まんぷく')],
+   branches=['駅前店','東口店','中央店'])
+# half-width katakana, as old receipt printers abbreviate product names (its own review card)
+_HW=dict(zip('アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォャュョッー',
+ 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜｦﾝｧｨｩｪｫｬｭｮｯｰ'))
+_DK=dict(zip('ガギグゲゴザジズゼゾダヂヅデドバビブベボ','カキクケコサシスセソタチツテトハヒフヘホ')); _HD=dict(zip('パピプペポ','ハヒフヘホ'))
+def halfwidth(kana):
+  out=''
+  for c in kana:
+    if 'ぁ'<=c<='ゖ': c=chr(ord(c)+0x60)
+    if c in _DK: out+=_HW[_DK[c]]+'ﾞ'
+    elif c in _HD: out+=_HW[_HD[c]]+'ﾟ'
+    elif c=='ヴ': out+='ｳﾞ'
+    else: out+=_HW.get(c,c)
+  return out
+ABBR_W=['フライドチキン','アメリカンドッグ','フランクフルト','フライドポテト','肉まん','ピザまん','ツナマヨ','幕の内弁当','のり弁','ハンバーグ弁当','カップ麺','ミネラルウォーター','ホットコーヒー','缶コーヒー','野菜ジュース','缶ビール','エナジードリンク','緑茶','シュークリーム','メロンパン','レジ袋']
+ABBR={w:halfwidth(W[w][0]) for w in ABBR_W}
+ABBR['ツナマヨ']=halfwidth('ツナマヨオニギリ')
+T['konbini']['abbr']=ABBR
+NAMEPAT_R.update({'マート':'マート','ストア':'ストア'})
+KONBINI_SCENES = [
+ [('s','いらっしゃいませ'),('s','温めますか'),('c','お願いします'),('s','少々お待ちください')],
+ [('s','温めますか'),('c','大丈夫です'),('s','袋はご利用ですか'),('c','お願いします')],
+ [('s','お箸おつけしますか'),('c','お願いします'),('s','ポイントカードはお持ちですか'),('c','大丈夫です')],
+ [('c','{d}を|ください'),('s','以上でよろしいですか'),('c','はい'),('s','ありがとうございました')],
+ [('s','袋はご利用ですか'),('c','大丈夫です'),('s','温めますか'),('c','お願いします')],
+ [('c','{d}を|ください'),('s','温めますか'),('c','大丈夫です'),('s','ありがとうございました')],
+]
 for w,r,f,e in SIGN_W+TALK_W: W[w]=(r,f)
 NEW_W.extend(SIGN_W+TALK_W)
 # who says it: s staff, c customer. {d} is a dish from the menu on the wall
@@ -648,7 +773,7 @@ SCENES = [
  [('c','ごちそうさまでした'),('s','ありがとうございました'),('s','またお越しください')],
  [('c','{d}を|ください'),('s','こちらでお召し上がりですか'),('s','お持ち帰りですか'),('c','持ち帰りで')],
 ]
-PHRASES = dict(signs=[x[0] for x in SIGN_W], talk=[x[0] for x in TALK_W], scenes=SCENES, cafe=CAFE_SCENES)
+PHRASES = dict(signs=[x[0] for x in SIGN_W], talk=[x[0] for x in TALK_W], scenes=SCENES, cafe=CAFE_SCENES, konbini=KONBINI_SCENES)
 
 # Typical prices in yen, tax included (casual places, Tokyo level, 2025–2026). One range per dish so a menu
 # never prices 鰻丼 under 牛丼; 'type:word' overrides a dish whose price depends on the kind of place.
@@ -735,4 +860,17 @@ PRICES.update({
  'ベーコンエピ':(250,350),'明太フランス':(250,380),'塩パン':(120,200),'カツサンド':(400,600),'bakery:サンドイッチ':(300,450),
  '食パン':(350,600),'バゲット':(300,420),'bakery:ベーグル':(200,300),'ラスク':(250,400),
  'bakery:コーヒー':(200,350),'bakery:カフェオレ':(250,380),'bakery:牛乳':(150,200),'bakery:オレンジジュース':(200,300),
+})
+PRICES.update({
+ # konbini, tax included (8% food, 10% alcohol and bags)
+ 'フライドチキン':(200,260),'konbini:唐揚げ':(216,260),'アメリカンドッグ':(130,160),'コロッケ':(90,130),'フランクフルト':(140,180),'フライドポテト':(180,250),'konbini:焼鳥':(120,160),
+ '肉まん':(150,200),'あんまん':(140,180),'ピザまん':(150,200),'カレーまん':(150,200),
+ 'konbini:鮭':(150,190),'梅':(120,150),'昆布':(120,150),'ツナマヨ':(130,160),'konbini:明太子':(150,190),'赤飯':(140,180),'konbini:焼おにぎり':(150,200),
+ '幕の内弁当':(500,650),'のり弁':(400,500),'唐揚げ弁当':(450,600),'生姜焼き弁当':(500,620),'ハンバーグ弁当':(500,650),'カップ麺':(200,280),
+ 'konbini:冷やし中華':(450,550),'パスタ':(450,580),'サラダ':(250,400),'konbini:サンドイッチ':(280,400),
+ '大根':(90,120),'ちくわ':(80,120),'はんぺん':(90,130),'こんにゃく':(80,110),'牛すじ':(130,180),'konbini:昆布':(80,110),
+ 'konbini:緑茶':(130,170),'konbini:お茶':(130,170),'ミネラルウォーター':(100,140),'ホットコーヒー':(110,180),'缶コーヒー':(120,150),'野菜ジュース':(130,170),
+ 'konbini:牛乳':(150,220),'缶ビール':(220,290),'缶チューハイ':(160,220),'エナジードリンク':(200,250),
+ 'konbini:プリン':(150,280),'konbini:シュークリーム':(130,200),'konbini:ロールケーキ':(180,280),'konbini:エクレア':(150,220),'konbini:大福':(130,180),'konbini:団子':(120,160),
+ 'konbini:メロンパン':(130,180),'konbini:カレーパン':(140,190),'konbini:あんパン':(120,160),'レジ袋':(3,5),
 })

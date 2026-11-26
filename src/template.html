@@ -368,7 +368,27 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .board .itm canvas{display:block;max-width:100%}
 .board canvas.doodle{display:block;align-self:flex-end;justify-self:end;margin:-4px 6px 0 auto;transform:rotate(-5deg);max-width:34%;height:auto;pointer-events:none}
 .board canvas.doodle.free{align-self:center;margin:-10px 0 0 min(42%,300px);max-width:28%}
-.board canvas.wdoodle{position:absolute;pointer-events:none;opacity:.88;height:auto}
+.board canvas.wdoodle{position:absolute;pointer-events:none;opacity:.88;height:auto;z-index:0}
+.board>.sign,.board>.items,.board>.scene,.board>.caption{position:relative;z-index:1}
+.board .sign{align-items:center;gap:14px}.board .sign canvas.logo{flex:none;max-width:22vw;height:auto;transform:rotate(-4deg)}
+.board.rc .items{flex-direction:column;align-items:center}
+.rcwrap{filter:drop-shadow(2px 7px 9px rgba(40,25,0,.34)) drop-shadow(0 1px 1px rgba(40,25,0,.25));transform:rotate(var(--rrot,0deg));flex:none;max-width:100%}
+.rcpt{box-sizing:border-box;background:var(--grain),linear-gradient(90deg,#e9e7df,#f8f7f2 12%,#f6f5ef 85%,#e2dfd6);display:flex;flex-direction:column;max-width:100%}
+.rcpt.p-yellow{background:var(--grain),linear-gradient(90deg,#efe2a2,#fbefb6 14%,#f9ecb0 86%,#ecdc98)}.rcpt.p-pink{background:var(--grain),linear-gradient(90deg,#f0cdd2,#fbe0e3 14%,#f9dde0 86%,#edc7cd)}.rcpt.p-blue{background:var(--grain),linear-gradient(90deg,#cddff0,#e1edf8 14%,#deebf7 86%,#c8dbee)}
+.rcpt canvas{display:block;max-width:100%}
+.board .rcpt .itm.rl{display:block;width:100%;border-radius:2px}
+.board .rcpt .itm.rl:hover,.board.h .rcpt .itm.rl:hover{transform:none;box-shadow:none;background-color:rgba(246,217,47,.28)}
+.board .rcpt .itm.rl.sel{transform:none;box-shadow:inset 0 0 0 3px var(--acc);background-color:rgba(246,217,47,.55)}
+.board .rcpt .itm.rl.good{transform:none;box-shadow:inset 0 0 0 3px #0b7a46;background-color:rgba(25,196,107,.32)}
+.board .rcpt .itm.rl.bad{box-shadow:inset 0 0 0 3px var(--bad)}
+.board .notes .rcwrap{align-self:center}
+.denpyo{display:grid;gap:0;padding:12px 14px 16px;background:#fbfbf3 repeating-linear-gradient(180deg,transparent 0 calc(var(--lh,40px) - 1px),#9cc7a8 calc(var(--lh,40px) - 1px) var(--lh,40px));border:1px solid #b9d6c1;border-top:10px solid #2f6b3a;background-position:0 12px;box-shadow:2px 6px 14px rgba(0,0,0,.28);transform:rotate(var(--rot,0deg))}
+.board .denpyo .itm.dl:hover{transform:none;background-color:rgba(246,217,47,.25)}
+.stage .rcpt canvas,.rcpt canvas{box-shadow:none;max-height:none}
+.stage canvas.wplq{box-shadow:none}
+.stage .rcwrap{max-width:100%}
+@media (max-width:520px){.board{padding-top:54px}.board .mtext{top:8px;right:8px}}
+canvas.wplq{border-radius:5px 5px 9px 8px;filter:drop-shadow(5px 9px 5px #2e1c1738) drop-shadow(1px 2px 2px #2e1c1750)}
 @media (max-width:899px){.board canvas.wdoodle{display:none}}
 .board .itm:hover{transform:translateY(-3px);box-shadow:0 0 0 2px rgba(27,24,20,.5)}
 .board .itm{border-radius:2px;transition:transform .15s,opacity .2s,filter .2s,box-shadow .15s,background-color .15s}
@@ -378,7 +398,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .board .itm.bad{background-color:rgba(207,42,26,.18);box-shadow:0 0 0 4px var(--bad);animation:shake .35s;z-index:3}
 .board.h .items{flex-direction:column;align-items:center;gap:22px}
 .board.h .poster{padding:18px 18px 22px;box-shadow:2px 6px 14px rgba(0,0,0,.28);position:relative;width:min(100%,640px)}
-.board.h .poster::before,.board.h .poster::after{content:"";position:absolute;top:-10px;width:70px;height:22px;background:rgba(240,232,205,.8);transform:rotate(-6deg)}
+.board.h .poster::before,.board.h .poster::after{content:"";position:absolute;top:-10px;width:70px;height:22px;background:var(--tape,rgba(240,232,205,.8));transform:rotate(-6deg)}
 .board.h .poster::before{left:20px}.board.h .poster::after{right:20px;transform:rotate(5deg)}
 .board.h .poster .rows{display:grid;gap:2px}
 .board.h .itm:hover{transform:translateX(3px)}
@@ -388,7 +408,7 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .board .scene{display:flex;flex-wrap:wrap;gap:26px 34px;justify-content:center;align-items:center;margin:30px auto 0;max-width:900px}
 .board .notes{display:flex;flex-wrap:wrap;gap:22px 18px;justify-content:center;align-items:flex-start}
 .board .itm.note{transform:rotate(var(--rot,0deg));box-shadow:2px 5px 12px rgba(0,0,0,.3)}
-.board .itm.note::before{content:"";position:absolute;top:-9px;left:50%;width:46px;height:18px;margin-left:-23px;background:rgba(240,232,205,.82);transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.board .itm.note::before{content:"";position:absolute;top:-9px;left:50%;width:46px;height:18px;margin-left:-23px;background:var(--tape,rgba(240,232,205,.82));transform:rotate(-4deg);box-shadow:0 1px 2px rgba(0,0,0,.12)}
 .board .itm.note:hover{transform:rotate(var(--rot,0deg)) translateY(-3px)}.board .itm.note.sel,.board .itm.note.good{transform:rotate(0) scale(1.05)}
 .board .talk{display:grid;gap:12px;width:min(100%,480px)}
 .board .trow{display:flex;align-items:flex-end;gap:8px;justify-self:start;max-width:100%}
@@ -719,7 +739,15 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 
 .session-report{margin-top:24px;border-top:1px solid var(--rule);padding-top:18px}.session-report h3{margin:0 0 8px}.session-report p{margin:8px 0 14px}
 @media (min-width:901px){.session-report{display:flex;align-items:center;flex-wrap:wrap;gap:8px 22px;margin-top:20px;padding-top:14px}.session-report h3{margin:0;padding:0;border:0;white-space:nowrap}.session-report p{margin:0}.session-report{flex-wrap:nowrap}.session-report .rwords{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.session-report .btn{margin-left:auto;padding-block:7px;flex:none}}
-.menu-text{margin-bottom:16px}.menu-text[open]{padding:12px;border:1px solid var(--rule)}#menu-text-items{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.board .mtext{position:absolute;top:10px;right:10px;z-index:4;display:flex;align-items:center;gap:6px;padding:5px 10px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);font:700 14px var(--f-mono);text-transform:uppercase;box-shadow:3px 3px 0 var(--ink);cursor:pointer}
+.board .mtext .j{font-family:var(--f-jp);font-size:20px;line-height:1}.board .mtext:hover{transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}.board .mtext:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.mtl{display:grid;gap:18px}.mtl .mshop{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:3px solid var(--ink);padding-bottom:10px}.mtl .mshop b{font:700 30px/1.1 var(--f-jp)}.mtl .mshop span{font:14px var(--f-mono);text-transform:uppercase;color:var(--mute)}
+.mtl .mq{background:var(--ink);color:var(--paper);padding:10px 14px;font-size:18px}.mtl .mq b{font-size:22px}
+.mtl section h3{margin:0 0 8px;font:700 15px var(--f-mono);text-transform:uppercase;letter-spacing:.04em;display:flex;gap:10px;align-items:baseline}.mtl section h3 .j{font:700 22px var(--f-jp);text-transform:none;letter-spacing:0}
+.mtl .its{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:8px}
+.mtl button.mt{display:flex;align-items:baseline;justify-content:space-between;gap:12px;text-align:left;padding:9px 12px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--ink);min-height:48px}
+.mtl button.mt:hover{background:#fff6c9}.mtl button.mt .w{font:600 22px/1.25 var(--f-jp)}.mtl button.mt .p{font:15px var(--f-mono);white-space:nowrap;color:var(--mute)}
+.mtl button.mt.good{background:rgba(25,196,107,.3)}.mtl button.mt.bad{background:rgba(207,42,26,.16)}
 .board .itm.note{isolation:isolate;box-shadow:2px 6px 9px #130b064d,0 1px 1px #130b0640}
 .board .itm.note::before{z-index:2;transform:rotate(var(--tape-rot,-4deg));background:linear-gradient(95deg,#e1d2b1b3,#f5e8c8d9 40%,#e1d2b1b3);border-inline:1px solid #c1ae872e}
 .board .itm.note::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 -2px 3px #66482126,inset 1px 0 2px #fff9}
@@ -738,7 +766,7 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:sof
 .board .itm.note::before,.board .itm.note::after{content:none;display:none}
 .board .itm.note canvas{border-radius:1px}
 .board .itm.note:hover{transform:rotate(var(--rot,0deg))}
-.paper-tape{position:absolute;z-index:4;pointer-events:none;background:linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa);border-inline:1px solid #f0e3be65;box-shadow:0 1px 2px #35241125}
+.paper-tape{position:absolute;z-index:4;pointer-events:none;background:var(--tape,linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa));border-inline:1px solid #f0e3be65;box-shadow:0 1px 2px #35241125}
 .paper-curl{position:absolute;z-index:3;pointer-events:none;background:linear-gradient(135deg,#bbaa87 0%,#f8f1df 24%,#e7d8b9 83%);clip-path:polygon(0 0,100% 0,0 100%);border-top-left-radius:2px;filter:drop-shadow(-1px -1px 1px #553c2238)}
 .pad canvas.ink-sheen{z-index:3;pointer-events:none;mix-blend-mode:normal}.pad canvas.over{z-index:4;pointer-events:none}
 </style>
@@ -780,7 +808,7 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:sof
     <button class="btn r" id="mnew" data-en="New menu ↻">Nouveau menu ↻</button>
   </div>
   </div>
-  <div id="mquest" aria-live="polite"></div><details class="more menu-text"><summary data-en="Text version of the menu">Version texte du menu</summary><p class="hint" data-en="Printed Japanese alternative to the handwriting exercise.">Alternative en japonais imprimé à l’exercice manuscrit.</p><div id="menu-text-items" lang="ja"></div></details>
+  <div id="mquest" aria-live="polite"></div>
   <div class="board" id="board"></div>
 </section>
 
@@ -1027,10 +1055,15 @@ function surface(kind){
   else if(kind==='tile'){ c=noiseTile(S,9,(r,X,Y)=>{const n=(r()-.5)*8, gr=(X%64<3||Y%64<3)?-40:0; return [226+n+gr,228+n+gr,222+n+gr]}); }
   else if(kind==='board'){ const vn=valueNoise(S,4,21); c=noiseTile(S,3,(r,X,Y)=>{const n=(r()-.5)*5+(vn(X,Y)-.5)*7; return [38+n,48+n,44+n]});
   }
-  else if(kind==='noren'){ c=noiseTile(S,13,(r,X,Y)=>{const n=(r()-.5)*10, w=(Y%3===0)?-6:0; return [30+n+w,44+n+w,92+n+w]}); }
+  else if(kind.startsWith('noren')){ const b={noren:[30,44,92],'noren-red':[132,30,28],'noren-brown':[88,54,32],'noren-black':[34,31,29],'noren-green':[30,72,52]}[kind]||[30,44,92]; c=noiseTile(S,13,(r,X,Y)=>{const n=(r()-.5)*10, w=(Y%3===0)?-6:0; return [b[0]+n+w,b[1]+n+w,b[2]+n+w]}); }
   SURF[kind]=c; return c;
 }
-function fillSurface(ctx,kind,w,h){ctx.save(); ctx.fillStyle=ctx.createPattern(surface(kind),'repeat'); ctx.fillRect(0,0,w,h);
+function woodPlaque(ctx,w,h){ const hor=w>h*1.15, r=rng((w*3+h*7)|0), rad=Math.min(w,h)*0.04+4*DPR; ctx.clearRect(0,0,w,h); ctx.save(); ctx.beginPath(); ctx.roundRect?ctx.roundRect(0,0,w,h,[rad,rad,rad*1.6,rad*1.5]):ctx.rect(0,0,w,h); ctx.clip();
+  const g=hor?ctx.createLinearGradient(0,0,0,h):ctx.createLinearGradient(0,0,w,0); [['#b98c55',0],['#deb77e',.1],['#d9b27a',.63],['#bb9059',1]].forEach(([c,o])=>g.addColorStop(o,c)); ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+  const L=hor?w:h, A=hor?h:w, n=Math.round(A/256*150); for(let i=0;i<n;i++){ const a=r()*A; ctx.strokeStyle=`rgba(84,52,22,${(.015+r()*.09)*.65})`; ctx.lineWidth=(.3+r()*.8)*DPR; ctx.beginPath();
+    if(hor){ ctx.moveTo(0,a); ctx.bezierCurveTo(L*.35,a-8*DPR,L*.7,a+8*DPR,L,a+(r()-.5)*8*DPR); } else { ctx.moveTo(a,0); ctx.bezierCurveTo(a-8*DPR,L*.35,a+8*DPR,L*.7,a+(r()-.5)*8*DPR,L); } ctx.stroke(); }
+  const e=hor?ctx.createLinearGradient(0,h-6*DPR,0,h):ctx.createLinearGradient(w-6*DPR,0,w,0); e.addColorStop(0,'rgba(119,80,39,0)'); e.addColorStop(1,'rgba(119,80,39,.22)'); ctx.fillStyle=e; ctx.fillRect(0,0,w,h); ctx.restore(); }
+function fillSurface(ctx,kind,w,h){ if(ctx.canvas&&ctx.canvas.classList) ctx.canvas.classList.toggle('wplq',kind==='wood'); if(kind==='wood'){ woodPlaque(ctx,w,h); return; } ctx.save(); ctx.fillStyle=ctx.createPattern(surface(kind),'repeat'); ctx.fillRect(0,0,w,h);
   if(kind==='board'){ const r=rng((w*7+h*13)|0); ctx.filter='blur(6px)'; ctx.lineCap='round'; const m=Math.max(w,h);
     for(let i=0;i<4;i++){ ctx.strokeStyle=`rgba(225,232,222,${0.018+r()*0.022})`; ctx.lineWidth=m*(0.06+r()*0.06); ctx.beginPath(); ctx.arc(r()*w,r()*h,m*(0.25+r()*0.3),r()*6,r()*6+0.9+r()*0.8); ctx.stroke(); }
     ctx.filter='none'; }
@@ -1226,6 +1259,9 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
   const tool=new Tool(layer.getContext('2d'), o.writer.tool, R, r);
   const sim=simulate(L.items, o.writer, r);
   const extra=layerAfter=>{ if(o.after) o.after(layerAfter.getContext('2d'),Wd,Hd,L,r); };
+  if(!o.anim&&o.dcolor&&L.items.some(it=>isDoodle(it.ch))){ const tI=L.items.filter(it=>!isDoodle(it.ch)), dI=L.items.filter(it=>isDoodle(it.ch)); const d2=document.createElement('canvas'); d2.width=Wd; d2.height=Hd;
+    const t1=new Tool(layer.getContext('2d'),o.writer.tool,R,r), t2=new Tool(d2.getContext('2d'),o.writer.tool,R*0.9,r); const s1=simulate(tI,o.writer,r), s2=simulate(dI,o.writer,r);
+    paint(); play(t1,s1.samples,0,s1.samples.length); t1.end(); play(t2,s2.samples,0,s2.samples.length); t2.end(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); compose(ctx,d2,o.writer.tool,o.dcolor); return {sim:s1, layout:L}; }
   if(!o.anim){ paint(); play(tool,sim.samples,0,sim.samples.length); tool.end(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); return {sim, layout:L}; }
   // animated
   let i=0, t0=performance.now(); const speedup=o.speedup||1; const token={stop:false};
@@ -1245,9 +1281,9 @@ const DGL={}, DCH={}; Object.keys(DOODLES).forEach((id,i)=>{ const ch=String.fro
 const isDoodle=c=>c in DGL;
 const D_TYPE={izakaya:['chochin','sake','beer','okame','hyottoko'],sakaba:['sake','chochin','okame','tengu'],yakitori:['kushi','chochin','beer'],ramen:['ramen','steam','tengu'],
   soba:['take','steam'],teishoku:['onigiri','sun','bonsai','steam'],sushi:['tai','wave','nami'],don:['steam','onigiri'],kissaten:['cup','kumo','heart'],kanmi:['dango','ougi','kumo'],
-  chaya:['ougi','take','geisha','kumo'],okonomiyaki:['steam','hyottoko'],cafe:['cup','heart','kira'],patisserie:['cake','heart','kira'],bakery:['melon','croissant','heart']};
+  chaya:['ougi','take','geisha','kumo'],okonomiyaki:['steam','hyottoko'],cafe:['cup','heart','kira'],patisserie:['cake','heart','kira'],bakery:['melon','croissant','heart'],konbini:['onigiri','steam','kira','neko']};
 const D_REGION={kyoto:['pagoda','geisha','torii'],tohoku:['kokeshi'],tokyo:['fuji'],hiroshima:['torii'],okinawa:['wave']};
-const D_MODERN=['cafe','patisserie','bakery'];
+const D_MODERN=['cafe','patisserie','bakery','konbini'];
 function seasonDoodles(){ const d=new Date(), mo=d.getMonth()+1, day=d.getDate();
   if((mo===12&&day>=28)||(mo===1&&day<=15)) return ['sun','tsuru','daruma','fuji'];
   if(mo===5&&day<=6) return ['kabuto']; if(mo>=3&&mo<=5) return ['sakura']; if(mo>=9&&mo<=11) return ['momiji','icho']; if(mo===7||mo===8) return ['wave']; return []; }
@@ -1256,6 +1292,7 @@ function menuDoodles(m){ const r=rng(m.seed+4242), out={head:{},pre:{},suf:{},co
   const modern=D_MODERN.includes(m.tk), sea=seasonDoodles(), base=D_TYPE[m.tk]||[], extra=[...(m.rk&&D_REGION[m.rk]||[]),...sea.filter(id=>!modern||['sakura','momiji','icho'].includes(id))];
   const flavour=[...base,...base,...extra,...extra,...(modern?[]:['daruma','kabuto','tsuru','fuji'].filter(()=>r()<.2))];
   const W=[.06,.18,.36,.2,.11,.06,.03]; let x=r(), N=0; while(N<6&&(x-=W[N])>0) N++;
+  if(m.layout==='receipt'){ const nw=[0,1,1,2][Math.floor(r()*4)]; const pool=[...new Set(flavour)]; for(let i=0;i<nw&&pool.length;i++){ const id=pick(r,pool); out.wall.push(id); pool.splice(pool.indexOf(id),1); } return out; }
   const used=new Set(), take=l=>{ const f=l.filter(id=>!used.has(id)); if(!f.length) return null; const id=pick(r,f); used.add(id); return id; };
   const specials=[], heads=[], marks=[];
   m.sections.forEach((s,si)=>{ if(!s.accent) heads.push(si); s.items.forEach((it,ii)=>{ const k=si+':'+ii, w=it.w;
@@ -1269,6 +1306,91 @@ function menuDoodles(m){ const r=rng(m.seed+4242), out={head:{},pre:{},suf:{},co
   for(const [kind,k,l] of slots.slice(0,N)){ const id=take(l.length?l:flavour); if(!id) continue; if(kind==='corner') out.corner=id; else out[kind][k]=DCH[id]; }
   const nw=[0,1,1,2][Math.floor(r()*4)]; for(let i=0;i<nw;i++){ const id=take(flavour); if(id) out.wall.push(id); }
   return out; }
+
+// ---------- shop identity: each shop draws once an accent ink, a noren colour, a logo and a heading style, reused on its menu, notices and receipts
+const ACC_LIGHT=['#c8261a','#c8261a','#1d4e89','#2f6b3a','#a4561c','#7a2e6b','#0f6b6b'], ACC_CHALK=['#ffd84d','#ff9ccf','#9fe3ff','#b6f09c'];
+const TAPES=['linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa)','linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa)','linear-gradient(100deg,#f2b8c495,#ffd6dec9 46%,#f0bfcaaa)','linear-gradient(100deg,#a9d8c095,#c4e8d6c9 46%,#acd9c3aa)','linear-gradient(100deg,#a9c4e895,#c6dcf6c9 46%,#adc8ebaa)','linear-gradient(100deg,#f0d97095,#ffec96c9 46%,#f2db76aa)'];
+function shopIdentity(m){ const r=rng(m.seed+9191), chalk=m.tool==='chalk', acc=pick(r,chalk?ACC_CHALK:ACC_LIGHT);
+  const others=chalk?ACC_CHALK.filter(c=>c!==acc):ACC_LIGHT.filter(c=>c!==acc&&!(m.tool==='pen'&&c==='#1d4e89'));
+  return { acc, dcol:r()<.65?pick(r,others):null, noren:pick(r,['noren','noren','noren-red','noren-brown','noren-black','noren-green']), tape:pick(r,TAPES),
+    logo:r()<.45?pick(r,[...(D_TYPE[m.tk]||[]),'kira','nijumaru','sun','kumo','neko']):null, rule:pick(r,['swoosh','swoosh','double','dots','none']),
+    band:r()<.35, bold:r()<.35, cols:pick(r,[24,28,32]) }; }
+
+// ---------- thermal receipt printer: each glyph rasterised to a 24-dot cell as a real 58 mm printer does (384 dots = 32 half-width columns)
+const PSYM={'¥':['M30,14 L54,50 L78,14','M54,50 L54,96','M32,58 L76,58','M32,72 L76,72'],'※':['M26,26 L82,82','M82,26 L26,82','M52,14 L56,18','M52,90 L56,94','M14,52 L18,56','M90,52 L94,56'],
+ ':':['M52,34 L56,38','M52,72 L56,76'],'.':['M50,88 L55,93'],',':['M55,86 L48,100'],'-':['M28,56 L80,56'],'(':['M66,8 C38,40 38,70 66,102'],')':['M42,8 C70,40 70,70 42,102'],
+ '/':['M76,8 L32,102'],'!':['M54,12 L54,72','M52,88 L56,92'],'?':['M30,30 C30,8 80,8 78,32 C76,48 54,48 54,66','M52,86 L56,90'],'%':['M30,12 C10,12 10,44 30,44 C50,44 50,12 30,12','M86,10 L22,100','M78,64 C58,64 58,96 78,96 C98,96 98,64 78,64'],
+ '゙':['M30,20 L44,46','M58,14 L72,40'],'゚':['M50,16 C36,16 36,40 50,40 C64,40 64,16 50,16'],'×':['M30,30 L78,78','M78,30 L30,78'],'#':['M40,14 L34,96','M70,14 L64,96','M20,40 L90,40','M18,70 L88,70'],'*':['M54,20 L54,88','M26,36 L82,72','M82,36 L26,72']};
+for(const [c,d] of Object.entries(PSYM)) if(!KVG[c]) KVG[c]={d,t:d.map(()=>''),c:[]};
+[['！','!'],['？','?'],['（','('],['）',')'],['：',':'],['／','/'],['％','%'],['－','-']].forEach(([a,b])=>{ if(!KVG[a]) KVG[a]=KVG[b]; });
+const Printer=(()=>{ const CELL=24, cache={};
+  const half=c=>/[ -~｡-ﾟ¥]/.test(c), base=c=>c==='ﾞ'?'゙':c==='ﾟ'?'゚':/[｡-ﾟ]/.test(c)?c.normalize('NFKC'):c;
+  function bitmap(c){ if(cache[c]) return cache[c]; const hw=half(c), W=hw?CELL/2:CELL, g=c===' '||c==='　'?null:glyph(base(c)); const cv=document.createElement('canvas'); cv.width=W; cv.height=CELL; const x=cv.getContext('2d',{willReadFrequently:true});
+    if(g){ x.strokeStyle='#000'; x.lineWidth=isDoodle(c)?2.4:2.1; x.lineCap='round'; x.lineJoin='round'; const sx=W/109*(hw?1.05:0.94), sy=CELL/109*0.94, ox=(W-109*sx)/2, oy=(CELL-109*sy)/2;
+      g.strokes.forEach(st=>{ x.beginPath(); st.forEach((p,i)=>i?x.lineTo(ox+p[0]*sx,oy+p[1]*sy):x.moveTo(ox+p[0]*sx,oy+p[1]*sy)); x.stroke(); }); }
+    const px=x.getImageData(0,0,W,CELL).data, on=[]; for(let j=0;j<CELL;j++) for(let i=0;i<W;i++) if(px[(j*W+i)*4+3]>110) on.push([i,j]);
+    return cache[c]={W,on}; }
+  const width=t=>[...t].reduce((a,c)=>a+bitmap(c).W,0);
+  // dots: o.sx/o.sy double width or height, o.fade(x) a worn print-head band, o.bold heavier dots, o.inv white dots (on a black band)
+  function line(ctx,text,x,y,dot,o={}){ const r=o.r||Math.random, sx=o.sx||1, sy=o.sy||1, rad=dot*(o.bold?0.6:0.47); let cx=x; ctx.fillStyle=o.inv?'#f6f5ef':'#24211d';
+    for(const c of [...text]){ const bm=bitmap(c); for(const [i,j] of bm.on){ const f=o.fade?o.fade(cx+i*dot*sx):1; ctx.globalAlpha=Math.min(1,(0.7+r()*0.3)*f);
+        ctx.beginPath(); ctx.ellipse(cx+(i+.5)*dot*sx, y+(j+.5)*dot*sy, rad*sx, rad*sy, 0, 0, 7); ctx.fill(); }
+      cx+=bm.W*dot*sx; } ctx.globalAlpha=1; return cx-x; }
+  return {CELL,bitmap,width,line}; })();
+const yen=n=>'¥'+String(n).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+// paper look shared by receipts: warm thermal white, faint vertical grain
+let RGRAIN=null; const receiptGrain=()=>{ if(RGRAIN) return RGRAIN; const c=document.createElement('canvas'); c.width=240; c.height=8; const x=c.getContext('2d'), r=rng(41);
+  for(let i=0;i<70;i++){ x.fillStyle=`rgba(120,110,90,${(r()*.05).toFixed(3)})`; x.fillRect(r()*240,0,1+r()*2,8); } return RGRAIN=c.toDataURL(); };
+const zig=(r,n,amp,y0,bottom)=>Array.from({length:n+1},(_,i)=>`${(i/n*100).toFixed(2)}% ${bottom?`calc(100% - ${(r()*amp).toFixed(1)}px)`:`${(r()*amp).toFixed(1)}px`}`);
+// one clickable receipt: spec {lines, seed, cols, width (css px), paper (thermal|blue|pink|yellow), style:{band,bold}}; returns its element and drawing tasks
+// a line is {gap} | {rule} | {logo} | {t, p, c (centred), big, tall, band, word, item, sub}
+function receiptEl(spec, onLine){ const r=rng(spec.seed), cols=spec.cols||32, dotsW=cols*Printer.CELL/2, padX=Math.round(spec.width*0.05), inner=spec.width-padX*2, dot=inner/dotsW, lh=Printer.CELL*dot*1.3;
+  const wrap=document.createElement('div'); wrap.className='rcwrap'; wrap.style.setProperty('--rrot',((r()-.5)*2.4).toFixed(2)+'deg');
+  const paper=document.createElement('div'); paper.className='rcpt'+(spec.paper&&spec.paper!=='thermal'?' p-'+spec.paper:''); paper.style.width=spec.width+'px'; paper.style.padding=`${Math.round(lh*.7)}px ${padX}px ${Math.round(lh*1.1)}px`; paper.style.setProperty('--grain',`url(${receiptGrain()})`);
+  const n=Math.round(spec.width/9); paper.style.clipPath=`polygon(${[...(spec.cutTop?['0 0','100% 0']:zig(r,n,4)),...zig(r,n,9,0,true).reverse()].join(',')})`; wrap.appendChild(paper);
+  const band=r()*inner*.7, fade=x=>1-0.38*Math.exp(-(((x/DPR-band)/(inner*.05))**2)), tasks=[];
+  spec.lines.forEach((l,li)=>{ if(l.gap!=null){ const g=document.createElement('div'); g.style.height=(l.gap*dot)+'px'; paper.appendChild(g); return; }
+    const big=l.big?2:1, hpx=l.logo? Printer.CELL*dot*3.1 : lh*(l.big||l.tall?2:1)*(l.sub?2:1);
+    const el=document.createElement(l.word||l.item||l.sign?'button':'div'); el.className=(el.tagName==='BUTTON'?'itm ':'')+'rl'; if(el.tagName==='BUTTON') el.type='button';
+    const cv=document.createElement('canvas'); cv.width=Math.round(inner*DPR); cv.height=Math.round(hpx*DPR); cv.style.width=inner+'px'; cv.style.height=hpx+'px'; el.appendChild(cv); paper.appendChild(el); if(onLine) onLine(l,el);
+    const rr=rng(spec.seed+li*17+1);
+    tasks.push(()=>{ const x=cv.getContext('2d'), d=dot*DPR, o={r:rr,fade,bold:spec.style&&spec.style.bold};
+      if(l.logo){ const w=Printer.width(l.logo)*d*3; Printer.line(x,l.logo,(cv.width-w)/2,0,d,{...o,sx:3,sy:3}); return; }
+      if(l.rule){ x.fillStyle='#24211d'; for(let px=0;px<cv.width;px+=d*(l.rule==='eq'?1.2:2.4)){ x.globalAlpha=.75*fade(px); x.beginPath(); x.arc(px,cv.height*.45,d*.45,0,7); x.fill(); if(l.rule==='eq'){ x.beginPath(); x.arc(px,cv.height*.45+d*3,d*.45,0,7); x.fill(); } } x.globalAlpha=1; return; }
+      let sx=big, sy=l.big||l.tall?2:1; let tw=Printer.width(l.t||'')*d*sx; if(tw>cv.width&&sx>1){ sx=1; tw/=2; }
+      if(l.band){ x.fillStyle='#24211d'; x.globalAlpha=.94; x.fillRect(0,0,cv.width,cv.height); x.globalAlpha=1; }
+      if(l.t) Printer.line(x,l.t,l.c?(cv.width-tw)/2:0,0,d,{...o,sx,sy,inv:l.band});
+      if(l.p!=null){ const pw=Printer.width(l.p)*d*big; Printer.line(x,l.p,cv.width-pw,0,d,{...o,sx:big,sy}); }
+      if(l.sub) Printer.line(x,l.sub,0,lh*DPR,d,o); }); });
+  return {el:wrap, paper, tasks}; }
+// konbini: the menu is the till receipt. Winter goods (中華まん, おでん) are more frequent from October to March and cold noodles in summer, but every word shows up all year
+const SEASON_NOW=(()=>{ const mo=new Date().getMonth()+1; return {winter:mo>=10||mo<=3,summer:mo>=6&&mo<=8,autumn:mo>=9&&mo<=11,mo}; })();
+function konbiniPrice(r,a,b,rate){ if(b<20) return a+Math.floor(r()*(b-a+1)); const v=(a+(b-a)*Math.pow(r(),1.2))/(1+rate/100); const base=Math.max(10,Math.round(v/10)*10-(r()<.6?2:0)); return Math.floor(base*(1+rate/100)); }
+function genKonbini(r,tk,t,want,F){ const pool=[]; const seen=new Set();
+  t.sections.forEach(([h,list,ab])=>list.forEach(w=>{ if(!WMAP[w]||seen.has(w)) return; seen.add(w); const s=t.season[w]; let wt=s==='w'?(SEASON_NOW.winter?3:.35):s==='s'?(SEASON_NOW.summer?3:.35):1; if(want&&knownWord(w)) wt*=3; if(F.has(w)) wt*=6; pool.push({w,h,ab,wt}); }));
+  const n=6+Math.floor(r()*4), items=[], per={};
+  while(items.length<n&&pool.length){ let x=r()*pool.reduce((a,p)=>a+p.wt,0), i=pool.findIndex(p=>(x-=p.wt)<0); if(i<0) i=pool.length-1; const p=pool.splice(i,1)[0]; if((per[p.h]=(per[p.h]||0)+1)>3) continue; items.push(p); }
+  if(r()<.5) items.push({w:'レジ袋',h:'',ab:[3,5]});
+  return items.map(p=>{ const rate=t.rate10.includes(p.w)?10:8, [a,b]=PRICES[tk+':'+p.w]||PRICES[p.w]||p.ab, unit=konbiniPrice(r,a,b,rate);
+    const qty=['ホットスナック','中華まん','おにぎり','おでん','ドリンク'].includes(p.h)&&r()<.18?2:1, abbr=!!t.abbr[p.w]&&r()<.45;
+    const line=abbr? t.abbr[p.w] : (t.line[p.w]||'{w}').replace('{w}',p.w), disc=p.h==='弁当'&&r()<.25? Math.round(unit*pick(r,[.2,.3,.5])) : 0;
+    return {w:p.w, sec:p.h, price:unit*qty, unit, qty, rate, line, abbr, disc}; }); }
+const nowStamp=(r,short)=>{ const d=new Date(Date.now()-Math.floor(r()*50)*6e4), p=n=>String(n).padStart(2,'0'); return `${short?'':d.getFullYear()+'年'}${d.getMonth()+1}月${d.getDate()}日${short?'':'('+'日月火水木金土'[d.getDay()]+')'} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+const phoneNo=r=>{ const a=pick(r,['03','06','045','052','092','011','075']), d=()=>String(Math.floor(r()*10)); return `${a}-${Array.from({length:6-a.length},d).join('')}-${Array.from({length:4},d).join('')}`; };
+function konbiniLines(m){ const r=rng(m.seed+31), L=[], ID=m.id;
+  if(ID.logo) L.push({logo:DCH[ID.logo]});
+  L.push({t:m.shop.jp,c:1,big:1,sign:1,band:ID.band},{t:m.branch,c:1,word:m.branch},{t:'電話 '+phoneNo(r),c:1,word:'電話'},{gap:8},{t:nowStamp(r)},{t:`レジ${1+Math.floor(r()*3)}　担当 ${String(100+Math.floor(r()*900))}`,word:'担当'},{gap:6},{t:'領収証',c:1,big:1,word:'領収証'},{gap:6});
+  let sum=0; m.items.forEach(it=>{ sum+=it.price-it.disc; L.push({t:it.line,p:yen(it.price)+(it.rate===8?'※':' '),item:it,sub:it.qty>1?`　${it.qty}個 × 単${it.unit}`:null}); if(it.disc) L.push({t:'　値引',p:'-'+yen(it.disc)+' ',word:'値引'}); });
+  L.push({rule:'dots'},{t:'小計',p:yen(sum)+' ',word:'小計',price:sum},{t:'合計',p:yen(sum),big:1,word:'合計',price:sum},{gap:10});
+  return L; }
+// short receipts, now and then, for the other shops: meal tickets from the machine, a handwritten bill, or a short thermal receipt
+function shortTicket(m,r,vw){ const its=shuffle(r,m.flat.filter(x=>!x.kind&&typeof x.price==='number')).slice(0,TICKET_SHOPS.includes(m.tk)?1+Math.floor(r()*2):2+Math.floor(r()*3)); if(!its.length) return null;
+  const width=Math.round(Math.min(vw*.82,TICKET_SHOPS.includes(m.tk)?230:300)), ID=m.id;
+  if(TICKET_SHOPS.includes(m.tk)){ const L=[{t:m.shop.jp,c:1},{gap:4},{t:'食券',c:1,big:1,word:'食券'},{gap:4},...its.map(x=>({t:x.w,p:yen(x.price),tall:1,item:x})),{gap:4},{t:nowStamp(r,true),c:1}];
+    return {lines:L,seed:m.seed+61,cols:20,width,paper:pick(r,['yellow','pink','blue']),cutTop:true,style:{bold:true}}; }
+  const sum=its.reduce((a,x)=>a+x.price,0);
+  const L=[...(ID.logo?[{logo:DCH[ID.logo]}]:[]),{t:m.shop.jp,c:1,big:[...m.shop.jp].length<=8?1:0,sign:1,band:ID.band},{gap:6},{t:nowStamp(r,ID.cols<28)},{gap:4},...its.map(x=>({t:x.w,p:yen(x.price),item:x})),{rule:ID.rule==='double'?'eq':'dots'},{t:'合計',p:yen(sum),big:1,word:'合計',price:sum},{gap:8}];
+  return {lines:L,seed:m.seed+67,cols:ID.cols,width,style:{bold:ID.bold}}; }
 
 // ---------- SRS (SM-2 variant)
 const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,Progress.fresh()); if(!S||typeof S!=='object') S=Progress.fresh();
@@ -1285,10 +1407,11 @@ const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味�
 const PH=DATA.phrases||{signs:[],talk:[],scenes:[]}; const PHSET=new Set([...PH.signs,...PH.talk]);
 const isPhrase=w=>PHSET.has(w), hasKanji=w=>/[一-鿿]/.test(w), firstId=w=>(hasKanji(w)?'r:':'m:')+w;
 const PH_FIRST=['いらっしゃいませ','すみません','ください','お会計','いただきます','ごちそうさまでした','お冷','禁煙','お会計お願いします','営業中','食券','少々お待ちください','ありがとうございました','現金のみ','お持ち帰り','以上です'];
+const ABBR_IDS=new Set(Object.keys((DATA.types.konbini||{}).abbr||{}));
 function buildCards(){ const ids=[], seen=new Set(); const base=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w)&&!isPhrase(w))];
   const ph=[...new Set([...PH_FIRST,...PH.talk,...PH.signs])].filter(w=>WMAP[w]); const order=[];
   base.forEach((w,i)=>{ order.push(w); if(i>=5&&(i-5)%4===0&&ph.length) order.push(ph.shift()); }); order.push(...ph);
-  order.forEach(w=>{ if(!hasKanji(w)){ ids.push('m:'+w); if(!isPhrase(w)) ids.push('r:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
+  order.forEach(w=>{ if(!hasKanji(w)){ ids.push('m:'+w); if(!isPhrase(w)) ids.push('r:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
 const CARDS=buildCards();
 const validateState=v=>Progress.validate(v,CARDS,WORDS.map(w=>w[0]));
 { const valid=validateState(S); if(!valid){ store.set('menyomi.recovery',S,true); S=Progress.fresh(); setTimeout(()=>toast(tr('Une sauvegarde illisible a été conservée pour récupération.','An unreadable save was kept for recovery.')),0); } else S=valid; rollDay(); }
@@ -1306,7 +1429,7 @@ function undoGrade(){
 }
 
 // meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
-const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
+const canIntro=id=>{ if(id[0]==='h'){ const c=S.cards[firstId(id.slice(2))]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); } if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
 // cards sharing a word or a kanji with the last few shown are held back while something else is waiting
 let RECENT=[]; const seen=id=>{ RECENT.push(id); if(RECENT.length>3) RECENT.shift(); }; const kset=id=>new Set([...id.slice(2)].filter(isKanji));
 const related=(a,b)=>{ if(a.slice(2)===b.slice(2)) return true; const B=kset(b); for(const c of kset(a)) if(B.has(c)) return true; return false; };
@@ -1420,6 +1543,7 @@ function showCard(){
   el.classList.toggle('intro',first);
   if(kind==='m'&&!first){ showMeaning(el,id,key,isNew); return; }
   if(kind==='k'){ showKanjiPick(el,id,key,isNew); return; }
+  if(kind==='h'){ showAbbr(el,id,key,isNew); return; }
   if(kind==='p'){ const w=WMAP[key];
     el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Inversée','Reverse')}</span></div>
       <div class="quest" style="margin:0;grid-template-columns:auto minmax(0,1fr)"><span class="q">${tr('Comment dit-on','How do you say')}</span><b>${esc(w[2])}</b></div>
@@ -1444,7 +1568,9 @@ function showCard(){
     const draw=(anim)=>{ const r=rng(seed); const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','hurry','gyosho','gyosho','sosho']);
       const wr=makeWriter(r,preset,m.tool); const box=el.querySelector('#rst').clientWidth-52; const n=[...key].length;
       const vmax=PHONE()? el.querySelector('#rst').clientHeight-24 : DESK()? el.querySelector('#rst').clientHeight-64 : innerHeight*0.6; const size=Math.floor(clamp(m.v? Math.min(160, vmax/(n*0.95+0.6)) : Math.min(180, box/(n*0.95+0.6)), 48, 180));
-      curAnim=textCanvas(el.querySelector('#rc'),key,{seed,writer:wr,size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35,anim,speedup:0.8}).token;
+      if(receiptStage(el.querySelector('#rst'),key,r,false,r()<.35)){ el.querySelector('#rhand').textContent=tr('ticket de caisse · imprimante thermique','till receipt · thermal printer'); return; }
+      const dd=reviewDoodle(key,r,m), txt=dd?(dd.pre?dd.ch+key:key+dd.ch):key, n2=[...txt].length, size2=dd?Math.floor(size*n/(n2*0.95+0.6)*(n*0.95+0.6)/n):size;
+      curAnim=textCanvas(el.querySelector('#rc'),txt,{seed,writer:wr,size:Math.max(40,size2),vertical:m.v,surface:m.surface,color:m.color,dcolor:dd&&dd.col,pad:0.35,anim,speedup:0.8}).token;
       el.querySelector('#rhand').textContent=LANG==='en'?`${MEDIA_EN[MEDIA.indexOf(m)]} · ${HANDS_EN[preset]} hand`:`${m.label} · main ${HANDS[preset]}`; };
     draw(false);
     el.querySelector('#ragain').onclick=()=>{seed=newSeed(); draw(false)};
@@ -1471,6 +1597,41 @@ function showCard(){
   }
 }
 
+// ---------- receipts in reviews: konbini words are sometimes shown printed on a torn receipt
+const KB=DATA.types.konbini||null, ABBR=KB?KB.abbr:{};
+const RECEIPT_W=new Set(KB?[...KB.sections.flatMap(s=>s[1]),...KB.branches,'領収証','小計','合計','値引','現金','お預り','お釣り','消費税','軽減税率','電子マネー','電話','担当','レジ袋','レジ']:[]);
+function receiptLine(key,r,abbr){ const n=a=>a+Math.floor(r()*(a*2)); const t=KB;
+  if(abbr||t.sections.some(s=>s[1].includes(key))){ const sec=t.sections.find(s=>s[1].includes(key)), [a,b]=PRICES['konbini:'+key]||PRICES[key]||(sec?sec[2]:[100,300]), rate=t.rate10.includes(key)?10:8;
+    return {t:abbr?ABBR[key]:(t.line[key]||'{w}').replace('{w}',key), p:yen(konbiniPrice(r,a,b,rate))+(rate===8?'※':' ')}; }
+  if(key==='消費税') return {t:'(内消費税等', p:yen(n(30))+')'}; if(key==='軽減税率') return {t:'※印は軽減税率対象商品'};
+  if(key==='領収証') return {t:key,c:1,big:1}; if(key==='電話') return {t:'電話 '+phoneNo(r),c:1}; if(key==='担当'||key==='レジ') return {t:`レジ${1+Math.floor(r()*3)}　担当 ${100+Math.floor(r()*900)}`};
+  if(t.branches.includes(key)) return {t:key,c:1};
+  if(key==='レジ袋') return {t:key,p:'¥'+(3+Math.floor(r()*3))+' '};
+  if(key==='値引') return {t:'　値引',p:'-'+yen(10*n(3))+' '}; if(key==='合計') return {t:key,p:yen(10*n(40)+8),big:1};
+  return {t:key,p:yen(key==='お預り'||key==='現金'?pick(r,[1000,2000,5000,10000]):10*n(30)+4)+' '}; }
+// draws the fragment in a review stage (hiding its canvas); returns false when the word is not a receipt word
+function receiptStage(stage,key,r,abbr,go=true){ stage.querySelectorAll('.rcwrap').forEach(e=>e.remove()); const cv=stage.querySelector('canvas'); if(cv) cv.hidden=false;
+  if(!go||!KB||!(abbr||RECEIPT_W.has(key))) return false; const l=receiptLine(key,r,abbr); const need=Math.ceil((Printer.width(l.t)*(l.big?2:1)+(l.p?Printer.width(l.p)*(l.big?2:1):0))/12)+2;
+  const width=Math.round(Math.min(stage.clientWidth-48,DESK()?460:360)), R=receiptEl({lines:[{gap:6},l,{gap:4}],seed:Math.floor(r()*1e6),cols:Math.max(18,need),width}); R.tasks.forEach(t=>t());
+  if(cv) cv.hidden=true; stage.appendChild(R.el); return true; }
+// separate card for half-width katakana: old receipt printers squeeze product names, ﾂﾅﾏﾖｵﾆｷﾞﾘ for ツナマヨおにぎり
+function showAbbr(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed());
+  const ds=shuffle(r,Object.keys(ABBR).filter(x=>x!==key&&WMAP[x])).sort((a,b)=>(WMAP[b][1].length===WMAP[key][1].length)-(WMAP[a][1].length===WMAP[key][1].length)).slice(0,6); const opts=shuffle(r,[key,...shuffle(r,ds).slice(0,3)]);
+  el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Ticket abrégé','Receipt shorthand')}</span></div>
+    <div class="stage" id="mst" style="min-height:0;padding-block:22px"><canvas id="mc" hidden></canvas></div>
+    <div class="quest mq" style="margin:14px 0 12px;grid-template-columns:minmax(0,1fr)"><span class="q">${tr('Quel produit est imprimé en abrégé ?','Which product is printed in shorthand?')}</span></div>
+    <div class="choices kch" id="mch">${opts.map((x,i)=>`<button type="button" data-i="${i}"><kbd class="k">${i+1}</kbd><span lang="ja">${esc(x)}</span></button>`).join('')}</div><div id="mans" style="margin-top:16px"></div>`;
+  receiptStage(el.querySelector('#mst'),key,r,true);
+  let tries=0, done=false;
+  const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
+    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w" lang="ja">${esc(ABBR[key])} → ${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div><p class="hint" style="margin:10px 0 0">${tr('Katakana demi-largeur : les petits signes ﾞ et ﾟ suivent la syllabe au lieu d’y être attachés.','Half-width katakana: the small ﾞ and ﾟ marks follow the syllable instead of being attached.')}</p><div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+    el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
+  el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===key;
+    if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(key)}"]`).classList.add('good'); finish(false); } } }); }
+// a small drawing beside the word now and then, in its own ink, as on the menus
+function reviewDoodle(key,r,m){ if(r()>.22||m.tool==='chalk'&&r()<.5) return null; const t=Object.entries(DATA.types).find(([k,t])=>t.sections.some(s=>s[1].includes(key)));
+  const id=pick(r,[...(t&&D_TYPE[t[0]]||[]),'hanamaru','nijumaru','kira','arrow',...seasonDoodles()]); const col=m.tool==='chalk'?pick(r,ACC_CHALK):pick(r,['#c8261a','#c8261a','#1d4e89','#2f6b3a']);
+  return {ch:DCH[id],pre:['arrow','nijumaru','kira'].includes(id)&&r()<.6,col}; }
 // ---------- meaning card: the handwritten word, four meanings to choose from
 function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed());
   const pool=(isPhrase(key)? [...PH.talk.includes(key)?PH.talk:PH.signs] : [...new Set([...huntPool(key),...WORDS.map(x=>x[0])])]).filter(x=>WMAP[x]&&WMAP[x][2]!==w[2]); const ds=[]; const seenM=new Set([w[2]]);
@@ -1482,7 +1643,7 @@ function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed())
     <div class="choices" id="mch">${opts.map((m,i)=>`<button type="button" data-i="${i}"><kbd class="k">${i+1}</kbd><span>${esc(m)}</span></button>`).join('')}</div><div id="mans" style="margin-top:16px"></div>`;
   const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','gyosho']); const box=el.querySelector('#mst').clientWidth-52; const n=[...key].length;
   const mvh=PHONE()? el.querySelector('#mst').clientHeight-20 : DESK()? el.querySelector('#mst').clientHeight-64 : innerHeight*0.36; const size=Math.floor(clamp(m.v? Math.min(120,mvh/(n*0.95+0.6)) : Math.min(160,box/(n*0.95+0.6)),n>6?24:44,160));
-  textCanvas(el.querySelector('#mc'),key,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size,vertical:m.v,surface:m.surface,color:m.color,pad:0.35});
+  if(!receiptStage(el.querySelector('#mst'),key,r,false,r()<.35)){ const dd=reviewDoodle(key,r,m), txt=dd?(dd.pre?dd.ch+key:key+dd.ch):key; textCanvas(el.querySelector('#mc'),txt,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size:dd?Math.floor(size*(n*0.95+0.6)/((n+1)*0.95+0.6)):size,vertical:m.v,surface:m.surface,color:m.color,dcolor:dd&&dd.col,pad:0.35}); }
   let tries=0, done=false;
   const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
     el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${hasKanji(key)?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
@@ -1506,7 +1667,7 @@ function showKanjiPick(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed(
 
 // how far each skill has come: reading, meaning, recalling the word, writing
 function renderSkills(){ const host=document.getElementById('skills'), wr=document.getElementById('skwrap'); if(!host||!wr||wr.hidden) return; const now=Date.now();
-  const K=[['r','読',tr('Lire','Read'),'var(--acc)'],['m','意',tr('Comprendre','Understand'),'var(--ok)'],['k','字',tr('Reconnaître','Spot'),'var(--ink)'],['p','言',tr('Retrouver','Recall'),'var(--warn)'],['w','書',tr('Écrire','Write'),'var(--blue)']];
+  const K=[['r','読',tr('Lire','Read'),'var(--acc)'],['m','意',tr('Comprendre','Understand'),'var(--ok)'],['k','字',tr('Reconnaître','Spot'),'var(--ink)'],['p','言',tr('Retrouver','Recall'),'var(--warn)'],['h','略',tr('Abrégés','Shorthand'),'var(--mute)'],['w','書',tr('Écrire','Write'),'var(--blue)']];
   host.innerHTML=K.map(([k,j,l,c])=>{ const all=CARDS.filter(id=>id[0]===k); const got=all.filter(id=>S.cards[id]&&S.cards[id].reps>0).length; const due=all.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const pc=all.length?got/all.length:0;
     return `<div class="sk" title="${esc(l)}"><span class="t"><span class="j">${j}</span>${esc(l)}</span><span class="bar" style="--c:${c}"><i style="width:${(pc*100).toFixed(1)}%"></i></span><span class="n">${got} / ${all.length}${due?` · ${due} ${tr('à revoir','due')}`:''}</span></div>`; }).join(''); }
 
@@ -1725,13 +1886,13 @@ function priceText(p, style){ if(p==='時価') return '時価';
 // one price range per dish (menudata PRICES, 'type:dish' first), the section's range only as a fallback
 const PRICES=DATA.prices||{}; const priceOf=(r,tk,w,ab)=>{ const [a,b]=PRICES[tk+':'+w]||PRICES[w]||ab; return roundPrice(r,a,b); };
 function roundPrice(r,a,b){ const v=a+(b-a)*Math.pow(r(),1.3); const st=v<400?10:50; const cut=r()<0.3; return Math.max(st,Math.round(v/st)*st - (cut&&v>=300?20:0)); }
-function shopName(r,t){ const pat=pick(r,t.names), n=pick(r,DATA.names); const jp=pat.replace('{n}',n[0]).replace(' ','　');
+function shopName(r,t){ const pat=pick(r,t.names), n=pick(r,t.names_n||DATA.names); const jp=pat.replace('{n}',n[0]).replace(' ','　');
   const rd=pat.split(/(\{n\})/).map(x=>x==='{n}'?n[1]:x.trim()?(DATA.namepat[x.trim()]||x.trim()):'').join('');
   const parts=pat.split(/(\{n\})/).map(x=>x==='{n}'?[n[0],n[1]]:x.trim()?[x.trim(),DATA.namepat[x.trim()]||'']:null).filter(Boolean);
   return {jp:pat.replace('{n}',n[0]).replace(' ',''), rd, parts}; }
 const LAYOUTS={
   tanzaku:{wall:'wall',label:'bandes de papier',en:'paper strips'}, wood:{wall:'darkwood',label:'plaques de bois',en:'wooden plaques'}, sheet:{wall:'wall',label:'grande feuille',en:'large sheet'},
-  poster:{wall:'wall',label:'affiches',en:'posters'}, slate:{wall:'board',label:'ardoise',en:'slate'}, card:{wall:'wood',label:'carte',en:'menu card'} };
+  poster:{wall:'wall',label:'affiches',en:'posters'}, slate:{wall:'board',label:'ardoise',en:'slate'}, card:{wall:'wood',label:'carte',en:'menu card'}, receipt:{wall:'wood',label:'ticket de caisse',en:'till receipt'} };
 let MENU=null, mmode='meaning', lastQ='meaning', lastTarget=-1, streak=0, target=null, score={ok:0,n:0}, menuGen=0, qmiss=false;
 let qpool='known'; try{ const v=localStorage.getItem('menyomi.qpool'); if(v==='all'||v==='known') qpool=v; }catch(e){}
 const knownWord=w=>['r:','m:','k:','p:'].some(p=>S.cards[p+w]&&S.cards[p+w].reps>0);
@@ -1759,6 +1920,9 @@ function genMenu(){
   let tk=document.getElementById('mtype').value; if(!tk){ const ks=Object.keys(TYPES); if(want&&ks.some(k=>kc(k))){ const ws=ks.map(k=>1+kc(k)*3); let x=r()*ws.reduce((a,b)=>a+b,0); tk=ks.find((k,i)=>(x-=ws[i])<0)||ks[0]; } else tk=pick(r,ks); } const t=TYPES[tk];
   const pref=list=>{ if(!want) return shuffle(r,list); const sh=shuffle(r,list); const f=sh.filter(w=>F.has(w)), a=sh.filter(w=>knownWord(w)&&!F.has(w)), b=sh.filter(w=>!knownWord(w)&&!F.has(w)); return [...f,...a,...b]; };
   const rk0=document.getElementById('mreg').value||(r()<0.55?pick(r,Object.keys(REGIONS)):''), rk=['cafe','patisserie','bakery'].includes(tk)?'':rk0; const reg=rk?REGIONS[rk]:null;
+  if(t.layouts[0]==='receipt'){ const items=genKonbini(r,tk,t,want,F), shop=shopName(r,t);
+    MENU={tk,t,rk:'',reg:null,layout:'receipt',vertical:false,tool:'print',writer:makeWriter(r,'hurry','marker'),pstyle:'arabic',sections:[{h:'',items}],items,shop,branch:pick(r,t.branches),seed:r()*1e9|0,tax:false}; MENU.focus=F; MENU.id=shopIdentity(MENU);
+    renderMenu(); newQuest(); return; }
   const layout=pick(r,t.layouts); const vertical=['tanzaku','wood','sheet'].includes(layout);
   const tool = layout==='slate'?'chalk' : layout==='poster'?pick(r,['chisel','chisel','marker']) : layout==='card'?'pen' : pick(r,['brush','brush','brush','chisel']);
   const writer=makeWriter(r,pick(r,['kaisho','hurry','hurry','gyosho','gyosho']),tool);
@@ -1767,19 +1931,22 @@ function genMenu(){
   if(reg){ const its=pref(reg.items).slice(0,vertical?4:3); sections.push({h:pick(r,['名物',reg.jp+'名物','当店自慢']),items:its.map(w=>({w,price:w==='蟹'&&r()<0.5?'時価':priceOf(r,tk,w,[480,1680])})),accent:true}); count+=its.length; }
   for(const [h,list,[a,b]] of t.sections){ if(count>=maxItems) break; const n=Math.min(list.length, Math.max(2,Math.round((maxItems-count)/ (t.sections.length>2?2.2:1.4))));
     const its=pref(list).slice(0,n).filter(w=>WMAP[w]); sections.push({h, items:its.map(w=>({w, price: (tk==='sushi'&&['中とろ','大とろ','雲丹','鮑'].includes(w)&&r()<0.35)?'時価':priceOf(r,tk,w,[a,b])}))}); count+=its.length; }
-  MENU={tk,t,rk,reg,layout,vertical,tool,writer,pstyle,sections,shop:shopName(r,t),seed:r()*1e9|0, tax:r()<0.6}; MENU.focus=F;
+  MENU={tk,t,rk,reg,layout,vertical,tool,writer,pstyle,sections,shop:shopName(r,t),seed:r()*1e9|0, tax:r()<0.6}; MENU.focus=F; MENU.id=shopIdentity(MENU); MENU.ticket=!TICKET_SKIP.includes(tk)&&r()<.14;
   renderMenu(); newQuest();
 }
 async function renderMenu(){
   const gen=++menuGen; const m=MENU, b=document.getElementById('board'); const L=LAYOUTS[m.layout];
-  b.className='board'+(m.vertical?'':' h')+(m.layout==='slate'?' slate':'')+(m.layout==='card'?' card':'');
+  b.className='board'+(m.vertical?'':' h')+(m.layout==='slate'?' slate':'')+(m.layout==='card'?' card':'')+(m.layout==='receipt'?' rc':''); const ID=m.id; b.style.setProperty('--tape',ID.tape);
   b.style.backgroundImage=`url(${surfaceURL(L.wall)})`; b.style.backgroundSize='256px 256px';
-  b.innerHTML=`<div class="sign"><button id="signbtn" aria-label="${tr('Enseigne','Shop sign')}"><canvas id="signc"></canvas></button></div><div class="items" id="mitems"></div><div class="scene" id="mscene"><div class="notes"></div><div class="talk"></div></div><p class="caption"><span>${esc(m.t.jp)} ${esc(m.t.fr)}${m.reg?' · '+esc(m.reg.jp)+' '+esc(m.reg.fr):''} · ${esc(tr(L.label,L.en))}</span></p><div class="pop" id="minfo" hidden></div>`;
+  b.innerHTML=`<div class="sign"><button id="signbtn" aria-label="${tr('Enseigne','Shop sign')}"><canvas id="signc"></canvas></button></div><div class="items" id="mitems"></div><div class="scene" id="mscene"><div class="notes"></div><div class="talk"></div></div><button class="mtext" id="mtextbtn" type="button" aria-haspopup="dialog" title="${tr('Version texte du menu','Text version of the menu')}"><span class="j" lang="ja" aria-hidden="true">文</span>${tr('Texte','Text')}</button><p class="caption"><span>${esc(m.t.jp)} ${esc(m.t.fr)}${m.reg?' · '+esc(m.reg.jp)+' '+esc(m.reg.fr):''} · ${esc(tr(L.label,L.en))}</span></p><div class="pop" id="minfo" hidden></div>`;
   const vw=b.clientWidth-40; const r=rng(m.seed);
   // sign: noren for brush shops, painted board for the others
   const signW=makeWriter(r,'kaisho', m.layout==='slate'?'chalk':'brush',{weight:1.25});
-  textCanvas(b.querySelector('#signc'), m.shop.jp, {seed:m.seed+1, writer:signW, size:clamp(vw/ ([...m.shop.jp].length+1.5),34,64), surface: m.layout==='slate'?'board':'noren', color: m.layout==='slate'?'#ffe27a':'#f5f1e8', pad:0.4});
-  b.querySelector('#signbtn').onclick=e=>showSign(e.currentTarget);
+  textCanvas(b.querySelector('#signc'), m.shop.jp, {seed:m.seed+1, writer:signW, size:clamp(vw/ ([...m.shop.jp].length+1.5),34,64), surface: m.layout==='slate'?'board':ID.noren, color: m.layout==='slate'?'#ffe27a':'#f5f1e8', pad:0.4});
+  b.querySelector('#signbtn').onclick=e=>showSign(e.currentTarget); b.querySelector('#mtextbtn').onclick=openMenuText;
+  if(ID.logo&&m.layout!=='receipt'){ const lc=document.createElement('canvas'); lc.className='logo'; lc.setAttribute('aria-hidden','true'); b.querySelector('.sign').prepend(lc); const dark=['darkwood','board'].includes(L.wall);
+    const lw=makeWriter(rng(m.seed+93),'kaisho',m.tool==='chalk'||dark?'chalk':'marker',{weight:.8}), ls=clamp(vw/9,46,72);
+    textCanvas(lc,DCH[ID.logo],{seed:m.seed+94,writer:lw,size:ls,surface:'washi',transparent:true,color:dark?pick(r,ACC_CHALK):ID.acc,pad:0.3,after:(x,W,H)=>{ x.save(); x.lineWidth=ls*DPR*.07; x.beginPath(); x.arc(W/2,H/2,Math.min(W,H)/2-ls*DPR*.06,0,7); x.stroke(); x.restore(); }}); }
   const box=b.querySelector('#mitems'); const items=[]; MENU.flat=[]; const DD=menuDoodles(m);
   const ink = m.tool==='chalk'?null: m.tool==='pen'?'#1d2a6b':null;
   const tasks=[];
@@ -1789,19 +1956,23 @@ async function renderMenu(){
     if(total(vsize)>inner){ const fitS=(inner-12*(n-1))/(1.8*ns+1.56*ni);
       if(fitS>=vsize*0.72 && fitS>=30) vsize=fitS;
       else { const rows=Math.ceil(total(vsize)/inner); box.style.maxWidth=Math.ceil(total(vsize)/rows*1.07+(m.layout==='sheet'?36:0))+'px'; box.style.marginInline='auto'; } } }
-  m.sections.forEach((sec,si)=>{
+  if(m.layout==='receipt') receiptMenu(b,box,m,vw,tasks);
+  (m.layout==='receipt'?[]:m.sections).forEach((sec,si)=>{
     let host=box;
     if(!m.vertical && (m.layout==='poster'||(m.layout==='card'&&si===0))){ const pc=m.layout==='card'?'cream':pick(r,['yellow','white','pink','white']); const pdiv=document.createElement('div'); pdiv.className='poster'; pdiv.style.backgroundImage=`url(${surfaceURL(pc)})`; pdiv.style.transform=`rotate(${(r()-.5)*2}deg)`; pdiv.innerHTML='<div class="rows"></div>'; box.appendChild(pdiv); host=pdiv.querySelector('.rows'); }
     else if(!m.vertical && m.layout==='card'){ host=box.querySelector('.rows'); }
     if(m.vertical && m.layout==='sheet' && si===0){ b.querySelector('#mitems').style.backgroundImage=`url(${surfaceURL('washi')})`; b.querySelector('#mitems').style.padding='16px'; b.querySelector('#mitems').style.boxShadow='3px 4px 12px rgba(0,0,0,.35)'; b.querySelector('#mitems').style.gap='0'; }
     // header
     const hb=document.createElement('button'); hb.className='itm'; hb.setAttribute('aria-label',tr('Rubrique','Section')); const hc=document.createElement('canvas'); hb.appendChild(hc); host.appendChild(hb);
-    const hcolor = m.tool==='chalk'? pick(r,['#ffd84d','#ff9ccf','#9fe3ff']) : '#c8261a';
+    const hcolor = m.tool==='chalk'? (si%2&&ID.dcol?ID.dcol:ID.acc) : ID.acc;
     const size = m.vertical? vsize : clamp(vw/20,30,50);
     const hw=Object.assign({},m.writer,{weight:m.writer.weight*1.1});
     if(m.vertical){ const surf = m.layout==='wood'?'wood':m.layout==='sheet'?null: pick(r,['red','yellow']); const hcol = surf==='red'?'#f6f1e6':hcolor; if(surf==='wood') Ambience.wood(hb,m.seed+si*101);
-      tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',color:hcol,pad:0.32,minH:size*3.2})); }
-    else tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.15,surface:'washi',transparent:true,color:hcolor,pad:0.22,align:'start',minW:Math.min(560,vw-60),after:(lx,W,H)=>{lx.save(); lx.lineWidth=3*DPR; lx.beginPath(); lx.moveTo(size*DPR*0.3,H-size*DPR*0.15); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); lx.restore();}}));
+      tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',color:hcol,pad:0.32,minH:size*3.2})); }
+    else tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.15,surface:'washi',transparent:true,color:hcolor,pad:0.22,align:'start',minW:Math.min(560,vw-60),dcolor:ID.dcol,after:(lx,W,H)=>{ if(ID.rule==='none') return; lx.save(); lx.lineWidth=3*DPR; lx.lineCap='round'; const y=H-size*DPR*0.15, x0=size*DPR*0.3;
+      if(ID.rule==='double'){ lx.lineWidth=2*DPR; [0,5].forEach(dy=>{ lx.beginPath(); lx.moveTo(x0,y-dy*DPR); lx.lineTo(W*0.6,y-dy*DPR-1); lx.stroke(); }); }
+      else if(ID.rule==='dots'){ for(let x=x0;x<W*0.6;x+=size*DPR*0.22){ lx.beginPath(); lx.arc(x,y,2*DPR,0,7); lx.fill(); } }
+      else { lx.beginPath(); lx.moveTo(x0,y); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); } lx.restore();}}));
     hb.onclick=()=>clickItem({w:sec.h,isHeader:true},hb);
     sec.items.forEach((it,ii)=>{ const btn=document.createElement('button'); btn.className='itm'; btn.setAttribute('aria-label',tr('Plat','Dish')); const cv=document.createElement('canvas'); btn.appendChild(cv); host.appendChild(btn);
       const idx=MENU.flat.length; MENU.flat.push({...it, sec:sec.h, btn}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
@@ -1809,11 +1980,11 @@ async function renderMenu(){
       if(m.vertical){
         const surf = m.layout==='wood'?'wood': m.layout==='sheet'? null : pick(r,['washi','kinari','white','washi']);
         if(surf==='wood') Ambience.wood(btn,seed); const text = it.w + '　' ; const ptxt = pt;
-        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
+        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
           after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
       else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...txt].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
-        tasks.push(()=>textCanvas(cv,txt,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,align:'start',minW:W0,color:ink,
+        tasks.push(()=>textCanvas(cv,txt,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,dcolor:ID.dcol,align:'start',minW:W0,color:ink,
           after:(lx,W,H,Lay)=>{ const ps=isz*0.8*DPR; const s2=String(pt); const chs=[...s2]; const its=[]; let x=W-isz*0.25*DPR; const adv=c=>/[0-9]/.test(c)?0.6:1;
             for(let i=chs.length-1;i>=0;i--){ const a=adv(chs[i])*ps; x-=a; its.unshift({ch:chs[i],cx:x+a/2,cy:H/2,size:ps*(/[0-9]/.test(chs[i])?0.8:0.9)}); }
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length);
@@ -1821,22 +1992,59 @@ async function renderMenu(){
     });
   });
   if(DD.corner){ const hosts=box.querySelectorAll('.rows'), host=hosts.length?hosts[hosts.length-1]:box, dc=document.createElement('canvas'); dc.className='doodle'+(host===box?' free':''); dc.setAttribute('aria-hidden','true'); host.appendChild(dc);
-    const dw=Object.assign({},m.writer,{weight:m.writer.weight*(m.tool==='brush'?0.6:0.85)}), dcol=m.tool==='chalk'?pick(r,['#ffd84d','#ff9ccf','#9fe3ff','#f4efe2']):ink;
+    const dw=Object.assign({},m.writer,{weight:m.writer.weight*(m.tool==='brush'?0.6:0.85)}), dcol=ID.dcol||(m.tool==='chalk'?pick(r,['#ffd84d','#ff9ccf','#9fe3ff','#f4efe2']):ink);
     tasks.push(()=>textCanvas(dc,DCH[DD.corner],{seed:m.seed+4343,writer:dw,size:clamp(vw/8,64,104),surface:'washi',transparent:true,color:dcol,pad:0.08})); }
-  if(DD.wall.length && b.clientWidth>=900){ const sw=b.querySelector('#signc').getBoundingClientRect().width, side=(b.clientWidth-sw)/2, wr=rng(m.seed+4444);
-    const spots=[...(side>=180?[{left:'3%',top:'16px'},{right:'3%',top:'16px'}]:[]),...(m.vertical?[]:[{left:'4%',top:'34%'},{right:'4%',top:'34%'},{left:'5%',top:'55%'},{right:'5%',top:'55%'}])];
+  if(DD.wall.length && b.clientWidth>=900){ const sw=(b.querySelector('#signc')||b.querySelector('.rcpt')).getBoundingClientRect().width, side=(b.clientWidth-sw)/2, wr=rng(m.seed+4444);
+    const spots=[...(side>=180&&!ID.logo?[{left:'3%',top:'16px'},{right:'3%',top:'16px'}]:[]),...(m.vertical?[]:[{left:'4%',top:'34%'},{right:'4%',top:'34%'},{left:'5%',top:'55%'},{right:'5%',top:'55%'}])];
     const sp=shuffle(wr,spots), dark=['darkwood','board'].includes(L.wall);
     DD.wall.forEach((id,i)=>{ if(!sp[i]) return; const c=document.createElement('canvas'); c.className='wdoodle'; c.setAttribute('aria-hidden','true'); Object.assign(c.style,sp[i]); c.style.transform=`rotate(${((wr()-.5)*14).toFixed(1)}deg)`; b.appendChild(c);
       const tool=dark?'chalk':m.tool==='chalk'?'marker':m.tool, w=makeWriter(wr,'hurry',tool,{weight:tool==='brush'?0.6:0.85});
-      tasks.push(()=>textCanvas(c,DCH[id],{seed:m.seed+4500+i*17,writer:w,size:clamp(b.clientWidth/8,120,180),surface:'washi',transparent:true,color:dark?'#efe6d2':tool==='pen'?'#1d2a6b':null,pad:0.06})); }); }
+      tasks.push(()=>textCanvas(c,DCH[id],{seed:m.seed+4500+i*17,writer:w,size:clamp(b.clientWidth/8,120,180),surface:'washi',transparent:true,color:dark?'#efe6d2':ID.dcol||(tool==='pen'?'#1d2a6b':ID.acc),pad:0.06})); }); }
   if(!m.vertical && m.tax){ const nb=document.createElement('p'); nb.className='hint'; nb.style.cssText='margin:0;font-size:15px;color:#333'; const hosts=box.querySelectorAll('.rows'); if(hosts.length){ const tc=document.createElement('canvas'); hosts[hosts.length-1].appendChild(tc); tasks.push(()=>textCanvas(tc,'税込',{seed:m.seed+999,writer:m.writer,size:22,surface:'washi',transparent:true,pad:0.2,align:'end',minW:Math.min(560,vw-60),color:ink})); } }
   sceneTasks(b,m,vw,ink).forEach(t=>tasks.push(t));
+  if(m.ticket){ const te=ticketEl(m,vw,tasks); if(te) b.querySelector('#mscene .notes').appendChild(te); }
   for(const tk of tasks){ if(gen!==menuGen) return; tk(); await nextFrame(); }
 }
+// the konbini receipt, one button per line
+function receiptMenu(b,box,m,vw,tasks){ b.querySelector('.sign')?.remove(); const width=Math.round(Math.min(vw-8,420));
+  const R=receiptEl({lines:konbiniLines(m),seed:m.seed+5,cols:32,width,cutTop:true,style:{bold:m.id.bold}},(l,el)=>{
+    if(l.sign){ el.id='signbtn'; el.setAttribute('aria-label',tr('Enseigne','Shop sign')); el.onclick=()=>showSign(el); return; }
+    if(l.item){ const idx=MENU.flat.length; MENU.flat.push({w:l.item.w,price:l.item.price,sec:l.item.sec,btn:el,full:l.item.line!==l.item.w?l.item.line:null}); el.setAttribute('aria-label',tr('Article','Item')); el.onclick=()=>clickItem(MENU.flat[idx],el); return; }
+    if(l.word&&WMAP[l.word]){ const idx=MENU.flat.length; MENU.flat.push({w:l.word,btn:el,kind:'rcpt',price:l.price,full:l.t.trim()!==l.word?l.t.trim():null}); el.setAttribute('aria-label',tr('Ligne du ticket','Receipt line')); el.onclick=()=>clickItem(MENU.flat[idx],el); } });
+  box.appendChild(R.el); tasks.push(...R.tasks); }
+// a short receipt left on the counter, for the other shops (now and then)
+function ticketEl(m,vw,tasks){ const r=rng(m.seed+59);
+  const dup=(x,el)=>{ const idx=MENU.flat.length; MENU.flat.push({...x,btn:el,dup:true}); el.setAttribute('aria-label',tr('Ligne du ticket','Receipt line')); el.onclick=()=>clickItem(MENU.flat[idx],el); };
+  const word=(w,el,extra={})=>{ if(!WMAP[w]) return; const idx=MENU.flat.length; MENU.flat.push({w,btn:el,kind:'rcpt',dup:true,...extra}); el.setAttribute('aria-label',tr('Ligne du ticket','Receipt line')); el.onclick=()=>clickItem(MENU.flat[idx],el); };
+  if(DENPYO_SHOPS.includes(m.tk)){ // handwritten bill on a lined pad
+    const its=shuffle(r,MENU.flat.filter(x=>!x.kind&&!x.dup&&typeof x.price==='number')).slice(0,3+Math.floor(r()*3)); if(!its.length) return null;
+    const d=document.createElement('div'); d.className='denpyo'; d.style.setProperty('--rot',((r()-.5)*5).toFixed(1)+'deg'); const wr=makeWriter(r,'hurry','pen'), W0=Math.round(Math.min(vw*.8,300)), sz=Math.round(clamp(W0/10,20,28)); d.style.setProperty('--lh',(Math.round(sz*1.32*DPR)/DPR).toFixed(2)+'px'); let k=0;
+    const row=(txt,price,onEl,col)=>{ const el=document.createElement('button'); el.type='button'; el.className='itm dl'; const cv=document.createElement('canvas'); el.appendChild(cv); d.appendChild(el); onEl(el); const seed=m.seed+800+(k++)*13;
+      tasks.push(()=>textCanvas(cv,txt,{seed,writer:wr,size:sz,transparent:true,surface:'white',pad:.16,align:'start',minW:W0,color:col||'#1d2a6b',after:(x,W,H)=>{ if(price==null) return; const ps=sz*.85*DPR, s2=String(price), its=[]; let xx=W-sz*.2*DPR;
+        for(let i=s2.length-1;i>=0;i--){ const a=(/[0-9]/.test(s2[i])?.6:1)*ps; xx-=a; its.unshift({ch:s2[i],cx:xx+a/2,cy:H/2,size:ps*.8}); } const sim=simulate(its,wr,rng(seed+5)); const tl=new Tool(x,wr.tool,ps*.09*wr.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }})); };
+    row('お会計',null,el=>word('お会計',el),'#2f6b3a'); its.forEach(x=>row(x.w,x.price,el=>dup(x,el))); const sum=its.reduce((a,x)=>a+x.price,0); row('合計',sum,el=>word('合計',el,{price:sum}),'#c8261a');
+    return d; }
+  const spec=shortTicket(m,r,vw); if(!spec) return null;
+  const R=receiptEl(spec,(l,el)=>{ if(l.sign){ el.setAttribute('aria-label',tr('Enseigne','Shop sign')); el.onclick=()=>showSign(el); return; } if(l.item) dup(l.item,el); else if(l.word) word(l.word,el,{price:l.price}); });
+  tasks.push(...R.tasks); return R.el; }
+// konbini counter cards, handwritten in marker; seasonal ones come up more in their season
+function popTasks(nb,m,r,vw,phone){ const S0=SEASON_NOW, hr=new Date().getHours(), tasks=[];
+  const hj=S0.summer?'冷やし中華はじめました':S0.autumn?pick(r,['おでんはじめました','中華まんはじめました']):pick(r,['冷やし中華はじめました','おでんはじめました','中華まんはじめました']);
+  const P=[['揚げたて','揚げたて！',2,'kira'],['新発売','新発売！',1.2,'kira'],['全品',`おでん全品${pick(r,[70,80,100])}円`,S0.winter?3:.4,'steam'],['割引',`${pick(r,['お弁当','サラダ','パスタ'])}${pick(r,[10,20,30])}%割引`,1,null],
+    ['半額','半額',hr>=18?3:.6,null],['はじめました',hj,S0.summer||S0.autumn?3:.5,hj.startsWith('冷')?'wave':'steam'],['期間限定','期間限定',.8,pick(r,seasonDoodles().length?seasonDoodles():['kira'])]].filter(p=>WMAP[p[0]]);
+  const picks=[]; while(picks.length<(phone?2:3)&&P.length){ let x=r()*P.reduce((a,p)=>a+p[2],0), i=P.findIndex(p=>(x-=p[2])<0); if(i<0) i=P.length-1; picks.push(P.splice(i,1)[0]); }
+  picks.forEach(([w,txt,,dd],i)=>{ const btn=document.createElement('button'); btn.className='itm note popc'; btn.setAttribute('aria-label',tr('Affichette','Shop card')); const cv=document.createElement('canvas'); btn.appendChild(cv); nb.appendChild(btn); Ambience.paper(btn,w,i);
+    const idx=MENU.flat.length; MENU.flat.push({w,btn,kind:'sign',full:txt!==w?txt:null}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
+    const surf=w==='半額'?'yellow':pick(r,['yellow','white','pink','yellow','white']), col=w==='半額'||r()<.5?'#c8261a':m.id.acc, t2=txt+(dd&&r()<.75?DCH[dd]:''), len=[...t2].length;
+    const vert=len<=4&&r()<.4, size=Math.round(vert?clamp(vw/14,28,44):Math.min(clamp(vw/14,26,42),Math.min(vw*.62,320)/(len*.92+0.6)));
+    const wr=makeWriter(r,pick(r,['hurry','hurry','kaisho']),pick(r,['marker','marker','chisel']),{weight:1.4});
+    tasks.push(()=>textCanvas(cv,t2,{seed:m.seed+520+i*29,writer:wr,size,vertical:vert,surface:surf,color:col,dcolor:col==='#c8261a'?'#1d4e89':'#c8261a',pad:0.42})); });
+  return tasks; }
 // notices pinned around the menu, and a short exchange between staff and customer
-const TICKET_SHOPS=['ramen','soba','teishoku','don'], CAFE_SHOPS=['cafe','patisserie','bakery'];
+const TICKET_SHOPS=['ramen','soba','teishoku','don'], CAFE_SHOPS=['cafe','patisserie','bakery'], TICKET_SKIP=['konbini'], DENPYO_SHOPS=['izakaya','yakitori','sakaba','okonomiyaki'];
 function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tasks; const r=rng(m.seed+77); const phone=vw<520;
   const nb=b.querySelector('#mscene .notes'), tb=b.querySelector('#mscene .talk');
+  if(m.tk==='konbini') popTasks(nb,m,r,vw,phone).forEach(t=>tasks.push(t)); else {
   const pool=['禁煙','全席禁煙','現金のみ','お冷はセルフ','ご自由にどうぞ','ラストオーダー','お持ち帰り','定休日','営業時間','お手洗い','予約席','お一人様','お会計','ご注文','お冷','喫煙席','ご予約'];
   if(TICKET_SHOPS.includes(m.tk)) pool.unshift('食券','券売機','食券制');
   if(CAFE_SHOPS.includes(m.tk)){ pool.unshift('テイクアウト','イートイン'); if(m.tk==='bakery') pool.unshift('焼きたて'); pool.splice(pool.indexOf('喫煙席'),1); }
@@ -1849,8 +2057,9 @@ function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tas
     const surf=pick(r,['white','white','kinari','yellow','pink']); const vert=n<=4&&r()<.5; const color=(w.includes('禁')||r()<.25)?'#c8261a':null;
     const size=Math.round(vert? clamp(vw/16,26,40) : Math.min(clamp(vw/16,24,38),(Math.min(vw*.62,300))/(n+0.6)));
     tasks.push(()=>textCanvas(cv,w,{seed:m.seed+500+i*13,writer:nw,size,vertical:vert,surface:surf,color,pad:0.48,after:(x,W,H)=>{ x.save(); x.globalAlpha=.16; x.strokeStyle='#80643c'; x.lineWidth=DPR; x.beginPath(); x.moveTo(W*.08,H*.12); x.lineTo(W*.92,H*.1); x.stroke(); x.restore(); }})); });
+  }
   // the exchange
-  const cafe=CAFE_SHOPS.includes(m.tk), sc=pick(r,cafe&&PH.cafe&&r()<.7?PH.cafe:PH.scenes); const dishes=MENU.flat.filter(x=>!x.kind&&x.sec!=='カスタマイズ'&&[...x.w].length<=5); const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
+  const cafe=CAFE_SHOPS.includes(m.tk), kb=m.tk==='konbini', sc=pick(r,kb&&PH.konbini&&r()<.85?PH.konbini:cafe&&PH.cafe&&r()<.7?PH.cafe:PH.scenes); const all=MENU.flat.filter(x=>!x.kind&&!x.dup&&x.sec!=='カスタマイズ'&&[...x.w].length<=5), counter=all.filter(x=>['ホットスナック','中華まん','おでん'].includes(x.sec)), dishes=kb&&counter.length?counter:all; const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
   const bw=makeWriter(r,pick(r,['kaisho','hurry']),'pen'); const maxW=Math.min(vw*(phone?.8:.72),420);
   sc.forEach(([who,line],i)=>{ const [pre,w]=line.includes('|')? line.split('|') : ['',line]; const full=pre.replace('{d}',dish)+w; if(!WMAP[w]) return; const n=[...full].length;
     const row=document.createElement('div'); row.className='trow '+who; row.innerHTML=`<span class="who" lang="ja" aria-hidden="true">${who==='s'?'店':'客'}</span>`;
@@ -1863,7 +2072,7 @@ function clickItem(it,btn){
   if(mmode==='explore' || it.isHeader){ const was=btn.classList.contains('sel'); clearSel(); if(!was){ btn.classList.add('sel'); document.getElementById('board').classList.add('hassel'); showInfo(it,undefined,btn); } return; }
   if(target==null) return; score.n++;
   const tw=MENU.flat[target].w;
-  if(it===MENU.flat[target]){ buzz(true); score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
+  if(it===MENU.flat[target]||it.w===MENU.flat[target].w){ buzz(true); score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
   else { buzz(false); streak=0; const note=qmiss?'':menuReview(tw,false); qmiss=true; btn.classList.remove('bad'); void btn.offsetWidth; btn.classList.add('bad'); showInfo(it,false,btn,note); }
   updScore(); }
 function clearSel(){ document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('sel')); const bd=document.getElementById('board'); if(bd) bd.classList.remove('hassel'); hidePop(); }
@@ -1878,7 +2087,7 @@ function showPop(html,anchor){ const b=document.getElementById('board'), p=docum
   const below=ar.bottom-br.top+b.scrollTop+14, above=ar.top-br.top+b.scrollTop-ph-14; const content=b.scrollHeight; let top=below, up=false;
   if(below+ph+12>content && above>8){ top=above; up=true; } else { const need=below+ph+20-content; if(need>0) b.style.paddingBottom=(parseFloat(getComputedStyle(b).paddingBottom)+need)+'px'; }
   p.style.left=left+'px'; p.style.top=top+'px'; p.classList.toggle('up',up); p.style.setProperty('--ax',clamp(ax-left,18,pw-18)+'px');
-  const r=p.getBoundingClientRect(); if(r.bottom>innerHeight||r.top<0) p.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
+  const r=p.getBoundingClientRect(); if(!TEXTPICK&&(r.bottom>innerHeight||r.top<0)) p.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'}); }
 function priceBlock(it,m){ if(it.price==null) return '';
   if(it.price==='時価') return `<div class="price"><span class="lab">${tr('Prix','Price')}</span><span class="big">時価</span><span>じか · <span class="mono">jika</span> · ${tr('prix du marché du jour','today’s market price')}</span></div>`;
   const nr=numReading(it.price); const written=priceText(it.price,m.vertical?m.pstyle:'arabic');
@@ -1892,14 +2101,31 @@ function showInfo(it,ok,btn,note){ const w=WMAP[it.w]||[it.w,'','']; const m=MEN
 function showSign(btn){ const s=MENU.shop; clearSel(); const L=LANG==='en'?1:0;
   const parts=(s.parts||[]).map(([w,r])=>{ const x=NX[w]; return `<div class="spart"><div class="sh"><b>${esc(w)}</b><span class="rd2">${esc(r)}</span>${sayBtn(w,r)}</div>${x?`<p>${esc(x[L])}</p>`:''}</div>`; }).join('');
   showPop(`<p class="lab" style="margin:0">${tr('Enseigne','Shop sign')}</p><div class="w">${esc(s.jp)}</div><div class="answer" style="margin-top:6px"><div class="rd">${esc(s.rd)}${sayBtn((s.parts||[]).map(p=>p[0]).join('|'),s.rd)}</div><div class="ro">${esc(toRomaji(s.rd))}</div><div class="mn">${esc(MENU.t.jp)} · ${esc(MENU.t.fr)}${MENU.reg?' · '+esc(MENU.reg.fr):''}</div></div><div class="sparts">${parts}</div>${wordChips(s.jp)}`, btn); }
-function updateMenuLabels(){ if(!MENU) return; const host=document.getElementById('menu-text-items'); host.innerHTML=MENU.flat.map((it,i)=>`<button class="btn" type="button" data-menu-item="${i}">${esc(it.full||it.w)}</button>`).join(''); host.querySelectorAll('button').forEach(b=>b.onclick=()=>{const it=MENU.flat[+b.dataset.menuItem]; clickItem(it,it.btn);}); const readable=mmode==='explore'; MENU.flat.forEach((it,i)=>{ const title=readable?(it.full||it.w):tr('Élément ','Item ')+(i+1); it.btn.setAttribute('aria-label',title); it.btn.querySelector('canvas')?.setAttribute('aria-hidden','true'); }); }
+function updateMenuLabels(){ if(!MENU) return; const readable=mmode==='explore'; MENU.flat.forEach((it,i)=>{ const title=readable?(it.full||it.w):tr('Élément ','Item ')+(i+1); it.btn.setAttribute('aria-label',title); it.btn.querySelector('canvas')?.setAttribute('aria-hidden','true'); }); }
+// the menu in print, in a sheet: tapping a word answers the challenge (when one is asked) and opens its card
+let TEXTPICK=false;
+function openMenuText(){ if(!MENU) return; const m=MENU, body=document.getElementById('dlgbody'); const groups=[];
+  const add=(h,list)=>{ list=list.filter(i=>!m.flat[i].dup); if(list.length) groups.push([h,list]); };
+  const idx=m.flat.map((x,i)=>i); const secs=[...new Set(idx.filter(i=>!m.flat[i].kind&&m.flat[i].sec!=null).map(i=>m.flat[i].sec))];
+  if(m.layout==='receipt') add(['領収証',tr('Ticket','Receipt')],idx.filter(i=>!m.flat[i].kind||m.flat[i].kind==='rcpt'));
+  else secs.forEach(h=>add([h,WMAP[h]?'':''],idx.filter(i=>!m.flat[i].kind&&m.flat[i].sec===h)));
+  add(['貼紙',tr('Affichettes','Notices')],idx.filter(i=>m.flat[i].kind==='sign')); add(['会話',tr('Au comptoir','At the counter')],idx.filter(i=>m.flat[i].kind==='talk'));
+  const q=target!=null&&mmode!=='explore'? document.querySelector('#mquest .quest b') : null;
+  body.innerHTML=`<div class="mtl"><div class="mshop"><b lang="ja">${esc(m.shop.jp)}</b><span>${esc(m.t.jp)} · ${esc(m.t.fr)}</span></div>${q?`<p class="mq">${tr('Trouve','Find')} <b>${q.innerHTML}</b></p>`:''}
+    ${groups.map(([[h,l],list])=>`<section><h3><span class="j" lang="ja">${esc(h)}</span>${esc(l)}</h3><div class="its">${list.map(i=>{ const it=m.flat[i]; return `<button class="mt" type="button" data-i="${i}"><span class="w" lang="ja">${esc(it.full||it.w)}</span>${typeof it.price==='number'?`<span class="p">${esc(priceText(it.price,'arabic'))}</span>`:it.price==='時価'?'<span class="p" lang="ja">時価</span>':''}</button>`; }).join('')}</div></section>`).join('')}</div>`;
+  body.querySelectorAll('button.mt').forEach(b=>b.onclick=()=>{ const it=m.flat[+b.dataset.i]; let fb='';
+    if(mmode!=='explore'&&target!=null){ const ok=it===m.flat[target]||it.w===m.flat[target].w; TEXTPICK=true; try{ clickItem(it,it.btn); } finally { TEXTPICK=false; } hidePop(); b.classList.add(ok?'good':'bad');
+      fb=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé !','Found it!'):tr('Raté · voici ce que vous avez choisi','Missed · here is what you picked')}</p>`; }
+    openWord(it.w); const bd=document.getElementById('dlgbody'); bd.insertAdjacentHTML('afterbegin',`<button class="btn" type="button" id="mtback" style="margin-bottom:12px">← ${tr('Version texte','Text version')}</button>${it.full?`<p class="full" lang="ja" style="margin:0 0 8px;font-size:18px">${esc(it.full)}</p>`:''}${fb}`);
+    bd.querySelector('#mtback').onclick=openMenuText; });
+  if(!dlg.open) dlg.showModal(); body.scrollTop=0; }
 let QSET=false;
 function updScore(){ const s=document.querySelector('#mquest .sc'); if(s){ s.innerHTML=streak>1?`<span lang="ja">連</span>${streak}`:''; s.title=`${score.ok} / ${score.n}`; } }
 function newQuest(){ const q=document.getElementById('mquest'); target=null; document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('good','bad','sel')); clearSel();
   document.querySelectorAll('#v-menu .modes button').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.m==='explore')===(mmode==='explore'))));
   updateMenuLabels();
   if(mmode==='explore'||!MENU||!MENU.flat.length){ q.innerHTML=''; return; }
-  qmiss=false; const idx=MENU.flat.map((x,i)=>i); const kn=idx.filter(i=>knownWord(MENU.flat[i].w)); if(qpool==='known'&&!kn.length&&(newQuest.tries=(newQuest.tries||0)+1)<12){ genMenu(); return; } newQuest.tries=0; const base=qpool==='known'&&kn.length? kn : idx;
+  qmiss=false; const idx=MENU.flat.map((x,i)=>i).filter(i=>!MENU.flat[i].dup); const kn=idx.filter(i=>knownWord(MENU.flat[i].w)); if(qpool==='known'&&!kn.length&&(newQuest.tries=(newQuest.tries||0)+1)<12){ genMenu(); return; } newQuest.tries=0; const base=qpool==='known'&&kn.length? kn : idx;
   // each word is asked once per menu; when none is left, a new menu is drawn
   const asked=MENU.asked||(MENU.asked=new Set()); let pool=base.filter(i=>!asked.has(i)); if(!pool.length){ genMenu(); return; } const fp=pool.filter(i=>MENU.focus&&MENU.focus.has(MENU.flat[i].w)); if(fp.length) pool=fp;
   let t=0; for(let k=0;k<6;k++){ t=pool[Math.floor(Math.random()*pool.length)]; if(t!==lastTarget||pool.length<2) break; } asked.add(t); lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
@@ -1922,7 +2148,7 @@ let menuResize=null, menuW=innerWidth; addEventListener('resize',()=>{ clearTime
 
 // ---------- atelier
 // glyphs also exist for bare components (so their sheet can be drawn); the writing lists keep to characters seen on menus
-const SEEN_TXT=[...WORDS.map(w=>w[0]), ...Object.values(DATA.types).flatMap(t=>[t.jp,...t.names]), ...DATA.names.map(n=>n[0]), ...Object.values(DATA.regions).map(r=>r.jp)].join('');
+const SEEN_TXT=[...WORDS.map(w=>w[0]), ...Object.values(DATA.types).flatMap(t=>[t.jp,...t.names,...(t.names_n||[]).map(n=>n[0])]), ...DATA.names.map(n=>n[0]), ...Object.values(DATA.regions).map(r=>r.jp)].join('');
 let atelierChar='焼', apad=null; const WRITABLE=[...new Set([...CARDS.filter(id=>id[0]==='w').map(id=>id.slice(2)), ...Object.keys(KVG).filter(c=>isKanji(c)&&c!=='〇'&&SEEN_TXT.includes(c))])];
 function renderAtelier(){ if(!apad){ apad=new Pad(document.getElementById('apad'),atelierChar,{ghost:true,onFull:()=>document.getElementById('acheck').click()}); bindAtelier(); } setA(); }
 function setA(){ apad.setChar(atelierChar); const k=kInfo(atelierChar);

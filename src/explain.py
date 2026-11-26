@@ -257,6 +257,77 @@ add("""
 ホットとアイスどちらになさいますか|« Chaud ou glacé, lequel prendrez-vous ? » Question très fréquente au comptoir.|“Hot or iced, which would you like?” A very common counter question.
 アイスで|Réponse : « Glacé ».|Answer: “Iced”.
 ホットで|Réponse : « Chaud ».|Answer: “Hot”.
+# --- konbini
+コンビニ|Supérette ouverte jour et nuit : repas, boissons, timbres, colis, factures. On en trouve à chaque coin de rue.|A shop open day and night: meals, drinks, stamps, parcels, bills. There is one on every corner.
+ホットスナック|Les fritures gardées au chaud près de la caisse : on les demande au vendeur.|The fried snacks kept warm by the till: you ask the clerk for them.
+フライドチキン|Morceau de poulet pané et frit, vendu à l’unité près de la caisse.|A piece of breaded fried chicken, sold one at a time by the till.
+アメリカンドッグ|Saucisse enrobée de pâte sucrée et frite, sur un bâton. On ajoute ketchup et moutarde.|A sausage in sweet batter, fried on a stick. Add ketchup and mustard.
+コロッケ|Croquette panée de purée de pomme de terre et de viande hachée, du français « croquette ».|A breaded croquette of mashed potato and minced meat, from French “croquette”.
+フランクフルト|Grosse saucisse grillée sur un bâton.|A big grilled sausage on a stick.
+フライドポテト|Frites, souvent servies dans un petit gobelet.|French fries, often in a small cup.
+中華まん|« Brioche chinoise » : brioches à la vapeur gardées dans une vitrine chauffante en hiver.|“Chinese bun”: steamed buns kept in a heated case in winter.
+肉まん|Brioche vapeur farcie de porc haché et d’oignon. Le classique de l’hiver.|A steamed bun filled with minced pork and onion. The winter classic.
+あんまん|Brioche vapeur à la pâte de haricots rouges sucrée.|A steamed bun with sweet red bean paste.
+ピザまん|Brioche vapeur à la tomate et au fromage, souvent teintée en orange.|A steamed bun with tomato and cheese, often tinted orange.
+カレーまん|Brioche vapeur au curry japonais, souvent teintée en jaune.|A steamed bun with Japanese curry, often tinted yellow.
+おにぎり|Boule ou triangle de riz garni, enveloppé de nori. L’emballage s’ouvre en trois tirettes numérotées.|A ball or triangle of rice with a filling, wrapped in nori. The wrapper opens with three numbered tabs.
+梅|Prune japonaise salée et acide (umeboshi), garniture classique de l’onigiri.|A salty, sour Japanese plum (umeboshi), a classic onigiri filling.
+昆布|Algue kombu, mijotée sucrée-salée dans l’onigiri, ou nouée dans l’oden.|Kelp, simmered sweet and salty in onigiri, or tied in a knot in oden.
+ツナマヨ|Thon et mayonnaise : la garniture d’onigiri la plus vendue.|Tuna and mayonnaise: the best-selling onigiri filling.
+赤飯|Riz gluant cuit avec des haricots azuki, qui le teintent de rose. Plat de fête.|Sticky rice cooked with azuki beans, which tint it pink. A festive dish.
+弁当|Repas complet en boîte : riz, plat et petits accompagnements. On vous propose de le réchauffer.|A full meal in a box: rice, a main and small sides. The clerk offers to heat it up.
+幕の内弁当|Bentō assorti à petites portions variées, né pour les entractes (幕の内) du théâtre.|An assorted bento of small varied portions, born for theatre intermissions (幕の内).
+のり弁|Riz recouvert de nori, avec poisson pané et chikuwa frit. Le bentō le moins cher.|Rice covered in nori, with breaded fish and fried chikuwa. The cheapest bento.
+唐揚げ弁当|Bentō au poulet frit, avec riz et petit accompagnement.|A fried chicken bento with rice and a small side.
+生姜焼き弁当|Bentō au porc sauté au gingembre et à la sauce soja.|A bento of pork stir-fried with ginger and soy sauce.
+ハンバーグ弁当|Bentō au steak haché nappé de sauce.|A bento with a hamburg steak in sauce.
+カップ麺|Nouilles instantanées en pot : on ajoute l’eau chaude de la bouilloire près de la caisse.|Instant noodles in a cup: add hot water from the kettle by the till.
+おでん|Pot-au-feu au dashi : on choisit ses morceaux dans le bac près de la caisse, d’octobre à mars surtout.|A dashi stew: you pick your pieces from the tray by the till, mostly from October to March.
+大根|Grosse rondelle de radis blanc qui a longuement mijoté dans le bouillon. La star de l’oden.|A thick round of white radish simmered long in the broth. The star of oden.
+ちくわ|Tube de pâte de poisson grillée, creux au milieu.|A tube of grilled fish paste, hollow in the middle.
+はんぺん|Galette blanche de poisson et d’igname, légère comme une guimauve.|A white cake of fish and yam, light as a marshmallow.
+こんにゃく|Gelée ferme de konjac, sans goût mais qui prend celui du bouillon.|A firm konjac jelly, tasteless but soaking up the broth.
+牛すじ|Tendons de bœuf sur un pique, fondants après mijotage.|Beef tendon on a skewer, melting after simmering.
+ドリンク|« Drink » : rubrique des boissons.|“Drink”: the drinks section.
+ミネラルウォーター|Eau minérale en bouteille.|Bottled mineral water.
+ホットコーヒー|Café chaud, souvent servi par une machine en libre-service après paiement.|Hot coffee, often from a self-service machine once you’ve paid.
+缶コーヒー|Café en canette, vendu chaud en hiver et froid en été.|Canned coffee, sold hot in winter and cold in summer.
+野菜ジュース|Jus de légumes mélangés, souvent avec des fruits.|Mixed vegetable juice, often with fruit.
+缶ビール|Bière en canette. Taxée à 10 % comme tout alcool.|Canned beer. Taxed at 10% like all alcohol.
+缶チューハイ|Alcool de base (shōchū) et soda aux fruits, en canette.|Shōchū with fruit soda, in a can.
+エナジードリンク|Boisson énergisante.|Energy drink.
+スイーツ|« Sweets » : rayon des desserts frais.|“Sweets”: the chilled desserts shelf.
+レジ袋|Sac en plastique, payant depuis 2020 : quelques yens, taxés à 10 %.|A plastic bag, charged since 2020: a few yen, taxed at 10%.
+レジ|La caisse, de l’anglais « register ».|The till, from English “register”.
+領収証|Reçu officiel. En haut du ticket ; on peut aussi demander un 領収書 nominatif.|An official receipt. At the top of the ticket; you can also ask for a named 領収書.
+小計|Sous-total avant remises et taxes.|Subtotal, before discounts and tax.
+合計|Total à payer, imprimé en grand.|The total to pay, printed large.
+値引|Remise : apparaît sous un article soldé, avec le montant en négatif.|Discount: shows under a marked-down item, with a negative amount.
+現金|Espèces.|Cash.
+お預り|La somme que vous avez tendue, « reçue en dépôt ».|The money you handed over, “received in trust”.
+お釣り|La monnaie rendue.|Your change.
+消費税|Taxe sur la consommation : 10 %, ou 8 % pour la nourriture à emporter. Déjà incluse dans les prix.|Consumption tax: 10%, or 8% for take-away food. Already in the prices.
+軽減税率|Taux réduit de 8 % pour la nourriture à emporter. Les articles concernés portent une marque ※ ou 軽.|The reduced 8% rate for take-away food. Items under it carry a ※ or 軽 mark.
+電子マネー|Paiement sans contact par carte IC ou téléphone.|Contactless payment by IC card or phone.
+電話|Téléphone : le numéro du magasin, sous son nom.|Phone: the shop’s number, under its name.
+担当|L’employé qui a tenu la caisse, souvent par un numéro.|The clerk who ran the till, often by a number.
+駅前店|« Magasin devant la gare » : les chaînes nomment chaque magasin par son quartier.|“In front of the station”: chains name each shop after its spot.
+東口店|« Magasin de la sortie est » d’une gare.|“East exit branch” of a station.
+中央店|« Magasin du centre ».|“Central branch”.
+揚げたて|« Tout juste frit » : sur les affichettes près des fritures.|“Freshly fried”: on the cards next to the fried food.
+新発売|« Nouvelle sortie » : produit qui vient d’arriver en rayon.|“Newly released”: a product just on the shelves.
+全品|« Tous les articles » : 全品70円 veut dire que tout est à 70 yens.|“All items”: 全品70円 means everything is 70 yen.
+割引|Réduction, souvent en pourcentage : 10%割引.|A discount, often in percent: 10%割引.
+半額|Moitié prix : l’étiquette collée le soir sur les bentō et plats du jour.|Half price: the sticker put on bento and daily dishes in the evening.
+はじめました|« On a commencé » : annonce le retour d’un produit de saison, comme 冷やし中華はじめました en été.|“We’ve started”: announces a seasonal item is back, like 冷やし中華はじめました in summer.
+温めますか|« Je vous le réchauffe ? » : on vous le demande pour les bentō et les plats.|“Shall I heat it up?”: asked for bento and ready meals.
+お願いします|« S’il vous plaît » : pour dire oui à une proposition.|“Please”: to say yes to an offer.
+大丈夫です|« Ça ira » : la façon polie de dire non merci.|“I’m fine”: the polite way to say no thanks.
+お箸おつけしますか|« Je vous mets des baguettes ? »|“Shall I add chopsticks?”
+袋はご利用ですか|« Vous utiliserez un sac ? » Le sac est payant.|“Will you use a bag?” Bags cost extra.
+ポイントカードはお持ちですか|« Avez-vous une carte de fidélité ? » On répond souvent 大丈夫です.|“Do you have a point card?” People often answer 大丈夫です.
+以上でよろしいですか|« Ce sera tout ? »|“Will that be all?”
+はい|Oui.|Yes.
 # --- kissaten / kanmi
 珈琲|Café filtre, souvent torréfié foncé dans les cafés rétro.|Drip coffee, usually dark-roasted in retro cafés.
 紅茶|Thé noir, servi avec lait ou citron.|Black tea, with milk or lemon.
@@ -502,5 +573,17 @@ for line in """
 茶寮|« Pavillon de thé » : 茶 thé, 寮 pavillon. Nom élégant pour un salon de thé.|“Tea pavilion”: 茶 tea, 寮 lodge. An elegant name for a tea house.
 日本茶|« Thé japonais » : la boutique vend et sert du thé.|“Japanese tea”: the shop sells and serves tea.
 園|« Jardin, plantation » : beaucoup de maisons de thé portent le nom de leur plantation, comme 〇〇園.|“Garden, plantation”: many tea houses are named after their plantation, like 〇〇園.
+マート|« Mart » : nom courant des supérettes.|“Mart”: a common name for convenience stores.
+ストア|« Store » : magasin.|“Store”: shop.
+サンライズ|« Sunrise », lever de soleil.|“Sunrise”.
+グリーン|« Green », vert.|“Green”.
+デイリー|« Daily », de tous les jours.|“Daily”.
+ハッピー|« Happy », heureux.|“Happy”.
+フレッシュ|« Fresh », frais.|“Fresh”.
+スマイル|« Smile », sourire.|“Smile”.
+エブリ|« Every », chaque (jour).|“Every” (day).
+ニコニコ|Onomatopée du sourire.|The sound of a smile.
+ハロー|« Hello », bonjour.|“Hello”.
+まんぷく|« Ventre plein ».|“Full belly”.
 """.strip().splitlines():
     w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)
