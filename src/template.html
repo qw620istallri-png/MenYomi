@@ -2190,18 +2190,17 @@ async function renderMenu(){
       else { lx.beginPath(); lx.moveTo(x0,y); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); } lx.restore();}}));
     hb.onclick=()=>clickItem({w:sec.h,isHeader:true},hb);
     // vertical menus: every strip gets the same length, so the prices line up along the bottom like on a real board
-    const VMAX=m.vertical? Math.max(...m.sections.flatMap((s2,sj)=>s2.items.map((x,ij)=>[...((DD.pre[sj+':'+ij]||'')+x.w+(DD.suf[sj+':'+ij]||''))].length+Math.ceil([...priceText(x.price,m.pstyle)].length*0.55)+1))) : 0;
-    const VH=m.vertical? Math.max(...m.sections.flatMap((s2,sj)=>s2.items.map((x,ij)=>{ const t=(DD.pre[sj+':'+ij]||'')+x.w+(DD.suf[sj+':'+ij]||''); return layoutText(t+'　'.repeat(VMAX-[...t].length),{size,vertical:true,pad:0.28,writer:m.writer,r:rng(1)}).H/DPR; })))+2 : 0;
+    // vertical menus: every strip gets the length of the longest dish plus its price, so the prices line up along the bottom like on a real board
+    const VH=m.vertical? Math.max(...m.sections.flatMap((s2,sj)=>s2.items.map((x,ij)=>{ const t=(DD.pre[sj+':'+ij]||'')+x.w+(DD.suf[sj+':'+ij]||''), pn=[...priceText(x.price,m.pstyle)].length;
+      return layoutText(t,{size,vertical:true,pad:0.28,writer:m.writer,r:rng(1)}).H/DPR+size*(pn*0.612+0.3+0.22-0.28); }))) : 0;
     sec.items.forEach((it,ii)=>{ const btn=document.createElement('button'); btn.className='itm'; btn.setAttribute('aria-label',tr('Plat','Dish')); const cv=document.createElement('canvas'); btn.appendChild(cv); host.appendChild(btn);
       const idx=MENU.flat.length; MENU.flat.push({...it, sec:sec.h, btn}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
       const pt=priceText(it.price, m.pstyle); const seed=m.seed+si*101+ii*7+3; const dk=si+':'+ii, txt=(DD.pre[dk]||'')+it.w+(DD.suf[dk]||'');
       if(m.vertical){
         const surf = m.layout==='wood'?'wood': m.layout==='sheet'? null : pick(r,['washi','kinari','white','washi']);
         if(surf==='wood') Ambience.wood(btn,seed); const text = it.w + '　' ; const ptxt = pt;
-        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt+'　'.repeat(Math.max(Math.ceil(pn*0.55)+1,VMAX-[...txt].length)),{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,minH:VH,
-          after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; const top=y; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
-            // a dotted leader from the dish down to its price, as on the horizontal menus
-            const ink2=Lay.items.filter(q=>q.ch!=='　'), end=ink2.length? ink2[ink2.length-1].cy+size*DPR*0.62 : 0; if(top-end>size*DPR*0.9){ lx.save(); lx.setLineDash([2*DPR,7*DPR]); lx.lineWidth=2*DPR; lx.lineCap='round'; lx.strokeStyle=ink; lx.globalAlpha=.7; lx.beginPath(); lx.moveTo(W/2,end); lx.lineTo(W/2,top-size*DPR*0.25); lx.stroke(); lx.restore(); }
+        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt,{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,minH:VH,
+          after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
       else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...txt].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
         tasks.push(()=>textCanvas(cv,txt,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,dcolor:ID.dcol,align:'start',minW:W0,color:ink,
