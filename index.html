@@ -381,6 +381,8 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .board .itm canvas{display:block;max-width:100%}
 .board canvas.doodle{display:block;align-self:flex-end;justify-self:end;margin:-4px 6px 0 auto;transform:rotate(-5deg);max-width:34%;height:auto;pointer-events:none}
 .board canvas.doodle.free{align-self:center;margin:-10px 0 0 min(42%,300px);max-width:28%}
+.board canvas.wdoodle{position:absolute;pointer-events:none;opacity:.88;height:auto}
+@media (max-width:899px){.board canvas.wdoodle{display:none}}
 .board .itm:hover{transform:translateY(-3px);box-shadow:0 0 0 2px rgba(27,24,20,.5)}
 .board .itm{border-radius:2px;transition:transform .15s,opacity .2s,filter .2s,box-shadow .15s,background-color .15s}
 .board .itm.sel{background-color:rgba(246,217,47,.62);box-shadow:0 0 0 4px var(--acc),0 0 0 11px rgba(232,69,44,.22),0 10px 24px rgba(40,20,0,.3);transform:scale(1.05);z-index:3}
@@ -1638,21 +1640,23 @@ const D_MODERN=['cafe','patisserie','bakery'];
 function seasonDoodles(){ const d=new Date(), mo=d.getMonth()+1, day=d.getDate();
   if((mo===12&&day>=28)||(mo===1&&day<=15)) return ['sun','tsuru','daruma','fuji'];
   if(mo===5&&day<=6) return ['kabuto']; if(mo>=3&&mo<=5) return ['sakura']; if(mo>=9&&mo<=11) return ['momiji','icho']; if(mo===7||mo===8) return ['wave']; return []; }
-// which drawings a menu gets: one by the first heading, marks on a few dishes, one at the bottom
-function menuDoodles(m){ const r=rng(m.seed+4242), out={head:{},pre:{},suf:{},corner:null};
-  const modern=D_MODERN.includes(m.tk), base=D_TYPE[m.tk]||[], extra=[...(m.rk&&D_REGION[m.rk]||[]),...seasonDoodles().filter(id=>!modern||['sakura','momiji','icho'].includes(id))];
-  const sea=seasonDoodles();
-  if(base.length&&r()<.55){ const si=m.sections.findIndex(s=>!s.accent); const h=m.sections[si]?.h||'';
-    out.head[si]=h==='季節限定'&&sea.length&&r()<.8? pick(r,sea.filter(x=>['sakura','momiji','icho'].includes(x)).concat(['kira'])) : pick(r,base); }
-  m.sections.forEach((s,si)=>s.items.forEach((it,ii)=>{ const k=si+':'+ii, w=it.w;
-    if(/辛|担々|キムチ/.test(w)&&r()<.7) out.suf[k]=r()<.3?'hannya':'chili';
-    else if(/きつね/.test(w)&&r()<.7) out.suf[k]='kitsune';
-    else if(/鯛/.test(w)&&r()<.5) out.suf[k]='tai'; }));
-  if(r()<.65){ const cand=[]; m.sections.forEach((s,si)=>s.items.forEach((it,ii)=>{ if(ii&&it.price!=='時価'&&!out.suf[si+':'+ii]) cand.push(si+':'+ii); }));
-    if(cand.length) out.pre[pick(r,cand)]=pick(r,modern?['heart','kira','nijumaru','arrow']:['nijumaru','nijumaru','hanamaru','arrow','kira']); }
-  const pool=[...base,...extra,...extra,...(modern?[]:['daruma','kabuto','tsuru','fuji'].filter(()=>r()<.25))].filter(id=>!Object.values(out.head).includes(id));
-  if(!m.vertical&&pool.length&&r()<.7) out.corner=pick(r,pool);
-  for(const o of [out.head,out.pre,out.suf]) for(const k in o) o[k]=DCH[o[k]];
+// which drawings a menu gets: 0 to 6 (usually 2) by headings, on dishes and at the foot, plus on wide screens 0 to 2 on the wall around the menu
+function menuDoodles(m){ const r=rng(m.seed+4242), out={head:{},pre:{},suf:{},corner:null,wall:[]};
+  const modern=D_MODERN.includes(m.tk), sea=seasonDoodles(), base=D_TYPE[m.tk]||[], extra=[...(m.rk&&D_REGION[m.rk]||[]),...sea.filter(id=>!modern||['sakura','momiji','icho'].includes(id))];
+  const flavour=[...base,...base,...extra,...extra,...(modern?[]:['daruma','kabuto','tsuru','fuji'].filter(()=>r()<.2))];
+  const W=[.06,.18,.36,.2,.11,.06,.03]; let x=r(), N=0; while(N<6&&(x-=W[N])>0) N++;
+  const used=new Set(), take=l=>{ const f=l.filter(id=>!used.has(id)); if(!f.length) return null; const id=pick(r,f); used.add(id); return id; };
+  const specials=[], heads=[], marks=[];
+  m.sections.forEach((s,si)=>{ if(!s.accent) heads.push(si); s.items.forEach((it,ii)=>{ const k=si+':'+ii, w=it.w;
+    if(/辛|担々|キムチ/.test(w)) specials.push([k,r()<.3?['hannya']:['chili']]); else if(/きつね/.test(w)) specials.push([k,['kitsune']]); else if(/鯛/.test(w)) specials.push([k,['tai']]);
+    else if(ii&&it.price!=='時価') marks.push(k); }); });
+  const slots=[]; shuffle(r,specials).slice(0,2).forEach(([k,l])=>slots.push(['suf',k,l]));
+  const headPool=si=>m.sections[si].h==='季節限定'? [...sea.filter(x=>['sakura','momiji','icho'].includes(x)),'kira'] : base.length?base:flavour;
+  const rest=[...shuffle(r,heads).slice(0,2).map(si=>['head',si,headPool(si)]), ...shuffle(r,marks).slice(0,2).map(k=>['pre',k,modern?['heart','kira','nijumaru','arrow']:['nijumaru','nijumaru','hanamaru','arrow','kira']])];
+  if(!m.vertical) rest.push(['corner',0,flavour]);
+  slots.push(...shuffle(r,rest));
+  for(const [kind,k,l] of slots.slice(0,N)){ const id=take(l.length?l:flavour); if(!id) continue; if(kind==='corner') out.corner=id; else out[kind][k]=DCH[id]; }
+  const nw=[0,1,1,2][Math.floor(r()*4)]; for(let i=0;i<nw;i++){ const id=take(flavour); if(id) out.wall.push(id); }
   return out; }
 
 // ---------- SRS (SM-2 variant)
@@ -2208,6 +2212,12 @@ async function renderMenu(){
   if(DD.corner){ const hosts=box.querySelectorAll('.rows'), host=hosts.length?hosts[hosts.length-1]:box, dc=document.createElement('canvas'); dc.className='doodle'+(host===box?' free':''); dc.setAttribute('aria-hidden','true'); host.appendChild(dc);
     const dw=Object.assign({},m.writer,{weight:m.writer.weight*(m.tool==='brush'?0.6:0.85)}), dcol=m.tool==='chalk'?pick(r,['#ffd84d','#ff9ccf','#9fe3ff','#f4efe2']):ink;
     tasks.push(()=>textCanvas(dc,DCH[DD.corner],{seed:m.seed+4343,writer:dw,size:clamp(vw/8,64,104),surface:'washi',transparent:true,color:dcol,pad:0.08})); }
+  if(DD.wall.length && b.clientWidth>=900){ const sw=b.querySelector('#signc').getBoundingClientRect().width, side=(b.clientWidth-sw)/2, wr=rng(m.seed+4444);
+    const spots=[...(side>=180?[{left:'3%',top:'16px'},{right:'3%',top:'16px'}]:[]),...(m.vertical?[]:[{left:'4%',top:'34%'},{right:'4%',top:'34%'},{left:'5%',top:'55%'},{right:'5%',top:'55%'}])];
+    const sp=shuffle(wr,spots), dark=['darkwood','board'].includes(L.wall);
+    DD.wall.forEach((id,i)=>{ if(!sp[i]) return; const c=document.createElement('canvas'); c.className='wdoodle'; c.setAttribute('aria-hidden','true'); Object.assign(c.style,sp[i]); c.style.transform=`rotate(${((wr()-.5)*14).toFixed(1)}deg)`; b.appendChild(c);
+      const tool=dark?'chalk':m.tool==='chalk'?'marker':m.tool, w=makeWriter(wr,'hurry',tool,{weight:tool==='brush'?0.6:0.85});
+      tasks.push(()=>textCanvas(c,DCH[id],{seed:m.seed+4500+i*17,writer:w,size:clamp(b.clientWidth/8,120,180),surface:'washi',transparent:true,color:dark?'#efe6d2':tool==='pen'?'#1d2a6b':null,pad:0.06})); }); }
   if(!m.vertical && m.tax){ const nb=document.createElement('p'); nb.className='hint'; nb.style.cssText='margin:0;font-size:15px;color:#333'; const hosts=box.querySelectorAll('.rows'); if(hosts.length){ const tc=document.createElement('canvas'); hosts[hosts.length-1].appendChild(tc); tasks.push(()=>textCanvas(tc,'税込',{seed:m.seed+999,writer:m.writer,size:22,surface:'washi',transparent:true,pad:0.2,align:'end',minW:Math.min(560,vw-60),color:ink})); } }
   sceneTasks(b,m,vw,ink).forEach(t=>tasks.push(t));
   for(const tk of tasks){ if(gen!==menuGen) return; tk(); await nextFrame(); }
@@ -2808,7 +2818,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · c43bcdd26d</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · aebd7d2207</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2887,7 +2897,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes','cards')} · ${es.filter(([,e])=>e.ok).length} ${tr('justes du premier coup','right first time')}</p>${wrong.length?`<p class="rwords">${tr('À retrouver','To revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}</p><button class="btn" id="review-difficult" title="${tr('Retravailler mes hésitations','Practise my difficult cards')}">${tr('Retravailler','Practise')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · c43bcdd26d';
+const BUILD='2 · aebd7d2207';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
