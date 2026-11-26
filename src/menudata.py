@@ -487,6 +487,109 @@ TALK_W = [
  ('ありがとうございました','ありがとうございました','merci beaucoup (au départ du client)','thank you very much'),
  ('またお越しください','またおこしください','revenez nous voir','please come again'),
 ]
+# ---------- modern café (chain style) and Western pastry shop: mostly katakana
+CAFE_W = [
+ ('カフェ','カフェ','café, salon moderne','café'),
+ ('コーヒー','コーヒー','café (la boisson)','coffee'),
+ ('本日のコーヒー','ほんじつのコーヒー','café du jour','coffee of the day'),
+ ('ドリップコーヒー','ドリップコーヒー','café filtre','drip coffee'),
+ ('エスプレッソ','エスプレッソ','expresso','espresso'),
+ ('アメリカーノ','アメリカーノ','americano, expresso allongé','americano'),
+ ('カフェラテ','カフェラテ','café latte','caffè latte'),
+ ('カフェオレ','カフェオレ','café au lait','café au lait'),
+ ('カプチーノ','カプチーノ','cappuccino','cappuccino'),
+ ('カフェモカ','カフェモカ','café moka au chocolat','caffè mocha'),
+ ('キャラメルマキアート','キャラメルマキアート','latte au caramel (macchiato)','caramel macchiato'),
+ ('アイスコーヒー','アイスコーヒー','café glacé','iced coffee'),
+ ('コールドブリュー','コールドブリュー','café infusé à froid','cold brew'),
+ ('ティー','ティー','thé','tea'),
+ ('チャイラテ','チャイラテ','chai latte aux épices','chai latte'),
+ ('アールグレイ','アールグレイ','thé Earl Grey','Earl Grey tea'),
+ ('ココア','ココア','chocolat chaud','hot cocoa'),
+ ('レモネード','レモネード','limonade','lemonade'),
+ ('フード','フード','à manger','food'),
+ ('スコーン','スコーン','scone','scone'),
+ ('マフィン','マフィン','muffin','muffin'),
+ ('ベーグル','ベーグル','bagel','bagel'),
+ ('クロワッサン','クロワッサン','croissant','croissant'),
+ ('サンドイッチ','サンドイッチ','sandwich','sandwich'),
+ ('パニーニ','パニーニ','panini','panini'),
+ ('シナモンロール','シナモンロール','roulé à la cannelle','cinnamon roll'),
+ ('ドーナツ','ドーナツ','beignet, donut','doughnut'),
+ ('カスタマイズ','カスタマイズ','options à ajouter','extras'),
+ ('ホイップ','ホイップ','crème fouettée','whipped cream'),
+ ('ショット追加','ショットついか','un expresso en plus','extra shot'),
+ ('オーツミルク','オーツミルク','lait d’avoine','oat milk'),
+ ('ソイミルク','ソイミルク','lait de soja','soy milk'),
+ ('シロップ','シロップ','sirop','syrup'),
+ ('デカフェ','デカフェ','déca','decaf'),
+ ('サイズアップ','サイズアップ','taille au-dessus','size up'),
+ ('ホット','ホット','chaud','hot'),
+ ('アイス','アイス','glacé ; aussi « glace »','iced; also “ice cream”'),
+ ('季節限定','きせつげんてい','édition de saison','seasonal, limited'),
+ ('期間限定','きかんげんてい','pour une durée limitée','limited time only'),
+ ('ケーキ','ケーキ','gâteau','cake'),
+ ('洋菓子','ようがし','pâtisserie occidentale','Western sweets'),
+ ('焼き菓子','やきがし','gâteaux secs, biscuits','baked sweets'),
+ ('ドリンク','ドリンク','boissons','drinks'),
+ ('苺','いちご','fraise','strawberry'),
+ ('ショートケーキ','ショートケーキ','génoise fraises et chantilly','strawberry shortcake'),
+ ('苺タルト','いちごタルト','tarte aux fraises','strawberry tart'),
+ ('苺パフェ','いちごパフェ','coupe glacée aux fraises','strawberry parfait'),
+ ('フルーツタルト','フルーツタルト','tarte aux fruits','fruit tart'),
+ ('モンブラン','モンブラン','mont-blanc aux marrons','Mont Blanc chestnut cake'),
+ ('和栗のモンブラン','わぐりのモンブラン','mont-blanc aux marrons japonais','Japanese chestnut Mont Blanc'),
+ ('チーズケーキ','チーズケーキ','cheesecake','cheesecake'),
+ ('ガトーショコラ','ガトーショコラ','gâteau au chocolat','chocolate cake'),
+ ('シュークリーム','シュークリーム','chou à la crème','cream puff'),
+ ('エクレア','エクレア','éclair','éclair'),
+ ('ロールケーキ','ロールケーキ','gâteau roulé','roll cake'),
+ ('ミルフィーユ','ミルフィーユ','mille-feuille','mille-feuille'),
+ ('ミルクレープ','ミルクレープ','gâteau de crêpes','mille crêpe cake'),
+ ('プリン','プリン','crème caramel','custard pudding'),
+ ('ティラミス','ティラミス','tiramisu','tiramisu'),
+ ('マカロン','マカロン','macaron','macaron'),
+ ('マドレーヌ','マドレーヌ','madeleine','madeleine'),
+ ('フィナンシェ','フィナンシェ','financier','financier'),
+ ('カヌレ','カヌレ','cannelé','canelé'),
+ ('クッキー','クッキー','biscuits, cookies','cookies'),
+ ('バウムクーヘン','バウムクーヘン','gâteau à la broche (baumkuchen)','baumkuchen'),
+ ('オレンジジュース','オレンジジュース','jus d’orange','orange juice'),
+]
+for w,r,f,e in CAFE_W: W[w]=(r,f)
+NEW_W.extend(CAFE_W)
+T['cafe']=dict(jp='カフェ', fr='Café moderne', layouts=['slate','card','slate'],
+   names=['カフェ {n}','{n}コーヒー','{n}珈琲店'],
+   sections=[('コーヒー',['本日のコーヒー','ドリップコーヒー','エスプレッソ','アメリカーノ','カフェラテ','カフェオレ','カプチーノ','カフェモカ','キャラメルマキアート','アイスコーヒー','コールドブリュー'],(330,620)),
+             ('ティー',['抹茶ラテ','ほうじ茶ラテ','チャイラテ','アールグレイ','ココア','レモネード'],(400,620)),
+             ('フード',['スコーン','マフィン','ベーグル','クロワッサン','サンドイッチ','パニーニ','シナモンロール','ドーナツ'],(220,700)),
+             ('カスタマイズ',['ホイップ','ショット追加','オーツミルク','ソイミルク','シロップ','デカフェ','サイズアップ'],(50,80))])
+T['patisserie']=dict(jp='洋菓子店', fr='Pâtisserie', layouts=['card','poster','card'],
+   names=['パティスリー {n}','洋菓子 {n}','ケーキハウス {n}'],
+   sections=[('ケーキ',['ショートケーキ','モンブラン','チーズケーキ','ガトーショコラ','シュークリーム','エクレア','ロールケーキ','ミルフィーユ','ミルクレープ','フルーツタルト','プリン','ティラミス'],(250,700)),
+             ('季節限定',['和栗のモンブラン','苺タルト','苺パフェ'],(550,1400)),
+             ('焼き菓子',['マドレーヌ','フィナンシェ','カヌレ','マカロン','クッキー','バウムクーヘン'],(180,600)),
+             ('ドリンク',['コーヒー','紅茶','カフェラテ','アイスコーヒー','オレンジジュース'],(400,650))])
+NAMEPAT_R.update({'カフェ':'カフェ','コーヒー':'コーヒー','珈琲店':'コーヒーてん','パティスリー':'パティスリー','洋菓子':'ようがし','ケーキハウス':'ケーキハウス'})
+MENTIONS.extend(['季節限定','期間限定','ホット','アイス'])
+CAFE_SIGNS = [
+ ('テイクアウト','テイクアウト','à emporter','takeaway'),
+ ('イートイン','イートイン','sur place','eat in'),
+]
+CAFE_TALK = [
+ ('店内でお召し上がりですか','てんないでおめしあがりですか','c’est pour consommer sur place ?','is it for here?'),
+ ('テイクアウトで','テイクアウトで','à emporter, s’il vous plaît','to go, please'),
+ ('店内で','てんないで','sur place, s’il vous plaît','for here, please'),
+ ('ホットとアイスどちらになさいますか','ホットとアイスどちらになさいますか','chaud ou glacé ?','hot or iced?'),
+ ('アイスで','アイスで','glacé, s’il vous plaît','iced, please'),
+ ('ホットで','ホットで','chaud, s’il vous plaît','hot, please'),
+]
+SIGN_W.extend(CAFE_SIGNS); TALK_W.extend(CAFE_TALK)
+CAFE_SCENES = [
+ [('s','いらっしゃいませ'),('c','{d}を|ください'),('s','ホットとアイスどちらになさいますか'),('c','アイスで')],
+ [('c','{d}を|ください'),('s','店内でお召し上がりですか'),('c','テイクアウトで'),('s','少々お待ちください')],
+ [('c','{d}を|ください'),('s','店内でお召し上がりですか'),('c','店内で'),('s','少々お待ちください')],
+]
 for w,r,f,e in SIGN_W+TALK_W: W[w]=(r,f)
 NEW_W.extend(SIGN_W+TALK_W)
 # who says it: s staff, c customer. {d} is a dish from the menu on the wall
@@ -501,7 +604,7 @@ SCENES = [
  [('c','お会計お願いします'),('c','別々で'),('c','カードで'),('c','ごちそうさまでした'),('s','ありがとうございました')],
  [('c','ごちそうさまでした'),('s','ありがとうございました'),('s','またお越しください')],
 ]
-PHRASES = dict(signs=[x[0] for x in SIGN_W], talk=[x[0] for x in TALK_W], scenes=SCENES)
+PHRASES = dict(signs=[x[0] for x in SIGN_W], talk=[x[0] for x in TALK_W], scenes=SCENES, cafe=CAFE_SCENES)
 
 # Typical prices in yen, tax included (casual places, Tokyo level, 2025–2026). One range per dish so a menu
 # never prices 鰻丼 under 牛丼; 'type:word' overrides a dish whose price depends on the kind of place.
@@ -566,3 +669,18 @@ PRICES = {
  '水炊き':(2000,3000),'胡麻鯖':(900,1300),'ゴーヤチャンプルー':(750,950),'沖縄蕎麦':(700,900),'ソーキ蕎麦':(850,1100),'角煮':(650,900),
  '海葡萄':(550,800),'泡盛':(500,700),
 }
+PRICES.update({
+ # modern café, per regular size
+ '本日のコーヒー':(350,450),'ドリップコーヒー':(330,450),'エスプレッソ':(330,420),'アメリカーノ':(400,500),'カフェラテ':(430,560),'カフェオレ':(400,520),
+ 'カプチーノ':(430,560),'カフェモカ':(480,600),'キャラメルマキアート':(500,620),'アイスコーヒー':(350,480),'コールドブリュー':(450,560),
+ 'cafe:抹茶ラテ':(480,620),'cafe:ほうじ茶ラテ':(480,620),'チャイラテ':(480,600),'アールグレイ':(400,520),'ココア':(420,550),'レモネード':(450,580),
+ 'スコーン':(280,380),'マフィン':(300,420),'ベーグル':(300,450),'クロワッサン':(250,380),'サンドイッチ':(450,650),'パニーニ':(550,700),
+ 'シナモンロール':(350,480),'ドーナツ':(200,320),
+ 'ホイップ':(50,60),'ショット追加':(50,80),'オーツミルク':(50,80),'ソイミルク':(50,60),'シロップ':(50,60),'デカフェ':(50,60),'サイズアップ':(50,60),
+ # pastry shop, per piece
+ 'ショートケーキ':(450,650),'モンブラン':(500,680),'チーズケーキ':(420,580),'ガトーショコラ':(430,600),'シュークリーム':(200,350),'エクレア':(300,420),
+ 'ロールケーキ':(380,520),'ミルフィーユ':(500,680),'ミルクレープ':(480,620),'フルーツタルト':(550,750),'プリン':(280,420),'ティラミス':(450,600),
+ '和栗のモンブラン':(650,900),'苺タルト':(550,750),'苺パフェ':(1000,1500),
+ 'マドレーヌ':(180,260),'フィナンシェ':(200,280),'カヌレ':(230,330),'マカロン':(200,300),'クッキー':(350,650),'バウムクーヘン':(300,500),
+ 'patisserie:コーヒー':(450,600),'patisserie:紅茶':(450,650),'patisserie:カフェラテ':(500,650),'patisserie:アイスコーヒー':(450,600),'オレンジジュース':(400,600),
+})

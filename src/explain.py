@@ -155,6 +155,81 @@ add("""
 江戸前寿司|Sushi à la manière de Tōkyō (Edo) : poissons de la baie, souvent marinés ou mijotés.|Tokyo-style sushi: fish from the bay, often cured or simmered.
 鮨|Sushi, écrit avec le caractère traditionnel des enseignes haut de gamme.|Sushi, written with the traditional character used by upscale shops.
 鮓|Sushi, graphie ancienne qui désignait le poisson fermenté dans le riz.|Sushi, an old spelling for fish fermented in rice.
+# --- café moderne / pâtisserie
+カフェ|Café moderne, souvent une chaîne, avec carte en katakana venue de l’anglais et de l’italien.|A modern café, often a chain, with a menu in katakana borrowed from English and Italian.
+コーヒー|Café, du néerlandais koffie. Le même mot que 珈琲 écrit en kanji dans les cafés rétro.|Coffee, from Dutch koffie. The same word as 珈琲, which retro cafés write in kanji.
+本日のコーヒー|Le café filtre du jour : un grain différent chaque jour, au prix le plus bas de la carte.|Today’s drip coffee: a different bean each day, usually the cheapest drink on the board.
+ドリップコーヒー|Café filtre, versé à travers un filtre papier.|Coffee brewed by pouring water through a paper filter.
+エスプレッソ|Café court et serré, de l’italien espresso. Les petits ッ marquent la double consonne.|A short, strong coffee, from Italian espresso. The small ッ marks the doubled consonant.
+アメリカーノ|Expresso allongé d’eau chaude. Le ー allonge la voyelle : a-me-ri-kā-no.|Espresso topped up with hot water. The ー lengthens the vowel: a-me-ri-kā-no.
+カフェラテ|Expresso et beaucoup de lait chaud.|Espresso with plenty of steamed milk.
+カフェオレ|Café filtre et lait chaud à parts égales, du français.|Drip coffee and hot milk in equal parts, from French.
+カプチーノ|Expresso avec une épaisse mousse de lait.|Espresso under a thick layer of milk foam.
+カフェモカ|Latte au chocolat, souvent avec crème fouettée.|A chocolate latte, often topped with whipped cream.
+キャラメルマキアート|Lait vanillé, expresso versé par-dessus et filet de caramel. ャ est un petit ya : kya.|Vanilla milk with espresso poured on top and a caramel drizzle. ャ is a small ya: kya.
+アイスコーヒー|Café glacé. アイス (ice) devant un mot veut dire « version glacée ».|Iced coffee. アイス (ice) in front of a drink means the iced version.
+コールドブリュー|Café infusé longuement à l’eau froide, plus doux. ュ est un petit yu : ryu.|Coffee steeped slowly in cold water, smoother. ュ is a small yu: ryu.
+ティー|Thé, de l’anglais tea. Le petit ィ forme le son « ti » absent du japonais.|Tea, from English. The small ィ makes the “ti” sound Japanese lacks.
+チャイラテ|Thé noir aux épices et lait chaud.|Spiced black tea with steamed milk.
+アールグレイ|Thé noir parfumé à la bergamote.|Black tea scented with bergamot.
+ココア|Chocolat chaud.|Hot chocolate.
+レモネード|Limonade au citron pressé.|Lemonade made with fresh lemon.
+フード|« Food » : la partie à manger de la carte.|“Food”: the things to eat on the board.
+スコーン|Scone, à la confiture ou à la crème.|A scone, with jam or cream.
+マフィン|Muffin.|A muffin.
+ベーグル|Bagel, nature ou garni.|A bagel, plain or filled.
+クロワッサン|Croissant, du français.|A croissant, from French.
+サンドイッチ|Sandwich.|A sandwich.
+パニーニ|Sandwich italien pressé et grillé.|A pressed, toasted Italian sandwich.
+シナモンロール|Brioche roulée à la cannelle.|A cinnamon roll.
+ドーナツ|Beignet en anneau.|A doughnut.
+カスタマイズ|« Customize » : les suppléments payants à ajouter à une boisson.|“Customize”: paid extras added to a drink.
+ホイップ|Crème fouettée ajoutée sur la boisson.|Whipped cream on top of the drink.
+ショット追加|Un expresso de plus dans la boisson. 追加 : ajout.|An extra espresso shot. 追加 means addition.
+オーツミルク|Lait d’avoine à la place du lait de vache.|Oat milk instead of cow’s milk.
+ソイミルク|Lait de soja à la place du lait de vache. On voit aussi 豆乳.|Soy milk instead of cow’s milk. Also written 豆乳.
+シロップ|Sirop ajouté : vanille, caramel, noisette…|Added syrup: vanilla, caramel, hazelnut…
+デカフェ|Version décaféinée, du français.|Decaffeinated, from French.
+サイズアップ|Passer à la taille supérieure pour un petit supplément.|Go up one size for a small extra charge.
+ホット|Chaud. Souvent en face de アイス sur la carte, avec deux prix.|Hot. Often paired with アイス on the board, with two prices.
+アイス|Glacé, version froide d’une boisson. Seul, ça peut aussi vouloir dire glace (アイスクリーム).|Iced, the cold version of a drink. On its own it can also mean ice cream.
+季節限定|« Limité à la saison » : produit qui ne reste que quelques semaines, comme les marrons en automne.|“Limited to the season”: on sale only for a few weeks, like chestnut in autumn.
+期間限定|« Pour une période limitée » : offre temporaire.|“For a limited period”: a temporary item.
+ケーキ|Gâteau, de l’anglais cake. Dans une pâtisserie, on choisit les parts dans la vitrine.|Cake. In a pastry shop you pick slices from the display case.
+洋菓子|« Douceurs occidentales » : 洋 l’Occident, 菓子 friandise. L’opposé de 和菓子.|“Western sweets”: 洋 the West, 菓子 sweets. The opposite of 和菓子.
+焼き菓子|« Douceurs cuites au four » : madeleines, financiers, biscuits, souvent en sachet cadeau.|“Baked sweets”: madeleines, financiers, cookies, often sold in gift bags.
+ドリンク|« Drinks » : boissons.|“Drinks”.
+苺|Fraise. Souvent écrit en hiragana いちご ; la fraise est la reine des gâteaux japonais.|Strawberry. Often written いちご in hiragana; the star of Japanese cakes.
+ショートケーキ|Génoise légère, chantilly et fraises entières. Le gâteau japonais par excellence.|Light sponge, whipped cream and whole strawberries. The classic Japanese cake.
+苺タルト|Tarte à la crème pâtissière couverte de fraises.|A custard tart covered with strawberries.
+苺パフェ|Grande coupe en couches avec fraises, glace, crème et biscuits.|A tall layered glass of strawberries, ice cream, cream and crumbs.
+フルーツタルト|Tarte à la crème couverte de fruits de saison.|A custard tart topped with seasonal fruit.
+モンブラン|Crème de marrons en vermicelles sur une base meringue ou génoise.|Chestnut cream piped in strands over meringue or sponge.
+和栗のモンブラン|Mont-blanc aux marrons japonais, plus parfumés : un classique d’automne.|Mont Blanc made with Japanese chestnuts, more fragrant: an autumn favourite.
+チーズケーキ|Cheesecake, cuit, léger « soufflé » ou cru.|Cheesecake, baked, light soufflé-style or no-bake.
+ガトーショコラ|Gâteau au chocolat dense, du français.|A dense chocolate cake, from French.
+シュークリーム|Chou à la crème, du français « chou à la crème ».|A cream puff, from French chou à la crème.
+エクレア|Éclair au chocolat.|A chocolate éclair.
+ロールケーキ|Génoise roulée autour de crème fouettée.|Sponge rolled around whipped cream.
+ミルフィーユ|Mille-feuille. ィ et ュ sont petits : mi-ru-fī-yu.|Mille-feuille. Small ィ and ュ: mi-ru-fī-yu.
+ミルクレープ|Gâteau fait de fines crêpes empilées avec de la crème.|A cake of thin crêpes stacked with cream.
+プリン|Crème caramel, de l’anglais pudding. Très populaire au Japon.|Custard pudding with caramel. Hugely popular in Japan.
+ティラミス|Tiramisu au mascarpone et café.|Tiramisu with mascarpone and coffee.
+マカロン|Macaron à la française.|A French-style macaron.
+マドレーヌ|Madeleine.|A madeleine.
+フィナンシェ|Financier aux amandes et beurre noisette.|An almond financier with browned butter.
+カヌレ|Cannelé bordelais, croûte caramélisée.|A canelé from Bordeaux with a caramelised crust.
+クッキー|Biscuits, souvent en sachet ou en boîte.|Cookies, often in bags or tins.
+バウムクーヘン|Gâteau allemand cuit en couches sur une broche : des cernes comme un arbre. Cadeau classique.|A German cake baked in layers on a spit, ringed like a tree. A classic gift.
+オレンジジュース|Jus d’orange.|Orange juice.
+テイクアウト|À emporter, de l’anglais take out. Plus courant que お持ち帰り dans les chaînes.|Takeaway, from English take out. More common than お持ち帰り in chains.
+イートイン|Sur place, de l’anglais eat in.|Eat in, from English.
+店内でお召し上がりですか|Question au comptoir : « Vous consommez sur place ? ». お召し上がり est la forme polie de manger.|Asked at the counter: “For here?”. お召し上がり is the polite verb for eating.
+テイクアウトで|Réponse : « À emporter ».|Answer: “To go”.
+店内で|Réponse : « Sur place ».|Answer: “For here”.
+ホットとアイスどちらになさいますか|« Chaud ou glacé, lequel prendrez-vous ? » Question très fréquente au comptoir.|“Hot or iced, which would you like?” A very common counter question.
+アイスで|Réponse : « Glacé ».|Answer: “Iced”.
+ホットで|Réponse : « Chaud ».|Answer: “Hot”.
 # --- kissaten / kanmi
 珈琲|Café filtre, souvent torréfié foncé dans les cafés rétro.|Drip coffee, usually dark-roasted in retro cafés.
 紅茶|Thé noir, servi avec lait ou citron.|Black tea, with milk or lemon.
@@ -355,6 +430,12 @@ for line in """
 山本|Nom de famille (« au pied de la montagne ») : le nom du patron.|A family name (“foot of the mountain”): the owner’s name.
 長寿|« Longue vie ».|“Long life”.
 松葉|« Aiguilles de pin » : toujours vertes, symbole de constance.|“Pine needles”: evergreen, a sign of constancy.
+カフェ|« Café » en katakana : nom d’enseigne moderne.|“Café” in katakana: a modern shop name.
+コーヒー|« Coffee » : souvent après le nom, comme une marque.|“Coffee”: often after the name, like a brand.
+珈琲店|« Maison du café » : 珈琲 café, 店 boutique.|“Coffee shop”: 珈琲 coffee, 店 shop.
+パティスリー|« Pâtisserie », du français, très prisé des enseignes.|“Pâtisserie”, from French, a favourite for shop names.
+洋菓子|« Douceurs occidentales » : 洋 l’Occident, 菓子 friandise.|“Western sweets”: 洋 the West, 菓子 sweets.
+ケーキハウス|« Cake house » : nom des pâtisseries de quartier.|“Cake house”: a name for neighbourhood cake shops.
 """.strip().splitlines():
     w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)
 

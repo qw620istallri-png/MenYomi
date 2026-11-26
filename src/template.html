@@ -1689,7 +1689,7 @@ function priceText(p, style){ if(p==='時価') return '時価';
   return p+'円'; }
 // one price range per dish (menudata PRICES, 'type:dish' first), the section's range only as a fallback
 const PRICES=DATA.prices||{}; const priceOf=(r,tk,w,ab)=>{ const [a,b]=PRICES[tk+':'+w]||PRICES[w]||ab; return roundPrice(r,a,b); };
-function roundPrice(r,a,b){ const v=a+(b-a)*Math.pow(r(),1.3); const st=v<400?10:50; return Math.max(st,Math.round(v/st)*st - (r()<0.3?20:0)); }
+function roundPrice(r,a,b){ const v=a+(b-a)*Math.pow(r(),1.3); const st=v<400?10:50; const cut=r()<0.3; return Math.max(st,Math.round(v/st)*st - (cut&&v>=300?20:0)); }
 function shopName(r,t){ const pat=pick(r,t.names), n=pick(r,DATA.names); const jp=pat.replace('{n}',n[0]).replace(' ','　');
   const rd=pat.split(/(\{n\})/).map(x=>x==='{n}'?n[1]:x.trim()?(DATA.namepat[x.trim()]||x.trim()):'').join('');
   const parts=pat.split(/(\{n\})/).map(x=>x==='{n}'?[n[0],n[1]]:x.trim()?[x.trim(),DATA.namepat[x.trim()]||'']:null).filter(Boolean);
@@ -1723,7 +1723,7 @@ function genMenu(){
   const kc=k=>TYPES[k].sections.reduce((a,s)=>a+s[1].filter(knownWord).length+s[1].filter(w=>F.has(w)).length*4,0);
   let tk=document.getElementById('mtype').value; if(!tk){ const ks=Object.keys(TYPES); if(want&&ks.some(k=>kc(k))){ const ws=ks.map(k=>1+kc(k)*3); let x=r()*ws.reduce((a,b)=>a+b,0); tk=ks.find((k,i)=>(x-=ws[i])<0)||ks[0]; } else tk=pick(r,ks); } const t=TYPES[tk];
   const pref=list=>{ if(!want) return shuffle(r,list); const sh=shuffle(r,list); const f=sh.filter(w=>F.has(w)), a=sh.filter(w=>knownWord(w)&&!F.has(w)), b=sh.filter(w=>!knownWord(w)&&!F.has(w)); return [...f,...a,...b]; };
-  const rk=document.getElementById('mreg').value||(r()<0.55?pick(r,Object.keys(REGIONS)):''); const reg=rk?REGIONS[rk]:null;
+  const rk0=document.getElementById('mreg').value||(r()<0.55?pick(r,Object.keys(REGIONS)):''), rk=['cafe','patisserie'].includes(tk)?'':rk0; const reg=rk?REGIONS[rk]:null;
   const layout=pick(r,t.layouts); const vertical=['tanzaku','wood','sheet'].includes(layout);
   const tool = layout==='slate'?'chalk' : layout==='poster'?pick(r,['chisel','chisel','marker']) : layout==='card'?'pen' : pick(r,['brush','brush','brush','chisel']);
   const writer=makeWriter(r,pick(r,['kaisho','hurry','hurry','gyosho','gyosho']),tool);
@@ -1777,12 +1777,12 @@ async function renderMenu(){
         tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,it.w+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
           after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
-      else { const W0=Math.min(560,vw-60);
-        tasks.push(()=>textCanvas(cv,it.w,{seed,writer:m.writer,size,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,align:'start',minW:W0,color:ink,
-          after:(lx,W,H,Lay)=>{ const ps=size*0.8*DPR; const s2=String(pt); const chs=[...s2]; const its=[]; let x=W-size*0.25*DPR; const adv=c=>/[0-9]/.test(c)?0.6:1;
+      else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...it.w].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
+        tasks.push(()=>textCanvas(cv,it.w,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,align:'start',minW:W0,color:ink,
+          after:(lx,W,H,Lay)=>{ const ps=isz*0.8*DPR; const s2=String(pt); const chs=[...s2]; const its=[]; let x=W-isz*0.25*DPR; const adv=c=>/[0-9]/.test(c)?0.6:1;
             for(let i=chs.length-1;i>=0;i--){ const a=adv(chs[i])*ps; x-=a; its.unshift({ch:chs[i],cx:x+a/2,cy:H/2,size:ps*(/[0-9]/.test(chs[i])?0.8:0.9)}); }
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length);
-            const endText=Lay.items.length? Lay.items[Lay.items.length-1].cx+size*DPR*0.6 : size*DPR; lx.save(); lx.setLineDash([2*DPR,7*DPR]); lx.lineWidth=2*DPR; lx.lineCap='round'; lx.beginPath(); lx.moveTo(endText,H*0.62); lx.lineTo(x-size*DPR*0.3,H*0.62); lx.stroke(); lx.restore(); }})); }
+            const endText=Lay.items.length? Lay.items[Lay.items.length-1].cx+isz*DPR*0.6 : isz*DPR; lx.save(); lx.setLineDash([2*DPR,7*DPR]); lx.lineWidth=2*DPR; lx.lineCap='round'; lx.beginPath(); lx.moveTo(endText,H*0.62); lx.lineTo(x-isz*DPR*0.3,H*0.62); lx.stroke(); lx.restore(); }})); }
     });
   });
   if(!m.vertical && m.tax){ const nb=document.createElement('p'); nb.className='hint'; nb.style.cssText='margin:0;font-size:15px;color:#333'; const hosts=box.querySelectorAll('.rows'); if(hosts.length){ const tc=document.createElement('canvas'); hosts[hosts.length-1].appendChild(tc); tasks.push(()=>textCanvas(tc,'税込',{seed:m.seed+999,writer:m.writer,size:22,surface:'washi',transparent:true,pad:0.2,align:'end',minW:Math.min(560,vw-60),color:ink})); } }
@@ -1790,13 +1790,14 @@ async function renderMenu(){
   for(const tk of tasks){ if(gen!==menuGen) return; tk(); await nextFrame(); }
 }
 // notices pinned around the menu, and a short exchange between staff and customer
-const TICKET_SHOPS=['ramen','soba','teishoku','don'];
+const TICKET_SHOPS=['ramen','soba','teishoku','don'], CAFE_SHOPS=['cafe','patisserie'];
 function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tasks; const r=rng(m.seed+77); const phone=vw<520;
   const nb=b.querySelector('#mscene .notes'), tb=b.querySelector('#mscene .talk');
   const pool=['禁煙','全席禁煙','現金のみ','お冷はセルフ','ご自由にどうぞ','ラストオーダー','お持ち帰り','定休日','営業時間','お手洗い','予約席','お一人様','お会計','ご注文','お冷','喫煙席','ご予約'];
   if(TICKET_SHOPS.includes(m.tk)) pool.unshift('食券','券売機','食券制');
+  if(CAFE_SHOPS.includes(m.tk)){ pool.unshift('テイクアウト','イートイン'); pool.splice(pool.indexOf('喫煙席'),1); }
   const picks=[]; if(r()<.4) picks.push(pick(r,['営業中','営業中','満席']));
-  const clash=[['禁煙','全席禁煙','喫煙席'],['食券','券売機','食券制'],['お冷','お冷はセルフ'],['予約席','ご予約']];
+  const clash=[['禁煙','全席禁煙','喫煙席'],['食券','券売機','食券制'],['お冷','お冷はセルフ'],['予約席','ご予約'],['テイクアウト','お持ち帰り']];
   for(const w of shuffle(r,pool)){ if(picks.length>=(phone?2:3)) break; if(!WMAP[w]||clash.some(g=>g.includes(w)&&g.some(x=>picks.includes(x)))) continue; picks.push(w); }
   const nw=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['marker','brush','marker']));
   picks.forEach((w,i)=>{ const n=[...w].length; const btn=document.createElement('button'); btn.className='itm note note-'+(i%3); btn.style.setProperty('--tape-rot',((r()-.5)*12).toFixed(1)+'deg'); btn.style.setProperty('--rot',((r()-.5)*7).toFixed(1)+'deg'); btn.setAttribute('aria-label',tr('Écriteau','Notice'));
@@ -1805,7 +1806,7 @@ function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tas
     const size=Math.round(vert? clamp(vw/16,26,40) : Math.min(clamp(vw/16,24,38),(Math.min(vw*.62,300))/(n+0.6)));
     tasks.push(()=>textCanvas(cv,w,{seed:m.seed+500+i*13,writer:nw,size,vertical:vert,surface:surf,color,pad:0.48,after:(x,W,H)=>{ x.save(); x.globalAlpha=.16; x.strokeStyle='#80643c'; x.lineWidth=DPR; x.beginPath(); x.moveTo(W*.08,H*.12); x.lineTo(W*.92,H*.1); x.stroke(); x.restore(); }})); });
   // the exchange
-  const sc=pick(r,PH.scenes); const dishes=MENU.flat.filter(x=>!x.kind&&[...x.w].length<=5); const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
+  const cafe=CAFE_SHOPS.includes(m.tk), sc=pick(r,cafe&&PH.cafe&&r()<.7?PH.cafe:PH.scenes); const dishes=MENU.flat.filter(x=>!x.kind&&x.sec!=='カスタマイズ'&&[...x.w].length<=5); const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
   const bw=makeWriter(r,pick(r,['kaisho','hurry']),'pen'); const maxW=Math.min(vw*(phone?.8:.72),420);
   sc.forEach(([who,line],i)=>{ const [pre,w]=line.includes('|')? line.split('|') : ['',line]; const full=pre.replace('{d}',dish)+w; if(!WMAP[w]) return; const n=[...full].length;
     const row=document.createElement('div'); row.className='trow '+who; row.innerHTML=`<span class="who" lang="ja" aria-hidden="true">${who==='s'?'店':'客'}</span>`;
