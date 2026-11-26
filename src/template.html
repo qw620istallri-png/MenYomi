@@ -2170,7 +2170,11 @@ async function renderMenu(){
     const total=q=>q*(1.8*ns+1.56*ni)+12*(n-1);
     if(total(vsize)>inner){ const fitS=(inner-12*(n-1))/(1.8*ns+1.56*ni);
       if(fitS>=vsize*0.72 && fitS>=30) vsize=fitS;
-      else { const rows=Math.ceil(total(vsize)/inner); box.style.maxWidth=Math.ceil(total(vsize)/rows*1.07+(m.layout==='sheet'?36:0))+'px'; box.style.marginInline='auto'; } } }
+      else { const avg=(1.8*ns+1.56*ni)/n, per=q=>Math.floor((inner+12)/(avg*q*1.03+12));
+        // narrow screens: go down to five strips per row when the text stays big enough for the strokes to read
+        if(inner<640 && per(vsize)<5){ const q5=(inner-12*4)/(5*avg*1.03); if(q5>=Math.max(27,vsize*0.8)) vsize=Math.min(vsize,q5); }
+        const k=per(vsize), rows=Math.ceil(n/k), cols=Math.ceil(n/rows); box.style.maxWidth=Math.ceil(cols*(avg*vsize*1.03+12)+(m.layout==='sheet'?36:0))+'px'; box.style.marginInline='auto'; } } }
+  const VL=[]; // vertical strips in page order, so the prices can be lined up row by row once the wrapping is known
   if(m.layout==='receipt') receiptMenu(b,box,m,vw,tasks);
   (m.layout==='receipt'?[]:m.sections).forEach((sec,si)=>{
     let host=box;
@@ -2183,23 +2187,21 @@ async function renderMenu(){
     const size = m.vertical? vsize : clamp(vw/20,30,50);
     const hw=Object.assign({},m.writer,{weight:m.writer.weight*1.1});
     if(m.vertical){ const surf = m.layout==='wood'?'wood':m.layout==='sheet'?null: pick(r,['red','yellow']); const hcol = surf==='red'?'#f6f1e6':hcolor; if(surf==='wood') Ambience.wood(hb,m.seed+si*101);
+      VL.push({w:layoutText(sec.h+(DD.head[si]||''),{size:size*1.1,vertical:true,pad:0.32,writer:hw,r:rng(1)}).W/DPR});
       tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',color:hcol,pad:0.32,minH:size*3.2})); }
     else tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.15,surface:'washi',transparent:true,color:hcolor,pad:0.22,align:'start',minW:Math.min(560,vw-60),dcolor:ID.dcol,after:(lx,W,H)=>{ if(ID.rule==='none') return; lx.save(); lx.lineWidth=3*DPR; lx.lineCap='round'; const y=H-size*DPR*0.15, x0=size*DPR*0.3;
       if(ID.rule==='double'){ lx.lineWidth=2*DPR; [0,5].forEach(dy=>{ lx.beginPath(); lx.moveTo(x0,y-dy*DPR); lx.lineTo(W*0.6,y-dy*DPR-1); lx.stroke(); }); }
       else if(ID.rule==='dots'){ for(let x=x0;x<W*0.6;x+=size*DPR*0.22){ lx.beginPath(); lx.arc(x,y,2*DPR,0,7); lx.fill(); } }
       else { lx.beginPath(); lx.moveTo(x0,y); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); } lx.restore();}}));
     hb.onclick=()=>clickItem({w:sec.h,isHeader:true},hb);
-    // vertical menus: every strip gets the same length, so the prices line up along the bottom like on a real board
-    // vertical menus: every strip gets the length of the longest dish plus its price, so the prices line up along the bottom like on a real board
-    const VH=m.vertical? Math.max(...m.sections.flatMap((s2,sj)=>s2.items.map((x,ij)=>{ const t=(DD.pre[sj+':'+ij]||'')+x.w+(DD.suf[sj+':'+ij]||''), pn=[...priceText(x.price,m.pstyle)].length;
-      return layoutText(t,{size,vertical:true,pad:0.28,writer:m.writer,r:rng(1)}).H/DPR+size*(pn*0.612+0.3+0.22-0.28); }))) : 0;
     sec.items.forEach((it,ii)=>{ const btn=document.createElement('button'); btn.className='itm'; btn.setAttribute('aria-label',tr('Plat','Dish')); const cv=document.createElement('canvas'); btn.appendChild(cv); host.appendChild(btn);
       const idx=MENU.flat.length; MENU.flat.push({...it, sec:sec.h, btn}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
       const pt=priceText(it.price, m.pstyle); const seed=m.seed+si*101+ii*7+3; const dk=si+':'+ii, txt=(DD.pre[dk]||'')+it.w+(DD.suf[dk]||'');
       if(m.vertical){
         const surf = m.layout==='wood'?'wood': m.layout==='sheet'? null : pick(r,['washi','kinari','white','washi']);
-        if(surf==='wood') Ambience.wood(btn,seed); const text = it.w + '　' ; const ptxt = pt;
-        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt,{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,minH:VH,
+        if(surf==='wood') Ambience.wood(btn,seed); const ptxt = pt;
+        const lay=layoutText(txt,{size,vertical:true,pad:0.28,writer:m.writer,r:rng(1)}), vl={w:lay.W/DPR,nat:lay.H/DPR+size*([...ptxt].length*0.612+0.24),h:0}; VL.push(vl);
+        tasks.push(()=>{ const pn=[...ptxt].length; textCanvas(cv,txt,{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,minH:vl.h||vl.nat,
           after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
       else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...txt].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
@@ -2210,6 +2212,12 @@ async function renderMenu(){
             const endText=Lay.items.length? Lay.items[Lay.items.length-1].cx+isz*DPR*0.6 : isz*DPR; lx.save(); lx.setLineDash([2*DPR,7*DPR]); lx.lineWidth=2*DPR; lx.lineCap='round'; lx.beginPath(); lx.moveTo(endText,H*0.62); lx.lineTo(x-isz*DPR*0.3,H*0.62); lx.stroke(); lx.restore(); }})); }
     });
   });
+  if(m.vertical && VL.length){ // group the strips the way the row wraps, then every dish of a row ends at the same height with its price;
+    // one much longer dish keeps its own length instead of pushing every price of the row down
+    const cs=getComputedStyle(box), cw=box.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight), rows=[[]]; let used=0;
+    VL.forEach(v=>{ const add=(rows[rows.length-1].length?12:0)+v.w; if(used+add>cw+0.5 && rows[rows.length-1].length){ rows.push([v]); used=v.w; } else { rows[rows.length-1].push(v); used+=add; } });
+    rows.forEach(row=>{ const it=row.filter(v=>v.nat).sort((a,c)=>a.nat-c.nat); if(!it.length) return; const med=it[Math.floor((it.length-1)/2)].nat, keep=it.filter(v=>it.length<3||v.nat<=med*1.4), t=keep[keep.length-1].nat;
+      it.forEach(v=>v.h=Math.max(v.nat,t)); }); }
   if(DD.corner){ const hosts=box.querySelectorAll('.rows'), host=hosts.length?hosts[hosts.length-1]:box, dc=document.createElement('canvas'); dc.className='doodle'+(host===box?' free':''); dc.setAttribute('aria-hidden','true'); host.appendChild(dc);
     const dw=Object.assign({},m.writer,{weight:m.writer.weight*(m.tool==='brush'?0.6:0.85)}), dcol=ID.dcol||(m.tool==='chalk'?pick(r,['#ffd84d','#ff9ccf','#9fe3ff','#f4efe2']):ink);
     tasks.push(()=>textCanvas(dc,DCH[DD.corner],{seed:m.seed+4343,writer:dw,size:clamp(vw/8,64,104),surface:'washi',transparent:true,color:dcol,pad:0.08})); }
