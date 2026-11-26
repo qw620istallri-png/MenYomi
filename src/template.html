@@ -642,6 +642,8 @@ html:fullscreen header.top{padding-top:max(12px,env(safe-area-inset-top,0px))}
 .spart .sh b{font-family:var(--f-jp);font-size:24px;font-weight:600;line-height:1.2}
 .spart .sh .rd2{font-family:var(--f-jp);font-size:16px;color:var(--mute)}
 .spart .say{width:34px;height:34px;margin-left:0}
+.say.sm{width:32px;height:32px;margin-left:8px}.say.sm svg{width:18px;height:18px}
+.wact{display:flex;align-items:center;gap:8px}.wact .say{margin-left:0}
 .spart p{margin:4px 0 0;font-size:15px;line-height:1.45}
 .qgroups{display:flex;gap:8px;flex-wrap:wrap}
 .qnote{margin:0 0 8px;font-size:15px;font-weight:700;color:var(--ink);border:2px solid var(--rule);background:var(--lime);display:inline-block;padding:2px 8px}
@@ -866,6 +868,8 @@ const say=(()=>{ let buf=null, ld=null, ctx=null, cur=[]; const dec={};
         return; }catch(e){} }
     tts(reading||keys.join('')); }; })();
 const SPK='<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+// a kanji reading has no recorded clip: the button reads it with the system voice
+const rdSay=x=>{ const t=String(x||'').replace(/[()\-.—]/g,'').split(/[・、,\s]+/).filter(Boolean).join('、'); return t?`<button type="button" class="say sm" data-say="" data-rd="${esc(t)}" aria-label="${tr('Écouter','Listen')}" title="${tr('Écouter','Listen')}">${SPK}</button>`:''; };
 const sayBtn=(w,rd)=>`<button type="button" class="say" data-say="${esc(w)}" data-rd="${esc(rd||'')}" aria-label="${tr('Écouter','Listen')}" title="${tr('Écouter','Listen')}">${SPK}</button>`;
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-say]'); if(!b) return; e.preventDefault(); e.stopPropagation(); say(b.dataset.say.split('|'),b.dataset.rd,b); },true);
 const xp=w=>{ const e=EXPL[w]; return e?`<p class="xp">${esc(e[LANG==='en'?1:0])}</p>`:''; };
@@ -1626,7 +1630,7 @@ function openKanji(ch){ const body=document.getElementById('dlgbody'); const k=k
   const comps=topComps(ch); const words=WORDS.filter(w=>w[0].includes(ch));
   const auto = comps.length>1 ? tr('Composé de ','Made of ')+comps.map(c=>`${c.e} (${compMean(c.e)||'?'})${c.pos&&POSFR[c.pos]?' '+POSFR[c.pos]:''}`).join(tr(' et ',' and '))+'.' : '';
   body.innerHTML=`<div class="dlg-top"><canvas id="dk"></canvas><div class="dlg-meta"><div class="mn">${esc(k.mean)}</div>
-    <dl class="rdg"><dt>On</dt><dd>${esc(k.on)}<small>${esc(toRomaji(k.on.replace(/[—]/g,'')))}</small></dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${esc(toRomaji(k.kun.replace(/[()—.\-]/g,'')))}</small></dd><dt>${tr('Traits','Strokes')}</dt><dd>${k.strokes??'—'}</dd>${k.jlpt?`<dt>JLPT</dt><dd>N${k.jlpt}</dd>`:''}${k.grade?`<dt>${tr('École','School')}</dt><dd>${+k.grade<=6?tr('primaire, année ','primary, year ')+k.grade:tr('collège et après','secondary')}</dd>`:''}</dl>
+    <dl class="rdg"><dt>On</dt><dd>${esc(k.on)}<small>${esc(toRomaji(k.on.replace(/[—]/g,'')))}</small>${rdSay(k.on)}</dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${esc(toRomaji(k.kun.replace(/[()—.\-]/g,'')))}</small>${rdSay(k.kun)}</dd><dt>${tr('Traits','Strokes')}</dt><dd>${k.strokes??'—'}</dd>${k.jlpt?`<dt>JLPT</dt><dd>N${k.jlpt}</dd>`:''}${k.grade?`<dt>${tr('École','School')}</dt><dd>${+k.grade<=6?tr('primaire, année ','primary, year ')+k.grade:tr('collège et après','secondary')}</dd>`:''}</dl>
     <p style="margin:6px 0 0;font-size:17px">${esc(k.note||auto)}</p></div></div>
     ${comps.length?`<div><h3>${tr('Composants','Components')}</h3><div class="comps">${comps.map((c,i)=>`<div class="comp"><span class="k" style="background:${COLS[i%5]}">${esc(c.e)}</span><span><b>${esc(compMean(c.e)||tr('élément graphique','graphic element'))}</b>${c.pos&&POSFR[c.pos]?' · '+POSFR[c.pos]:''}${KD[c.e]&&c.e!==ch?` · <button class="btn" style="padding:2px 10px;font-size:14px" data-k="${esc(c.e)}">${tr('voir','see')}</button>`:''}</span></div>`).join('')}</div></div>`:''}
     <div><h3>${tr('Imprimé ou écrit à la main','Printed or handwritten')}</h3><div class="variants" id="dvar"></div><div class="row" style="margin-top:12px"><button class="btn" id="dregen">${tr('Autres mains ↻','Other hands ↻')}</button><a class="btn r" href="#atelier" id="dwrite">${tr('L’écrire','Write it')}</a>${knownKanji(ch)?'':reviewBtn('w:'+ch)}</div></div>
@@ -1867,7 +1871,7 @@ function aDetail(ch){ const box=document.getElementById('adetail'); if(!box) ret
   const auto=comps.length>1? tr('Composé de ','Made of ')+comps.map(c=>`${c.e} (${compMean(c.e)||'?'})${c.pos&&POSFR[c.pos]?' '+POSFR[c.pos]:''}`).join(tr(' et ',' and '))+'.' : '';
   const ws=new Set(words.map(w=>w[0])); const types=Object.values(TYPES).filter(t=>t.sections.some(q=>q[1].some(x=>ws.has(x))||ws.has(q[0])));
   box.innerHTML=`<div class="mn">${esc(k.mean)}</div>${(k.note||auto)?`<p>${esc(k.note||auto)}</p>`:''}
-    <dl class="rdg" style="margin-top:8px"><dt>On</dt><dd>${esc(k.on)}<small>${esc(toRomaji(k.on.replace(/[—]/g,'')))}</small></dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${esc(toRomaji(k.kun.replace(/[()—.\-]/g,'')))}</small></dd>${k.grade?`<dt>${tr('École','School')}</dt><dd>${+k.grade<=6?tr('primaire, année ','primary, year ')+k.grade:tr('collège et après','secondary')}</dd>`:''}</dl>
+    <dl class="rdg" style="margin-top:8px"><dt>On</dt><dd>${esc(k.on)}<small>${esc(toRomaji(k.on.replace(/[—]/g,'')))}</small>${rdSay(k.on)}</dd><dt>Kun</dt><dd>${esc(k.kun)}<small>${esc(toRomaji(k.kun.replace(/[()—.\-]/g,'')))}</small>${rdSay(k.kun)}</dd>${k.grade?`<dt>${tr('École','School')}</dt><dd>${+k.grade<=6?tr('primaire, année ','primary, year ')+k.grade:tr('collège et après','secondary')}</dd>`:''}</dl>
     ${comps.length?`<h3>${tr('Composants','Components')}</h3><div class="comps">${comps.map((c,i)=>`<div class="comp"><span class="k" style="background:${COLS[i%5]}">${esc(c.e)}</span><span><b>${esc(compMean(c.e)||tr('élément graphique','graphic element'))}</b>${c.pos&&POSFR[c.pos]?' · '+POSFR[c.pos]:''}</span></div>`).join('')}</div>`:''}
     <h3>${tr('Sur les menus','On menus')}</h3>${words.length?`${types.length?`<div class="where">${types.map(t=>`<span><b>${esc(t.jp)}</b>${esc(LANG==='en'&&t.en?t.en:t.fr)}</span>`).join('')}</div>`:''}<div class="vtable" style="margin-top:8px">${words.map(vRow).join('')}</div>`:`<p style="color:var(--mute)">${tr('Pas encore dans les mots des menus.','Not in the menu words yet.')}</p>`}`; }
 // random draw among the kanji I know, or among all of them
@@ -1983,7 +1987,7 @@ document.getElementById('vsearch').oninput=renderVocab;
 document.getElementById('vidx').addEventListener('click',e=>{ const b=e.target.closest('[data-ix]'); if(!b) return; const g=document.querySelector(`#vbody .vgroup[data-j="${b.dataset.ix}行"]`); if(g) g.scrollIntoView({block:'start',behavior:'auto'}); });
 document.getElementById('vbody').addEventListener('click',e=>{ if(e.target.closest('[data-k]')) return; const b=e.target.closest('.vrow'); if(!b) return;
   const open=b.getAttribute('aria-expanded')==='true'; document.querySelectorAll('#vbody .vx').forEach(x=>x.remove()); document.querySelectorAll('#vbody .vrow').forEach(x=>x.setAttribute('aria-expanded','false')); if(open) return;
-  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><div class="whead"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span>'+favoriteBtn(w[0])+'</div>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+reviewBtn(firstId(w[0]))+'</div></div>'; b.after(x);
+  b.setAttribute('aria-expanded','true'); const w=WMAP[b.dataset.w]; const x=document.createElement('div'); x.className='vx'; x.innerHTML='<canvas></canvas><div style="flex:1 1 240px;min-width:0;display:grid;gap:8px"><div class="whead"><span class="lab">'+tr('Écrit à la main','Handwritten')+'</span><span class="wact">'+sayBtn(w[0],w[1])+favoriteBtn(w[0])+'</span></div>'+xp(w[0])+wordChips(w[0])+'<div class="row"><button class="btn" type="button">'+tr('Autre main ↻','Another hand ↻')+'</button>'+reviewBtn(firstId(w[0]))+'</div></div>'; b.after(x);
   const draw=()=>{ const r=rng(newSeed()); const v=pick(r,['kaisho','hurry','gyosho']); const tool=pick(r,['brush','brush','chisel','marker']); const surf={brush:pick(r,['washi','kinari','wood']),chisel:'yellow',marker:'white'}[tool];
     textCanvas(x.querySelector('canvas'),w[0],{seed:newSeed(),writer:makeWriter(r,v,tool),size:clamp((x.clientWidth-40)/([...w[0]].length+0.8),40,84),surface:surf,pad:0.3}); };
   x.querySelector('.btn').onclick=draw; draw(); });
