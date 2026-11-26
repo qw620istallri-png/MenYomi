@@ -1074,11 +1074,11 @@ const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a,b)=>Math.max(a,Math.min(b,x)), smooth=
 const mpath=document.getElementById('mpath'); const GL={};
 function sampleD(d){mpath.setAttribute('d',d); const L=mpath.getTotalLength(); const n=Math.max(4,Math.ceil(L/1.5)); const pts=[]; for(let i=0;i<=n;i++){const p=mpath.getPointAtLength(L*i/n); pts.push([p.x,p.y])} return pts;}
 function glyph(ch){ if(!(ch in GL)){const g=KVG[ch]; GL[ch]=g?{strokes:g.d.map(sampleD),types:g.t,comps:g.c||[]}:null;} return GL[ch]; }
-function deform(g, mess, r, slant=0){
+function deform(g, mess, r, slant=0, skill=0.6){
   const ang=(r()-.5)*0.10*mess, sh=(r()-.5)*0.3*mess+slant, sx=1+(r()-.5)*0.16*mess, sy=1+(r()-.5)*0.14*mess, c0=54.5, ca=Math.cos(ang), sa=Math.sin(ang);
   const T=(x,y)=>{x-=c0;y-=c0;x=x*sx-y*sh;y=y*sy;return [c0+x*ca-y*sa, c0+x*sa+y*ca]};
   return g.strokes.map(pts=>{
-    const n=pts.length, dx=gauss(r)*2.4*mess, dy=gauss(r)*2.4*mess, rot=(r()-.5)*0.16*mess, ls=1+(r()-.5)*0.24*mess, amp=(0.3+r())*mess, fr=0.8+r()*2.2, ph=r()*6.28;
+    const loose=1.15-0.7*skill, n=pts.length, dx=gauss(r)*2.4*mess*loose, dy=gauss(r)*2.4*mess*loose, rot=(r()-.5)*0.16*mess*loose, ls=1+(r()-.5)*0.24*mess, amp=(0.3+r())*mess*(1-skill)*0.7, fr=0.8+r()*2.2, ph=r()*6.28;
     const [x0,y0]=pts[0]; let mx=0,my=0; for(const p of pts){mx+=p[0];my+=p[1]} mx/=n; my/=n; const cr=Math.cos(rot), sr=Math.sin(rot);
     return pts.map((p,k)=>{const t=k/(n-1); let x=x0+(p[0]-x0)*ls, y=y0+(p[1]-y0)*ls; const ux=x-mx, uy=y-my; x=mx+ux*cr-uy*sr; y=my+ux*sr+uy*cr;
       const a=pts[Math.max(0,k-1)], b=pts[Math.min(n-1,k+1)]; const tx=b[0]-a[0], ty=b[1]-a[1], l=Math.hypot(tx,ty)||1; const w=amp*Math.sin(t*fr*Math.PI+ph)*Math.sin(t*Math.PI);
@@ -1156,15 +1156,19 @@ function tooth(){ if(TOOTH) return TOOTH; const vn=valueNoise(128,32,77), rows=A
 let GRAIN=null; function grain(){ if(!GRAIN) GRAIN=noiseTile(128,98,(r)=>[255,255,255,r()<.3?255*r():0]); return GRAIN; }
 
 // ---------- the writing hand (kinematic simulation)
+// speed and cursiveness are not sloppiness: semi-cursive and cursive are trained hands, so they keep the
+// structure (skill) and simplify by joining strokes and rounding turns; the everyday hurried hand is the sloppy one
 const PRESETS={
-  kaisho:{speed:0.75,cursive:0.05,stiff:15,mess:0.12,flow:0.12,lift:1},
-  hurry:{speed:1.45,cursive:0.38,stiff:11,mess:0.38,flow:0.28,lift:0.8},
-  gyosho:{speed:2.1,cursive:0.72,stiff:9,mess:0.5,flow:0.4,lift:0.6},
-  sosho:{speed:2.8,cursive:0.95,stiff:6.5,mess:0.62,flow:0.5,lift:0.45},
+  kaisho:{speed:0.75,cursive:0.05,stiff:15,mess:0.12,flow:0.12,skill:0.85},
+  hurry:{speed:1.45,cursive:0.32,stiff:12,mess:0.34,flow:0.28,skill:0.5},
+  gyosho:{speed:1.9,cursive:0.66,stiff:11,mess:0.3,flow:0.4,skill:0.75},
+  sosho:{speed:2.3,cursive:0.9,stiff:9.5,mess:0.3,flow:0.5,skill:0.85},
 };
+// felt pens, ballpoints and chalk on menus and posters are written by staff, not calligraphers: no sosho with them
+const TOOLCAP={brush:{cursive:1,speed:9,mess:1},pen:{cursive:0.6,speed:2,mess:0.34},marker:{cursive:0.5,speed:1.8,mess:0.3},chisel:{cursive:0.45,speed:1.8,mess:0.3},chalk:{cursive:0.45,speed:1.7,mess:0.3}};
 function makeWriter(r, base='hurry', tool='brush', over={}){
-  const p=PRESETS[base]; const j=v=>v*(1+(r()-.5)*0.25);
-  return Object.assign({tool, speed:j(p.speed), cursive:clamp(j(p.cursive),0,1), stiff:j(p.stiff), mess:clamp(j(p.mess),0,1), flow:p.flow, slant:(r()-.5)*0.12, weight:0.85+r()*0.35, zeta:0.8+r()*0.15}, over);
+  const p=PRESETS[base], cap=TOOLCAP[tool]||TOOLCAP.brush; const j=v=>v*(1+(r()-.5)*0.25);
+  return Object.assign({tool, speed:Math.min(cap.speed,j(p.speed)), cursive:clamp(Math.min(cap.cursive,j(p.cursive)),0,1), stiff:j(p.stiff), mess:clamp(Math.min(cap.mess,j(p.mess)),0,1), skill:clamp(j(p.skill),0,0.95), flow:p.flow, slant:(r()-.5)*0.12, weight:0.85+r()*0.35, zeta:0.8+r()*0.15}, over);
 }
 function lognCDF(tau){ if(tau<=0) return 0; const z=(Math.log(tau)-Math.log(0.42))/0.38; return Math.min(1, 0.5*(1+erf(z/Math.SQRT2))/0.989); }
 function erf(x){const s=Math.sign(x); x=Math.abs(x); const t=1/(1+0.3275911*x); const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x); return s*y;}
@@ -1188,20 +1192,30 @@ function pressureAt(kind,u,first){ // u = progress 0..1 along stroke
 // plan + integrate the pen for a sequence of glyphs. items: [{ch,cx,cy,size,rot}]
 function simulate(items, W, r){
   const moves=[]; // {pts, t0, segs:[{L,start,dur}], L, kind, type:'down'|'up', p0,p1}
-  let t=0, prevEnd=null, prevKind=null;
+  let t=0, prevEnd=null, prevKind=null, prevDir=null, prevItem=-1, itemIdx=-1;
   const unit=items.length?items[0].size/109:1;
-  for(const it of items){
+  let glyphPts=[];
+  for(const it of items){ itemIdx++; glyphPts=[];
     const g=glyph(it.ch); if(!g) continue; const s=it.size/109;
-    const strokes=deform(g,W.mess,r,W.slant);
+    const strokes=deform(g,W.mess,r,W.slant,W.skill??0.6);
     const ca=Math.cos(it.rot||0), sa=Math.sin(it.rot||0);
     const tf=p=>{const x=(p[0]-54.5)*s, y=(p[1]-54.5)*s*(it.sy||1); return [it.cx+x*ca-y*sa, it.cy+x*sa+y*ca]};
     strokes.forEach((st,i)=>{
       const pts=st.map(tf), kind=kindOf(g.types[i], plen(st));
-      if(prevEnd){ // air move
-        const La=Math.hypot(pts[0][0]-prevEnd[0],pts[0][1]-prevEnd[1]); const dur=0.05+La/s/109*0.3/W.speed+ (W.cursive<0.3?0.06:0);
-        const h=Math.max(0,(1-W.cursive)*1.45+Math.max(0,La/it.size-0.22)*3.5-0.32);
-        moves.push({type:'up',pts:[prevEnd,pts[0]],t0:t,dur,L:La,h,pEnd:prevKind==='left'||prevKind==='right'||prevKind==='rise'||prevKind==='hook'?0.02:0.12});
-        t+=dur;
+      if(prevEnd){ // air move: the pen leaves along the stroke's direction (hitsumyaku) and curves to the next start
+        const La=Math.hypot(pts[0][0]-prevEnd[0],pts[0][1]-prevEnd[1]), near=La/it.size; const dur=0.05+La/s/109*0.3/W.speed+ (W.cursive<0.3?0.06:0);
+        // a visible join (renmen) only inside one character, between close strokes, and only for a cursive hand;
+        // felt pens and ballpoints draw the join at full width, so they join only very short hops
+        const thin=W.tool==='brush', reach=thin? 0.2+0.5*W.cursive : 0.08+0.14*W.cursive;
+        const ctl=prevDir? [prevEnd[0]+prevDir[0]*La*0.4, prevEnd[1]+prevDir[1]*La*0.4] : null;
+        // a join never runs across strokes already written (it would read as an extra stroke)
+        const clear=()=>{ const lim=(it.size*0.05)**2; for(let q=2;q<=8;q++){ const e=q/10, o=1-e, a=prevEnd, b=pts[0], c=ctl||[(a[0]+b[0])/2,(a[1]+b[1])/2];
+            const x=o*o*a[0]+2*o*e*c[0]+e*e*b[0], y=o*o*a[1]+2*o*e*c[1]+e*e*b[1];
+            for(let si=0;si<glyphPts.length;si++){ const sp=glyphPts[si], last=si===glyphPts.length-1; for(let k=0;k<sp.length-(last?3:0);k++){ const dx=sp[k][0]-x, dy=sp[k][1]-y; if(dx*dx+dy*dy<lim) return false; } } } return true; };
+        const connect= prevItem===itemIdx && W.cursive>0.25 && near<reach && r()<W.cursive+0.15 && clear();
+        const h=connect? 0 : Math.max(0.9,(1-W.cursive)*1.45+Math.max(0,near-0.22)*3.5);
+        moves.push({type:'up',pts:[prevEnd,pts[0]],ctl,t0:t,dur:dur*(connect?0.85:1),L:La,h,connect,pc:thin?0.06+0.1*W.cursive:0.3,pEnd:prevKind==='left'||prevKind==='right'||prevKind==='rise'||prevKind==='hook'?0.02:0.12});
+        t+=dur*(connect?0.85:1);
       }
       const segs=splitCorners(pts); let st0=t, last=0; const meta=[];
       segs.forEach((sg,j)=>{const L=plen(sg); const dur=Math.max(0.045, L/s/109/(W.speed*1.7) + 0.02); const start= j===0? st0 : last + meta[j-1].dur*(1-W.flow); meta.push({L,start,dur}); last=start;});
@@ -1210,7 +1224,8 @@ function simulate(items, W, r){
       // follow-through: after tome a short pause; after harai/hane a flick
       const flick = (kind==='left'||kind==='right'||kind==='rise'||kind==='hook') ? 1 : 0;
       moves.push({type:'down',pts,cum,L:cum[cum.length-1],segs:meta,t0:t,dur:end-t+ (flick?0.03:0.06/W.speed),kind,flick});
-      t=end+(flick?0.03:0.06/W.speed); prevEnd=pts[pts.length-1]; prevKind=kind;
+      t=end+(flick?0.03:0.06/W.speed); prevEnd=pts[pts.length-1]; prevKind=kind; prevItem=itemIdx; glyphPts.push(pts);
+      { const a=pts[pts.length-1], b=pts[Math.max(0,pts.length-4)], l=Math.hypot(a[0]-b[0],a[1]-b[1]); prevDir=l>0.5?[(a[0]-b[0])/l,(a[1]-b[1])/l]:null; }
     });
   }
   // integrate
@@ -1230,8 +1245,9 @@ function simulate(items, W, r){
       p=pressureAt(m.kind,u)*(after>0? Math.max(0,1-after/(m.flick?0.03:0.06)) : 1);
     } else {
       const u=clamp((tt-m.t0)/m.dur,0,1), e=lognCDF(u*1.0);
-      tx=lerp(m.pts[0][0],m.pts[1][0],e); ty=lerp(m.pts[0][1],m.pts[1][1],e);
-      p=lerp(m.pEnd,0.25,u)-m.h*Math.sin(Math.PI*u);
+      if(m.ctl){ const a=m.pts[0], c=m.ctl, b=m.pts[1], q=1-e; tx=q*q*a[0]+2*q*e*c[0]+e*e*b[0]; ty=q*q*a[1]+2*q*e*c[1]+e*e*b[1]; }
+      else { tx=lerp(m.pts[0][0],m.pts[1][0],e); ty=lerp(m.pts[0][1],m.pts[1][1],e); }
+      p= m.connect? lerp(lerp(m.pEnd,m.pc,Math.min(1,u*4)),0.3,Math.max(0,(u-0.8)/0.2)) : lerp(m.pEnd,0.25,u)-m.h*Math.sin(Math.PI*u);
     }
     const ax=k*(tx-x)-c*vx, ay=k*(ty-y)-c*vy; vx+=ax*dt; vy+=ay*dt; x+=vx*dt; y+=vy*dt;
     const sp=Math.hypot(vx,vy); if(sp>1) lastDir=[vx/sp,vy/sp];
@@ -2612,7 +2628,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · d50f91c3b0</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 6975fd415e</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2691,7 +2707,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes','cards')} · ${es.filter(([,e])=>e.ok).length} ${tr('justes du premier coup','right first time')}</p>${wrong.length?`<p class="rwords">${tr('À retrouver','To revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}</p><button class="btn" id="review-difficult" title="${tr('Retravailler mes hésitations','Practise my difficult cards')}">${tr('Retravailler','Practise')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · d50f91c3b0';
+const BUILD='2 · 6975fd415e';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
