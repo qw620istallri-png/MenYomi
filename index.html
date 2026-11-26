@@ -777,7 +777,8 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var
 
 /* Soft daily materials sit behind the existing window light and foliage. */
 #ground{position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:var(--background-texture);background-size:512px 512px;opacity:.88}
-html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:soft-light}
+/* at night the light texture would wash the room out: only its grain is kept (strong contrast), tinted blue and screened onto the dark, so the material still shows in moonlight */
+html.night #ground,html[data-theme="dark"] #ground{opacity:1;mix-blend-mode:screen;filter:brightness(.55) contrast(10) brightness(.12) sepia(1) hue-rotate(185deg) saturate(3)}
 .board .itm.wood-plaque{isolation:isolate;border-radius:5px 5px 9px 8px;background:linear-gradient(90deg,#b98c55,#deb77e 10%,#d9b27a 63%,#bb9059 100%);box-shadow:5px 10px 5px #2e1c1740,1px 2px 2px #2e1c1750,inset -3px 0 3px #77502738;transform:rotate(var(--plate-angle,0deg));transform-origin:50% 2px}
 .board .itm.wood-plaque::before{content:"";position:absolute;inset:0;background:var(--wood-grain);opacity:.65;border-radius:inherit;pointer-events:none}
 .board .itm.wood-plaque canvas{position:relative;border-radius:inherit}
@@ -3440,7 +3441,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
    <details><summary>${tr('Crédits','Credits')}</summary><ul>
    <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
    <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul></details>
-   <span class="mono" style="font-size:14px">Version 2 · a98122759c</span></div></div>`;
+   <span class="mono" style="font-size:14px">Version 2 · 58b308a474</span></div></div>`;
   const B=document.getElementById('dlgbody'); { const mm=B.querySelector('.mini'), got=SHOPS.filter(s=>(S.stamps||{})[s[0]]).sort((a,b)=>S.stamps[b[0]]-S.stamps[a[0]]).slice(0,3);
     if(got.length) got.forEach(s=>mm.appendChild(shopStamp(s,44))); else mm.innerHTML='<span class="e" lang="ja">帳</span>'; }
   B.querySelector('#icarnet').onclick=()=>{ dlg.close(); location.hash='carnet'; };
@@ -3526,7 +3527,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes','cards')} · ${es.filter(([,e])=>e.ok).length} ${tr('justes du premier coup','right first time')}</p>${wrong.length?`<p class="rwords">${tr('À retrouver','To revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}</p><button class="btn" id="review-difficult" title="${tr('Retravailler mes hésitations','Practise my difficult cards')}">${tr('Retravailler','Practise')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · a98122759c';
+const BUILD='2 · 58b308a474';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
