@@ -2247,7 +2247,12 @@ document.querySelector('.mast a.home').addEventListener('click',e=>{ e.preventDe
 document.getElementById('logo').addEventListener('click',()=>document.querySelector('.mast a.home').click());
 document.addEventListener('click',e=>{ const b=e.target.closest('.asub [data-sub]'); if(b){ location.hash=b.dataset.sub; } });
 const VIEWS=['revisions','menu','atelier','main','kanji','vocab']; let menuDone=false, simDone=false;
-function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'revisions';
+// Écrire and La main open on a different one of « my » kanji / words each day (cycling through them before repeating)
+let DAILY_SET=''; function dailyPicks(){ const k=today(); if(DAILY_SET===k) return; DAILY_SET=k; const dn=Math.round(Date.parse(k+'T12:00:00Z')/DAY);
+  const of=(l,salt)=>{ l=shuffle(rng(salt),[...new Set(l)].sort()); return l[((dn%l.length)+l.length)%l.length]; };
+  const kp=WRITABLE.filter(knownKanji); if(kp.length){ atelierChar=of(kp,7919); if(apad) setA(); }
+  const wp=WORDS.filter(w=>/[一-鿿]/.test(w[0])&&knownWord(w[0])).map(w=>w[0]); if(wp.length) setSimText(of(wp,104729),simDone); }
+function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'revisions'; try{ dailyPicks(); }catch(e){}
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
   const tv=v==='main'?'atelier':v; document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+tv?'page':'false'));
   if(v==='revisions') showCard(); if(v!=='revisions') cancelAuto(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
@@ -2602,7 +2607,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 899ed714b4</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 67feb9cbb7</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2681,7 +2686,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes travaillées','cards practised')} · ${es.filter(([,e])=>e.ok).length} ${tr('réussies au premier essai','right on the first try')}.</p>${wrong.length?`<p>${tr('À retrouver sans hésiter','Words to revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}.</p><button class="btn" id="review-difficult">${tr('Retravailler mes hésitations','Practise my difficult cards')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · 899ed714b4';
+const BUILD='2 · 67feb9cbb7';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };

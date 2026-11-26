@@ -2001,7 +2001,12 @@ document.querySelector('.mast a.home').addEventListener('click',e=>{ e.preventDe
 document.getElementById('logo').addEventListener('click',()=>document.querySelector('.mast a.home').click());
 document.addEventListener('click',e=>{ const b=e.target.closest('.asub [data-sub]'); if(b){ location.hash=b.dataset.sub; } });
 const VIEWS=['revisions','menu','atelier','main','kanji','vocab']; let menuDone=false, simDone=false;
-function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'revisions';
+// Écrire and La main open on a different one of « my » kanji / words each day (cycling through them before repeating)
+let DAILY_SET=''; function dailyPicks(){ const k=today(); if(DAILY_SET===k) return; DAILY_SET=k; const dn=Math.round(Date.parse(k+'T12:00:00Z')/DAY);
+  const of=(l,salt)=>{ l=shuffle(rng(salt),[...new Set(l)].sort()); return l[((dn%l.length)+l.length)%l.length]; };
+  const kp=WRITABLE.filter(knownKanji); if(kp.length){ atelierChar=of(kp,7919); if(apad) setA(); }
+  const wp=WORDS.filter(w=>/[一-鿿]/.test(w[0])&&knownWord(w[0])).map(w=>w[0]); if(wp.length) setSimText(of(wp,104729),simDone); }
+function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'revisions'; try{ dailyPicks(); }catch(e){}
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
   const tv=v==='main'?'atelier':v; document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+tv?'page':'false'));
   if(v==='revisions') showCard(); if(v!=='revisions') cancelAuto(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
