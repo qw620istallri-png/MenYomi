@@ -1564,7 +1564,7 @@ function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.fi
   { const hc=document.querySelector('.hctl'), old=document.getElementById('hstop'); if(old) old.remove(); if(SESSION&&hc){ const lab=SESSION.test?tr('Arrêter le test','Stop the test'):tr('Arrêter l’entraînement','Stop practice'); hc.insertAdjacentHTML('afterbegin',`<button class="btn" id="hstop" title="${lab}" aria-label="${lab}"><span class="lg">${lab}</span><span class="sm">✕</span></button>`); document.getElementById('hstop').onclick=()=>{ endSession(); showCard(); }; } }
   c.innerHTML= SESSION? ''
     : `${t?`<button class="btn" id="rredo" title="${tr('Refaire les cartes du jour','Redo today’s cards')}">${tr('Refaire','Redo')} ${t}</button>`:''}<button class="btn" id="rnext" title="${tr('Ajouter des nouvelles cartes aujourd’hui','Add new cards today')}">+${S.newPer} ${tr('cartes','cards')}</button><button class="btn" id="rtest"${known?'':' disabled'} title="${tr('Des cartes au hasard parmi celles apprises','Random cards among the learned ones')}">${tr('Me tester','Test me')}</button>${TESTRES?`<span class="tres">${tr('Test','Test')} ${TESTRES.ok}/${TESTRES.n}</span>`:''}`;
-  if(LAST_GRADE) c.insertAdjacentHTML('beforeend',`<button class="btn ghost" id="undo-grade">${tr('Annuler l’évaluation','Undo rating')}</button>`);
+  if(LAST_GRADE) c.insertAdjacentHTML('beforeend',`<button class="btn k" id="undo-grade" title="${tr('Annuler la dernière évaluation','Undo the last rating')}">${tr('Annuler','Undo')}</button>`);
   if(c.querySelector('#undo-grade')) c.querySelector('#undo-grade').onclick=undoGrade;
   const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{ endSession(); showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; if(b('#rtest')) b('#rtest').onclick=testMe; }
 function endSession(){ if(SESSION&&SESSION.test&&SESSION.n) TESTRES={ok:SESSION.ok,n:SESSION.n}; SESSION=null; }
@@ -2602,7 +2602,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · f65eeb8c45</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 899ed714b4</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2681,7 +2681,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes travaillées','cards practised')} · ${es.filter(([,e])=>e.ok).length} ${tr('réussies au premier essai','right on the first try')}.</p>${wrong.length?`<p>${tr('À retrouver sans hésiter','Words to revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}.</p><button class="btn" id="review-difficult">${tr('Retravailler mes hésitations','Practise my difficult cards')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · f65eeb8c45';
+const BUILD='2 · 899ed714b4';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
