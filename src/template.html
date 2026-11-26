@@ -1723,7 +1723,7 @@ function genMenu(){
   const kc=k=>TYPES[k].sections.reduce((a,s)=>a+s[1].filter(knownWord).length+s[1].filter(w=>F.has(w)).length*4,0);
   let tk=document.getElementById('mtype').value; if(!tk){ const ks=Object.keys(TYPES); if(want&&ks.some(k=>kc(k))){ const ws=ks.map(k=>1+kc(k)*3); let x=r()*ws.reduce((a,b)=>a+b,0); tk=ks.find((k,i)=>(x-=ws[i])<0)||ks[0]; } else tk=pick(r,ks); } const t=TYPES[tk];
   const pref=list=>{ if(!want) return shuffle(r,list); const sh=shuffle(r,list); const f=sh.filter(w=>F.has(w)), a=sh.filter(w=>knownWord(w)&&!F.has(w)), b=sh.filter(w=>!knownWord(w)&&!F.has(w)); return [...f,...a,...b]; };
-  const rk0=document.getElementById('mreg').value||(r()<0.55?pick(r,Object.keys(REGIONS)):''), rk=['cafe','patisserie'].includes(tk)?'':rk0; const reg=rk?REGIONS[rk]:null;
+  const rk0=document.getElementById('mreg').value||(r()<0.55?pick(r,Object.keys(REGIONS)):''), rk=['cafe','patisserie','bakery'].includes(tk)?'':rk0; const reg=rk?REGIONS[rk]:null;
   const layout=pick(r,t.layouts); const vertical=['tanzaku','wood','sheet'].includes(layout);
   const tool = layout==='slate'?'chalk' : layout==='poster'?pick(r,['chisel','chisel','marker']) : layout==='card'?'pen' : pick(r,['brush','brush','brush','chisel']);
   const writer=makeWriter(r,pick(r,['kaisho','hurry','hurry','gyosho','gyosho']),tool);
@@ -1790,12 +1790,12 @@ async function renderMenu(){
   for(const tk of tasks){ if(gen!==menuGen) return; tk(); await nextFrame(); }
 }
 // notices pinned around the menu, and a short exchange between staff and customer
-const TICKET_SHOPS=['ramen','soba','teishoku','don'], CAFE_SHOPS=['cafe','patisserie'];
+const TICKET_SHOPS=['ramen','soba','teishoku','don'], CAFE_SHOPS=['cafe','patisserie','bakery'];
 function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tasks; const r=rng(m.seed+77); const phone=vw<520;
   const nb=b.querySelector('#mscene .notes'), tb=b.querySelector('#mscene .talk');
   const pool=['禁煙','全席禁煙','現金のみ','お冷はセルフ','ご自由にどうぞ','ラストオーダー','お持ち帰り','定休日','営業時間','お手洗い','予約席','お一人様','お会計','ご注文','お冷','喫煙席','ご予約'];
   if(TICKET_SHOPS.includes(m.tk)) pool.unshift('食券','券売機','食券制');
-  if(CAFE_SHOPS.includes(m.tk)){ pool.unshift('テイクアウト','イートイン'); pool.splice(pool.indexOf('喫煙席'),1); }
+  if(CAFE_SHOPS.includes(m.tk)){ pool.unshift('テイクアウト','イートイン'); if(m.tk==='bakery') pool.unshift('焼きたて'); pool.splice(pool.indexOf('喫煙席'),1); }
   const picks=[]; if(r()<.4) picks.push(pick(r,['営業中','営業中','満席']));
   const clash=[['禁煙','全席禁煙','喫煙席'],['食券','券売機','食券制'],['お冷','お冷はセルフ'],['予約席','ご予約'],['テイクアウト','お持ち帰り']];
   for(const w of shuffle(r,pool)){ if(picks.length>=(phone?2:3)) break; if(!WMAP[w]||clash.some(g=>g.includes(w)&&g.some(x=>picks.includes(x)))) continue; picks.push(w); }

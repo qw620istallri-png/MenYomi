@@ -155,6 +155,31 @@ add("""
 江戸前寿司|Sushi à la manière de Tōkyō (Edo) : poissons de la baie, souvent marinés ou mijotés.|Tokyo-style sushi: fish from the bay, often cured or simmered.
 鮨|Sushi, écrit avec le caractère traditionnel des enseignes haut de gamme.|Sushi, written with the traditional character used by upscale shops.
 鮓|Sushi, graphie ancienne qui désignait le poisson fermenté dans le riz.|Sushi, an old spelling for fish fermented in rice.
+# --- boulangerie
+パン|Pain, du portugais pão : un des plus vieux mots étrangers du japonais.|Bread, from Portuguese pão: one of the oldest loanwords in Japanese.
+パン屋|Boulangerie : on prend un plateau et une pince, on se sert, puis on paie à la caisse.|Bakery: you take a tray and tongs, help yourself, then pay at the till.
+菓子パン|Pains sucrés et brioches fourrées, la spécialité des boulangeries japonaises.|Sweet and filled buns, the speciality of Japanese bakeries.
+惣菜パン|Pains salés garnis d’un plat : curry, croquette, nouilles…|Savoury buns filled with a dish: curry, croquette, noodles…
+食事パン|Pains simples pour accompagner les repas : pain de mie, baguette.|Plain bread to eat with meals: white loaf, baguette.
+焼きたて|« Tout juste cuit » : affiché quand une fournée sort du four, souvent avec l’heure.|“Just baked”: posted when a batch comes out of the oven, often with the time.
+食パン|Pain de mie très moelleux, vendu entier ou en tranches épaisses.|A very soft white loaf, sold whole or in thick slices.
+メロンパン|Brioche couverte d’une croûte de biscuit quadrillée, qui rappelle un melon. Souvent sans goût de melon.|A bun under a crisp, criss-crossed cookie crust that looks like a melon. Usually no melon flavour.
+あんパン|Brioche fourrée de pâte de haricots rouges, créée à Tōkyō en 1874.|A bun filled with sweet red bean paste, created in Tokyo in 1874.
+クリームパン|Brioche fourrée de crème pâtissière.|A bun filled with custard cream.
+チョココロネ|Pain en spirale, en forme de corne, rempli de crème au chocolat.|A spiral horn of bread filled with chocolate cream.
+ジャムパン|Brioche fourrée à la confiture, souvent de fraise.|A bun filled with jam, often strawberry.
+デニッシュ|Viennoiserie feuilletée garnie de fruits ou de crème.|A flaky pastry topped with fruit or custard.
+パンオショコラ|Pain au chocolat, du français.|Pain au chocolat, from French.
+カレーパン|Pain fourré au curry japonais, pané et frit.|Bread filled with Japanese curry, breaded and fried.
+焼きそばパン|Petit pain fendu garni de nouilles sautées. Un classique des écoles.|A split roll stuffed with fried noodles. A school-canteen classic.
+コロッケパン|Petit pain avec une croquette de pomme de terre et sauce.|A roll with a potato croquette and sauce.
+ピザパン|Pain garni comme une pizza : sauce tomate, fromage, saucisse.|Bread topped like a pizza: tomato sauce, cheese, sausage.
+ベーコンエピ|Pain en épi de blé avec du bacon à l’intérieur.|Bread shaped like an ear of wheat with bacon inside.
+明太フランス|Baguette tartinée de beurre aux œufs de colin épicés (mentaiko), puis grillée.|Baguette spread with spicy pollock-roe butter, then toasted.
+塩パン|Petit pain roulé autour de beurre, avec du sel sur le dessus. Très populaire.|A roll wrapped around butter with salt on top. Hugely popular.
+カツサンド|Sandwich de porc pané avec sauce tonkatsu, sur pain de mie.|Breaded pork cutlet with tonkatsu sauce in white bread.
+バゲット|Baguette à la française. On voit aussi フランスパン, « pain français ».|A French baguette. Also called フランスパン, “French bread”.
+ラスク|Tranches de pain séchées au four avec beurre et sucre.|Slices of bread oven-dried with butter and sugar.
 # --- café moderne / pâtisserie
 カフェ|Café moderne, souvent une chaîne, avec carte en katakana venue de l’anglais et de l’italien.|A modern café, often a chain, with a menu in katakana borrowed from English and Italian.
 コーヒー|Café, du néerlandais koffie. Le même mot que 珈琲 écrit en kanji dans les cafés rétro.|Coffee, from Dutch koffie. The same word as 珈琲, which retro cafés write in kanji.
@@ -436,6 +461,8 @@ for line in """
 パティスリー|« Pâtisserie », du français, très prisé des enseignes.|“Pâtisserie”, from French, a favourite for shop names.
 洋菓子|« Douceurs occidentales » : 洋 l’Occident, 菓子 friandise.|“Western sweets”: 洋 the West, 菓子 sweets.
 ケーキハウス|« Cake house » : nom des pâtisseries de quartier.|“Cake house”: a name for neighbourhood cake shops.
+ベーカリー|« Bakery » en katakana : nom courant des boulangeries.|“Bakery” in katakana: a common shop name.
+パン工房|« Atelier à pain » : 工房 veut dire atelier d’artisan.|“Bread workshop”: 工房 means a craftsman’s workshop.
 """.strip().splitlines():
     w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)
 

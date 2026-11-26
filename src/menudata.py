@@ -590,6 +590,45 @@ CAFE_SCENES = [
  [('c','{d}を|ください'),('s','店内でお召し上がりですか'),('c','テイクアウトで'),('s','少々お待ちください')],
  [('c','{d}を|ください'),('s','店内でお召し上がりですか'),('c','店内で'),('s','少々お待ちください')],
 ]
+# ---------- bakery (パン屋): sweet buns, savoury buns, everyday bread
+BAKERY_W = [
+ ('パン','パン','pain','bread'),
+ ('パン屋','パンや','boulangerie','bakery'),
+ ('菓子パン','かしパン','pains sucrés, brioches','sweet buns'),
+ ('惣菜パン','そうざいパン','pains salés garnis','savoury buns'),
+ ('食事パン','しょくじパン','pains pour les repas','table bread'),
+ ('焼きたて','やきたて','tout juste sorti du four','freshly baked'),
+ ('食パン','しょくパン','pain de mie','sliced white loaf'),
+ ('メロンパン','メロンパン','brioche à croûte de biscuit','melon bread'),
+ ('あんパン','あんパン','brioche aux haricots rouges','red bean bun'),
+ ('クリームパン','クリームパン','brioche à la crème pâtissière','custard cream bun'),
+ ('チョココロネ','チョココロネ','corne fourrée au chocolat','chocolate cornet'),
+ ('ジャムパン','ジャムパン','brioche à la confiture','jam bun'),
+ ('デニッシュ','デニッシュ','viennoiserie danoise','Danish pastry'),
+ ('パンオショコラ','パンオショコラ','pain au chocolat','pain au chocolat'),
+ ('カレーパン','カレーパン','beignet fourré au curry','curry bread'),
+ ('焼きそばパン','やきそばパン','pain garni de nouilles sautées','yakisoba bun'),
+ ('コロッケパン','コロッケパン','pain à la croquette','croquette bun'),
+ ('ピザパン','ピザパン','pain façon pizza','pizza bread'),
+ ('ベーコンエピ','ベーコンエピ','épi au bacon','bacon épi'),
+ ('明太フランス','めんたいフランス','baguette au beurre de mentaiko','mentaiko butter baguette'),
+ ('塩パン','しおパン','petit pain beurre et sel','salt butter roll'),
+ ('カツサンド','カツサンド','sandwich au porc pané','katsu sandwich'),
+ ('バゲット','バゲット','baguette','baguette'),
+ ('ラスク','ラスク','pain grillé sucré','rusk'),
+ ('ベーカリー','ベーカリー','boulangerie (mot anglais)','bakery'),
+ ('パン工房','パンこうぼう','atelier de boulangerie','bread workshop'),
+]
+for w,r,f,e in BAKERY_W: W[w]=(r,f)
+NEW_W.extend(BAKERY_W)
+T['bakery']=dict(jp='パン屋', fr='Boulangerie', layouts=['card','poster','slate'],
+   names=['ベーカリー {n}','{n}ベーカリー','パン工房 {n}'],
+   sections=[('菓子パン',['メロンパン','あんパン','クリームパン','チョココロネ','ジャムパン','デニッシュ','パンオショコラ','クロワッサン'],(150,320)),
+             ('惣菜パン',['カレーパン','焼きそばパン','コロッケパン','ピザパン','ベーコンエピ','明太フランス','塩パン','カツサンド','サンドイッチ'],(150,600)),
+             ('食事パン',['食パン','バゲット','ベーグル','ラスク'],(200,600)),
+             ('ドリンク',['コーヒー','カフェオレ','牛乳','オレンジジュース'],(150,380))])
+NAMEPAT_R.update({'ベーカリー':'ベーカリー','パン工房':'パンこうぼう'})
+SIGN_W.append(('焼きたて','やきたて','tout juste sorti du four','freshly baked'))
 for w,r,f,e in SIGN_W+TALK_W: W[w]=(r,f)
 NEW_W.extend(SIGN_W+TALK_W)
 # who says it: s staff, c customer. {d} is a dish from the menu on the wall
@@ -683,4 +722,12 @@ PRICES.update({
  '和栗のモンブラン':(650,900),'苺タルト':(550,750),'苺パフェ':(1000,1500),
  'マドレーヌ':(180,260),'フィナンシェ':(200,280),'カヌレ':(230,330),'マカロン':(200,300),'クッキー':(350,650),'バウムクーヘン':(300,500),
  'patisserie:コーヒー':(450,600),'patisserie:紅茶':(450,650),'patisserie:カフェラテ':(500,650),'patisserie:アイスコーヒー':(450,600),'オレンジジュース':(400,600),
+})
+PRICES.update({
+ # bakery, per piece (bread per loaf)
+ 'メロンパン':(160,250),'あんパン':(150,230),'クリームパン':(160,250),'チョココロネ':(180,260),'ジャムパン':(150,220),'デニッシュ':(250,380),
+ 'パンオショコラ':(200,300),'bakery:クロワッサン':(180,280),'カレーパン':(200,300),'焼きそばパン':(200,300),'コロッケパン':(220,320),'ピザパン':(230,330),
+ 'ベーコンエピ':(250,350),'明太フランス':(250,380),'塩パン':(120,200),'カツサンド':(400,600),'bakery:サンドイッチ':(300,450),
+ '食パン':(350,600),'バゲット':(300,420),'bakery:ベーグル':(200,300),'ラスク':(250,400),
+ 'bakery:コーヒー':(200,350),'bakery:カフェオレ':(250,380),'bakery:牛乳':(150,200),'bakery:オレンジジュース':(200,300),
 })
