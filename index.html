@@ -299,6 +299,8 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .answerbar input{border:2px solid var(--rule);background:var(--sheet);padding:12px 14px;font-size:20px;min-width:0}
 @media (max-width:600px){.answerbar{grid-template-columns:minmax(0,1fr) auto}.answerbar .ghost{grid-column:1/-1;justify-self:start}}
 .feedback{font-weight:700;font-size:17px}
+#card.intro .introgo{display:flex;justify-content:flex-end}
+#card.intro .introgo .btn{min-width:160px;justify-content:center}
 .answer{display:grid;gap:4px;border-left:6px solid var(--acc);padding-left:14px}
 .answer .w{font-family:var(--f-jp);font-weight:600;font-size:clamp(38px,5vw,60px);line-height:1.15}
 .answer .rd{font-size:28px;font-weight:700;letter-spacing:.03em}
@@ -589,6 +591,11 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   .card{gap:10px}
   #rhand{display:none}
   #rst.stage{min-height:0;height:clamp(190px,calc(100vh - 385px),480px);height:clamp(190px,calc(100dvh - 385px),480px);padding:8px}
+  #card.intro #rst.stage{height:clamp(170px,calc(100vh - 430px),440px);height:clamp(170px,calc(100dvh - 430px),440px)}
+  #card.intro .chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-12px;padding-inline:12px}
+  #card.intro .chips::-webkit-scrollbar{display:none}
+  #card.intro .chip{flex:none}
+  #card.intro .introgo .btn{flex:1}
   .stage canvas{max-height:100%;width:auto;object-fit:contain}
   .card .tools{flex-wrap:nowrap;gap:6px}
   .card .tools .btn{padding:8px 8px;white-space:nowrap;flex:1 1 auto;justify-content:center}
@@ -1490,9 +1497,15 @@ function undoGrade(){
 
 // meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
 const canIntro=id=>{ if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
+// cards sharing a word or a kanji with the last few shown are held back while something else is waiting
+let RECENT=[]; const seen=id=>{ RECENT.push(id); if(RECENT.length>3) RECENT.shift(); }; const kset=id=>new Set([...id.slice(2)].filter(isKanji));
+const related=(a,b)=>{ if(a.slice(2)===b.slice(2)) return true; const B=kset(b); for(const c of kset(a)) if(B.has(c)) return true; return false; };
+const fresh=id=>!RECENT.some(r=>r!==id&&related(r,id));
 function nextCard(){ if(REPLAY_ID) return REPLAY_ID; if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endSession(); } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
-  if(due.length) return due[0]; const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); if(qd) return qd; if(S.newToday<S.newPer+S.extraNew){const n=CARDS.find(id=>!S.cards[id]&&canIntro(id)); if(n) return n;}
-  const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon[0]||null; }
+  const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); const nw=S.newToday<S.newPer+S.extraNew? CARDS.filter(id=>!S.cards[id]&&canIntro(id)).slice(0,40).filter((id,i,l)=>id[0]!=='w'||!l.slice(0,i).some(o=>o[0]==='r'&&o.includes(id[2]))) : [];
+  const lk=(RECENT[RECENT.length-1]||'')[0], pickFresh=l=>l.find(id=>fresh(id)&&id[0]!==lk)||l.find(fresh); const f=pickFresh(due)||(qd&&fresh(qd)?qd:null)||pickFresh(nw); if(f) return f;
+  if(due.length) return due[0]; if(qd) return qd; if(nw.length) return nw[0];
+  const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon.find(fresh)||soon[0]||null; }
 function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now();
   if(c.reps===0){ if(g===0)c.due=now+MIN; else if(g===1)c.due=now+6*MIN; else if(g===2){c.reps=1;c.ivl=1;c.due=dueIn(1)} else {c.reps=1;c.ivl=4;c.due=dueIn(4)} }
   else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=dueIn(c.ivl); } }
@@ -1508,7 +1521,7 @@ function swapCard(){ const el=document.getElementById('card'); const still=match
     el.animate([{opacity:0,transform:'translateY(10px)',filter:'blur(1.5px)'},{opacity:1,transform:'none',filter:'blur(0)'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'}); out.cancel();
     const h2=el.offsetHeight; if(Math.abs(h2-h)>4&&!PHONE()&&!el.classList.contains('donecard')) el.animate([{minHeight:h+'px'},{minHeight:h2+'px'}],{duration:220,easing:'cubic-bezier(.2,.8,.2,1)'}); };
   out.onfinish=go; out.oncancel=()=>{ if(SWAP){ SWAP=false; showCard(); } }; }
-function grade(id,g){ if(SWAP) return; rememberGrade(id); REPLAY_ID=null; cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
+function grade(id,g){ if(SWAP) return; rememberGrade(id); if(!SESSION) seen(id); REPLAY_ID=null; cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
     SESSION.q.shift(); if(g===0) SESSION.q.push(id); swapCard(); return; }
   const introduced=S.cards[id]?.introduced||(!S.cards[id]?Date.now():undefined); if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(introduced) S.cards[id].introduced=introduced; if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2,id); } store.set(SKEY,S); swapCard(); }
 // one entry per day: [right at first try, cards seen]; the streak counts days in a row with at least one card
@@ -1576,7 +1589,7 @@ addEventListener('resize',()=>{ clearTimeout(fitStage._t); fitStage._t=setTimeou
 function showCard(){
   if(reviewPad){ reviewPad.destroy(); reviewPad=null; }
   if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
-  const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard'); el.style.marginTop='';
+  const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard','intro'); el.style.marginTop='';
   { const vr=document.getElementById('v-revisions'); vr.classList.toggle('busy',!!id); vr.classList.toggle('sess',!!SESSION); if(id) fitStage(); }
   if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const st=streakDays();
     const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
@@ -1589,7 +1602,10 @@ function showCard(){
     if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard'); centerDone(); return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
   if(kind==='m' && !isNew && !isPhrase(key) && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
-  if(kind==='m'){ showMeaning(el,id,key,isNew); return; }
+  // first time a word is met: it is shown with its reading and meaning, the test comes back a minute later
+  const first=isNew&&!SESSION&&!REPLAY_ID&&(kind==='r'||(kind==='m'&&!CARDS.includes('r:'+key)))&&!!WMAP[key];
+  el.classList.toggle('intro',first);
+  if(kind==='m'&&!first){ showMeaning(el,id,key,isNew); return; }
   if(kind==='k'){ showKanjiPick(el,id,key,isNew); return; }
   if(kind==='p'){ const w=WMAP[key];
     el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Inversée','Reverse')}</span></div>
@@ -1605,12 +1621,13 @@ function showCard(){
     el.querySelector('#pform').onsubmit=e=>{ e.preventDefault(); const v=el.querySelector('#pin').value; if(!v.trim()){ if(PHONE()) reveal(null); else el.querySelector('#pin').focus(); return; }
       const alts=WORDS.filter(x=>x[2]===w[2]); reveal(alts.some(x=>checkAnswer(v,x[0],x[1])===true)); };
     el.querySelector('#preveal').onclick=()=>reveal(null); return; }
-  if(kind==='r'){
+  if(kind==='r'||first){
     const w=WMAP[key]; let seed=newSeed();
-    el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${isNew?tr('Nouveau · ','New · '):''}${tr('Lecture','Reading')}</span><span class="mono" id="rhand" style="color:var(--mute)"></span></div>
+    el.innerHTML=`<div class="cardhead"><span class="pill${isNew?' y':''}">${first?tr('Nouveau mot','New word'):(isNew?tr('Nouveau · ','New · '):'')+tr('Lecture','Reading')}</span><span class="mono" id="rhand" style="color:var(--mute)"></span></div>
       <div class="stwrap"><div class="stage" id="rst"><canvas id="rc"></canvas></div><div class="stools"><button class="ico" id="ragain" title="${tr('Autre main','Another hand')}" aria-label="${tr('Autre main','Another hand')}">↻</button><button class="ico" id="rwatch" title="${tr('Voir écrire','Watch it written')}" aria-label="${tr('Voir écrire','Watch it written')}">▶</button><button class="ico" id="rprint" lang="ja" title="${tr('Version imprimée','Printed form')}" aria-label="${tr('Version imprimée','Printed form')}">印</button></div></div>
-      <form class="answerbar" id="rform" autocomplete="off"><input id="rin" lang="ja" placeholder="${tr('romaji ou kana','romaji or kana')}" aria-label="${tr('Votre lecture','Your reading')}"><button class="btn k" type="submit"><span class="lv">${tr('Vérifier','Check')}</span><span class="ln">${tr('Je ne sais pas','I don’t know')}</span></button><button class="btn ghost" type="button" id="reveal">${tr('Je ne sais pas','I don’t know')}</button></form>
-      <div id="rans"></div>`;
+      ${first?`<div class="answer"><div class="rd" lang="ja">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}${wordChips(key)}<div class="introgo"><button class="btn k" id="rgot">${tr('Retenu','Got it')} <span aria-hidden="true">→</span></button></div>`
+      :`<form class="answerbar" id="rform" autocomplete="off"><input id="rin" lang="ja" placeholder="${tr('romaji ou kana','romaji or kana')}" aria-label="${tr('Votre lecture','Your reading')}"><button class="btn k" type="submit"><span class="lv">${tr('Vérifier','Check')}</span><span class="ln">${tr('Je ne sais pas','I don’t know')}</span></button><button class="btn ghost" type="button" id="reveal">${tr('Je ne sais pas','I don’t know')}</button></form>
+      <div id="rans"></div>`}`;
     const draw=(anim)=>{ const r=rng(seed); const m=pick(r,MEDIA); const preset=pick(r,['kaisho','hurry','hurry','gyosho','gyosho','sosho']);
       const wr=makeWriter(r,preset,m.tool); const box=el.querySelector('#rst').clientWidth-52; const n=[...key].length;
       const vmax=PHONE()? el.querySelector('#rst').clientHeight-24 : DESK()? el.querySelector('#rst').clientHeight-64 : innerHeight*0.6; const size=Math.floor(clamp(m.v? Math.min(160, vmax/(n*0.95+0.6)) : Math.min(180, box/(n*0.95+0.6)), 48, 180));
@@ -1620,6 +1637,7 @@ function showCard(){
     el.querySelector('#ragain').onclick=()=>{seed=newSeed(); draw(false)};
     el.querySelector('#rwatch').onclick=()=>draw(true);
     el.querySelector('#rprint').onclick=e=>{ const w=el.querySelector('.stwrap'); const s=w.querySelector('.prtag'); if(s){ s.remove(); e.currentTarget.setAttribute('aria-pressed','false'); return; } w.insertAdjacentHTML('beforeend',`<span class="prtag" lang="ja">${esc(key)}</span>`); e.currentTarget.setAttribute('aria-pressed','true'); };
+    if(first){ el.querySelector('#rgot').onclick=()=>{ if(SWAP) return; rememberGrade(id); seen(id); REPLAY_ID=null; cancelAuto(); S.newToday++; S.cards[id]={...schedule(null,0),introduced:Date.now()}; store.set(SKEY,S); swapCard(); }; return; }
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
         <div class="answer"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
@@ -1691,6 +1709,7 @@ addEventListener('keydown',e=>{ if(e.ctrlKey||e.metaKey||e.altKey||e.isComposing
   const grades=[...card.querySelectorAll('.grades button')];
   if(e.key==='Enter'){ if(performance.now()-cardShownAt<450){ e.preventDefault(); return; }
     if(grades.length){ e.preventDefault(); (card.querySelector('.grades .sug')||grades[2]).click(); return; }
+    const got=card.querySelector('#rgot'); if(got){ e.preventDefault(); got.click(); return; }
     if(typing){ if(!t.value.trim()){ e.preventDefault(); const dk=card.querySelector('#reveal,#preveal'); if(dk) dk.click(); } return; }
     const chk=card.querySelector('#wcheck'); if(chk){ e.preventDefault(); chk.click(); return; }
     const inp=card.querySelector('.answerbar input:not(:disabled)'); if(inp){ e.preventDefault(); inp.focus(); } return; }
@@ -2580,7 +2599,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · c729e7d2c4</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · f364c05da0</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -2659,7 +2678,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes travaillées','cards practised')} · ${es.filter(([,e])=>e.ok).length} ${tr('réussies au premier essai','right on the first try')}.</p>${wrong.length?`<p>${tr('À retrouver sans hésiter','Words to revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}.</p><button class="btn" id="review-difficult">${tr('Retravailler mes hésitations','Practise my difficult cards')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · c729e7d2c4';
+const BUILD='2 · f364c05da0';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
