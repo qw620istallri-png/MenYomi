@@ -1407,8 +1407,7 @@ const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味�
 const PH=DATA.phrases||{signs:[],talk:[],scenes:[]}; const PHSET=new Set([...PH.signs,...PH.talk]);
 const isPhrase=w=>PHSET.has(w), hasKanji=w=>/[一-鿿]/.test(w), firstId=w=>(hasKanji(w)?'r:':'m:')+w;
 const PH_FIRST=['いらっしゃいませ','すみません','ください','お会計','いただきます','ごちそうさまでした','お冷','禁煙','お会計お願いします','営業中','食券','少々お待ちください','ありがとうございました','現金のみ','お持ち帰り','以上です'];
-const ABBR_IDS=new Set(Object.keys((DATA.types.konbini||{}).abbr||{}));
-function buildCards(){ const ids=[], seen=new Set(); const base=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w)&&!isPhrase(w))];
+function buildCards(){ const ABBR_IDS=new Set(Object.keys(((typeof DATA!=='undefined'&&DATA.types.konbini)||{}).abbr||{})); const ids=[], seen=new Set(); const base=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w)&&!isPhrase(w))];
   const ph=[...new Set([...PH_FIRST,...PH.talk,...PH.signs])].filter(w=>WMAP[w]); const order=[];
   base.forEach((w,i)=>{ order.push(w); if(i>=5&&(i-5)%4===0&&ph.length) order.push(ph.shift()); }); order.push(...ph);
   order.forEach(w=>{ if(!hasKanji(w)){ ids.push('m:'+w); if(!isPhrase(w)) ids.push('r:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
