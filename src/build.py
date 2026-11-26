@@ -18,7 +18,7 @@ def render():
     explanations = runpy.run_path(str(HERE / 'explain.py'))
     def seasons(data):
         sz = runpy.run_path(str(HERE / 'seasons.py')); known = {w[0] for w in data['words']}
-        return {'sekki': sz['SEKKI'], 'ko': sz['KO'], 'shun': {m: [w for w in ws if w in known] for m, ws in sz['SHUN'].items()}}
+        return {'sekki': sz['SEKKI'], 'ko': sz['KO'], 'shun': {m: [w for w in ws if w in known] for m, ws in sz['SHUN'].items()}, 'hol': sz['HOLIDAYS']}
     values = {'DATA': data, 'K': json.loads((HERE / 'kanji.json').read_text(encoding='utf-8')), 'EN': {k: en[v] for k, v in dict(w='W_EN', k='K_EN', rad='RAD_EN', fro='FRO_EN', types='TYPES_EN').items()}, 'EXPL': explanations['X'], 'NX': explanations['NX'], 'PARTS': runpy.run_path(str(HERE / 'parts.py'))['P'], 'SEASONS': seasons(data), 'TZ': json.loads((HERE / 'tz.json').read_text(encoding='utf-8')), 'VOICE': json.loads((HERE / 'voice' / 'voice.json').read_text(encoding='utf-8'))}
     for key, value in values.items():
         template = template.replace('__' + key + '__', json.dumps(value, ensure_ascii=False, separators=(',', ':')))

@@ -128,3 +128,25 @@ SHUN = {
     11: ['牡蠣フライ', '鰤', '熱燗', 'おでん', 'もつ鍋', '肉まん'],
     12: ['石狩鍋', '鰤', '蟹', '熱燗', '牡蠣フライ', 'おでん'],
 }
+
+# public holidays named on the calendar: reading, French, English, a line on each
+HOLIDAYS = {
+    '元日': ['がんじつ', 'Jour de l’an', 'New Year’s Day', 'Le premier jour de l’année. Beaucoup de boutiques ferment jusqu’au 3 janvier, et on mange les plats froids de l’osechi.', 'The first day of the year. Many shops close until 3 January, and families eat the cold osechi dishes.'],
+    '成人の日': ['せいじんのひ', 'Jour de la majorité', 'Coming of Age Day', 'On fête ceux qui deviennent adultes dans l’année, souvent en kimono, avec une cérémonie en mairie.', 'Celebrates those who come of age this year, often in kimono, with a ceremony at the town hall.'],
+    '建国記念の日': ['けんこくきねんのひ', 'Fondation du pays', 'National Foundation Day', 'Commémore la fondation légendaire du Japon par l’empereur Jinmu.', 'Marks the legendary founding of Japan by Emperor Jinmu.'],
+    '天皇誕生日': ['てんのうたんじょうび', 'Anniversaire de l’empereur', 'Emperor’s Birthday', 'La date suit l’empereur en place ; le palais ouvre ses portes au public ce jour-là.', 'The date follows the reigning emperor; the palace opens to the public that day.'],
+    '春分の日': ['しゅんぶんのひ', 'Équinoxe de printemps', 'Spring Equinox Day', 'Le jour et la nuit sont égaux. On rend visite aux tombes de la famille, et on mange des botamochi.', 'Day and night are equal. Families visit their graves and eat botamochi.'],
+    '昭和の日': ['しょうわのひ', 'Jour de Shōwa', 'Shōwa Day', 'Ancien anniversaire de l’empereur Shōwa. Il ouvre la Golden Week, la semaine des grands départs.', 'The former birthday of Emperor Shōwa. It opens Golden Week, the big holiday week.'],
+    '憲法記念日': ['けんぽうきねんび', 'Jour de la Constitution', 'Constitution Day', 'Commémore la Constitution de 1947.', 'Marks the 1947 Constitution.'],
+    'みどりの日': ['みどりのひ', 'Jour de la verdure', 'Greenery Day', 'Un jour pour profiter de la nature, au milieu de la Golden Week.', 'A day to enjoy nature, in the middle of Golden Week.'],
+    'こどもの日': ['こどものひ', 'Jour des enfants', 'Children’s Day', 'Les carpes en tissu (koinobori) flottent au vent, et on mange des kashiwa-mochi.', 'Cloth carp streamers (koinobori) fly in the wind, and people eat kashiwa-mochi.'],
+    '海の日': ['うみのひ', 'Jour de la mer', 'Marine Day', 'Remercie la mer, le troisième lundi de juillet ; l’été commence vraiment.', 'Gives thanks to the sea, on the third Monday of July; summer really begins.'],
+    '山の日': ['やまのひ', 'Jour de la montagne', 'Mountain Day', 'Un jour pour la montagne, juste avant les congés d’Obon.', 'A day for the mountains, just before the Obon holidays.'],
+    '敬老の日': ['けいろうのひ', 'Jour du respect des aînés', 'Respect for the Aged Day', 'On honore les personnes âgées, le troisième lundi de septembre.', 'Honours the elderly, on the third Monday of September.'],
+    '秋分の日': ['しゅうぶんのひ', 'Équinoxe d’automne', 'Autumn Equinox Day', 'Le jour et la nuit sont égaux. On rend visite aux tombes de la famille, et on mange des ohagi.', 'Day and night are equal. Families visit their graves and eat ohagi.'],
+    'スポーツの日': ['スポーツのひ', 'Jour du sport', 'Sports Day', 'Rappelle l’ouverture des Jeux de Tōkyō 1964 ; les écoles organisent leurs fêtes sportives.', 'Recalls the opening of the 1964 Tōkyō Olympics; schools hold their sports days.'],
+    '文化の日': ['ぶんかのひ', 'Jour de la culture', 'Culture Day', 'On remet les décorations culturelles, et les musées sont souvent gratuits.', 'Cultural honours are awarded, and museums are often free.'],
+    '勤労感謝の日': ['きんろうかんしゃのひ', 'Jour de remerciement du travail', 'Labour Thanksgiving Day', 'Vient d’une ancienne fête des récoltes, où l’empereur goûte le riz nouveau.', 'Comes from an old harvest festival, where the emperor tastes the new rice.'],
+    '振替休日': ['ふりかえきゅうじつ', 'Jour férié reporté', 'Substitute holiday', 'Un jour férié tombé un dimanche est reporté au jour suivant.', 'A holiday that falls on a Sunday moves to the next day.'],
+    '国民の休日': ['こくみんのきゅうじつ', 'Jour du peuple', 'Citizens’ holiday', 'Un jour coincé entre deux jours fériés devient férié lui aussi.', 'A day squeezed between two holidays becomes a holiday too.'],
+}
