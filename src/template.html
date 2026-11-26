@@ -1328,10 +1328,11 @@ function wordChips(word){ const cs=[...new Set([...word].filter(c=>isKanji(c)&&c
 const MEDIA=[ // reading-card looks: surface, tool, color, vertical
   {surface:'washi',tool:'brush',v:true,label:'papier, pinceau'},{surface:'kinari',tool:'brush',v:true,label:'bande de papier, pinceau'},{surface:'wood',tool:'brush',v:true,label:'plaque de bois, pinceau'},
   {surface:'yellow',tool:'chisel',v:false,label:'affiche jaune, feutre biseauté'},{surface:'white',tool:'marker',v:false,color:'#d12a1b',label:'affiche, feutre rouge'},
-  {surface:'board',tool:'chalk',v:false,label:'ardoise, craie'},{surface:'cream',tool:'pen',v:false,label:'carte, stylo'},{surface:'white',tool:'chisel',v:true,label:'papier, feutre biseauté'}];
+  {surface:'board',tool:'chalk',v:false,label:'ardoise, craie'},{surface:'cream',tool:'pen',v:false,label:'carte, stylo'},{surface:'white',tool:'chisel',v:true,label:'papier, feutre biseauté'},
+  {surface:'washi',tool:'brush',v:false,label:'menu sur papier, pinceau'},{surface:'kinari',tool:'brush',v:false,label:'carte de menu, pinceau'},{surface:'wood',tool:'brush',v:false,label:'planche de bois, pinceau'}];
 let curAnim=null;
 const HANDS={kaisho:'soignée',hurry:'pressée',gyosho:'semi-cursive',sosho:'très cursive'}, HANDS_EN={kaisho:'neat',hurry:'hurried',gyosho:'semi-cursive',sosho:'very cursive'};
-const MEDIA_EN=['paper, brush','paper strip, brush','wooden plaque, brush','yellow poster, chisel marker','poster, red marker','slate, chalk','card, pen','paper, chisel marker'];
+const MEDIA_EN=['paper, brush','paper strip, brush','wooden plaque, brush','yellow poster, chisel marker','poster, red marker','slate, chalk','card, pen','paper, chisel marker','menu paper, brush','menu card, brush','wooden board, brush'];
 // the "all done" card is centred in the free height below the stats, to let it breathe
 function centerDone(){ const el=document.getElementById('card'); if(!el.classList.contains('donecard')) return; el.style.marginTop='';
   const r=el.getBoundingClientRect(), nav=document.querySelector('nav.tabs'), nb=PHONE()&&nav?nav.getBoundingClientRect().top:innerHeight; const top=r.top+scrollY;

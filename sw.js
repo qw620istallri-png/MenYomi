@@ -1,5 +1,5 @@
 // Menyomi offline cache. The version changes with every build so a new page replaces the old one.
-const V='menyomi-493393975d71'; self.addEventListener('message',e=>{ if(e.data==='skip') self.skipWaiting(); }); const CORE=['./','index.html','manifest.webmanifest','voice.mp3','icon-192.png','icon-512.png','icon-180.png','icon-32.png'];
+const V='menyomi-cf8e648bed40'; self.addEventListener('message',e=>{ if(e.data==='skip') self.skipWaiting(); }); const CORE=['./','index.html','manifest.webmanifest','voice.mp3','icon-192.png','icon-512.png','icon-180.png','icon-32.png'];
 self.addEventListener('install',e=>{ e.waitUntil(caches.open(V).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())); });
 self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('menyomi-')&&k!==V&&k!=='menyomi-fonts'&&k!=='menyomi-state').map(k=>caches.delete(k)))).then(()=>self.clients.claim())); });
 self.addEventListener('periodicsync',e=>{ if(e.tag!=='menyomi-daily') return; e.waitUntil((async()=>{
