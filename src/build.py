@@ -16,7 +16,10 @@ def render():
     data.update(words=[[w, *v] for w, v in menu['W'].items()], types=menu['T'], regions=menu['R'], names=menu['NAMES'], namepat=menu['NAMEPAT_R'], mentions=menu['MENTIONS'], phrases=menu['PHRASES'], prices=menu['PRICES'])
     en = runpy.run_path(str(HERE / 'en.py'))
     explanations = runpy.run_path(str(HERE / 'explain.py'))
-    values = {'DATA': data, 'K': json.loads((HERE / 'kanji.json').read_text(encoding='utf-8')), 'EN': {k: en[v] for k, v in dict(w='W_EN', k='K_EN', rad='RAD_EN', fro='FRO_EN', types='TYPES_EN').items()}, 'EXPL': explanations['X'], 'NX': explanations['NX'], 'PARTS': runpy.run_path(str(HERE / 'parts.py'))['P'], 'TZ': json.loads((HERE / 'tz.json').read_text(encoding='utf-8')), 'VOICE': json.loads((HERE / 'voice' / 'voice.json').read_text(encoding='utf-8'))}
+    def seasons(data):
+        sz = runpy.run_path(str(HERE / 'seasons.py')); known = {w[0] for w in data['words']}
+        return {'sekki': sz['SEKKI'], 'ko': sz['KO'], 'shun': {m: [w for w in ws if w in known] for m, ws in sz['SHUN'].items()}}
+    values = {'DATA': data, 'K': json.loads((HERE / 'kanji.json').read_text(encoding='utf-8')), 'EN': {k: en[v] for k, v in dict(w='W_EN', k='K_EN', rad='RAD_EN', fro='FRO_EN', types='TYPES_EN').items()}, 'EXPL': explanations['X'], 'NX': explanations['NX'], 'PARTS': runpy.run_path(str(HERE / 'parts.py'))['P'], 'SEASONS': seasons(data), 'TZ': json.loads((HERE / 'tz.json').read_text(encoding='utf-8')), 'VOICE': json.loads((HERE / 'voice' / 'voice.json').read_text(encoding='utf-8'))}
     for key, value in values.items():
         template = template.replace('__' + key + '__', json.dumps(value, ensure_ascii=False, separators=(',', ':')))
     for key, filename in [('PROGRESS', 'progress.js'), ('LEARNING', 'learning.js'), ('AMBIENCE', 'ambience.js'), ('DOODLES', 'doodles.js')]:

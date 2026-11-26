@@ -51,3 +51,11 @@ test('invalid remote data aborts before any write',async()=>{
   let wrote=false;const F={runTransaction:(_,fn)=>fn({get:async()=>({exists:()=>true,data:()=>({s:'{"cards":null}'})}),set(){wrote=true;}})};
   await assert.rejects(P.commit(F,{},'test',P.fresh(),read,day),/invalid-remote/);assert.equal(wrote,false);
 });
+test('review days, shop stamps and counters survive the 90-day trim and merge',()=>{
+  const a=P.fresh(),b=P.fresh();a.rdays=['2025-01-02'];a.days={'2026-11-20':[1,2]};a.stamps={ramen:5,sushi:9};a.firsts=3;delete a.nrev;
+  b.rdays=['2025-01-03','2025-01-02'];b.stamps={ramen:4};b.firsts=7;b.nrev=40;
+  const v=P.validate(a,ids,words);assert.deepEqual(v.rdays,['2025-01-02','2026-11-20']);assert.equal(v.nrev,2);
+  const m=P.merge(v,P.validate(b,ids,words),day);assert.deepEqual(m.rdays,['2025-01-02','2025-01-03','2026-11-20']);
+  assert.deepEqual({...m.stamps},{ramen:4,sushi:9});assert.equal(m.firsts,7);assert.equal(m.nrev,40);
+  for(const bad of [{cards:{},rdays:'x'},{cards:{},rdays:['2025-1-2']},{cards:{},stamps:{'Bad!':1}},{cards:{},firsts:-1}]) assert.equal(P.validate(bad,ids,words),null);
+});

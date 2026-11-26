@@ -589,7 +589,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
   #logo{width:40px;height:40px;box-shadow:3px 3px 0 var(--blue)}
   .mast h1{font-size:28px;gap:8px;flex-wrap:nowrap;white-space:nowrap}
   .mast h1 .jp{font-size:15px}
-  .hctl .btn{padding:6px 10px}
+  .hctl{gap:4px}.hctl .btn{padding:6px 10px}
   header.top{grid-template-columns:auto minmax(0,1fr) auto}
   .mast{min-width:0}
   #v-revisions .vhead{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin:10px 0}
@@ -774,6 +774,174 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:sof
 .paper-tape{position:absolute;z-index:4;pointer-events:none;background:var(--tape,linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa));border-inline:1px solid #f0e3be65;box-shadow:0 1px 2px #35241125}
 .paper-curl{position:absolute;z-index:3;pointer-events:none;background:linear-gradient(135deg,#bbaa87 0%,#f8f1df 24%,#e7d8b9 83%);clip-path:polygon(0 0,100% 0,0 100%);border-top-left-radius:2px;filter:drop-shadow(-1px -1px 1px #553c2238)}
 .pad canvas.ink-sheen{z-index:3;pointer-events:none;mix-blend-mode:normal}.pad canvas.over{z-index:4;pointer-events:none}
+/* ---------- stamp book (帳) */
+@media (max-width:420px){.hctl .btn{padding:6px 7px}.mast h1{gap:6px}}
+.hctl #stampbtn{position:relative;font-family:var(--f-jp);font-weight:700;color:var(--acc)}
+.hctl #stampbtn[aria-current="page"]{background:var(--ink);color:var(--paper)}
+.hctl #stampbtn i{position:absolute;top:-6px;right:-6px;width:12px;height:12px;border-radius:50%;background:var(--acc);border:2px solid var(--paper)}
+.stmp{mix-blend-mode:multiply}
+:root[data-theme="dark"] .stmp{mix-blend-mode:normal}
+:root[data-theme="dark"] .rcal .stmp,:root[data-theme="dark"] .book .stmp{mix-blend-mode:multiply}
+.ck{display:grid;gap:48px;padding-block:26px 70px}
+.ck-h{display:grid;gap:8px}
+.ck-h h1{margin:0;font:900 clamp(34px,6vw,54px)/1 var(--f-disp);text-transform:uppercase;letter-spacing:-.01em;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px}
+.ck-h h1 .jp{font:600 .55em var(--f-jp);color:var(--acc);text-transform:none}
+.ck-h p{margin:0;font-size:18px}.ck-h p b{font:900 22px var(--f-disp)}
+.ck-cols{display:grid;gap:48px 56px;align-items:start}
+.ck-l{display:grid;gap:40px;min-width:0}
+@media (min-width:1000px){.ck-cols{grid-template-columns:minmax(0,1.08fr) minmax(0,1fr)}}
+.ck-lab{font:700 14px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--mute);display:flex;justify-content:space-between;gap:12px;margin-bottom:14px}
+.ck-lab i{font-style:normal;letter-spacing:0;text-transform:none;font-family:var(--f-body);font-weight:500;text-align:right}
+/* retro wall calendar */
+.rcal{position:relative;padding:34px 22px 26px;background:#f7f0dd var(--washi) center/400px;color:#1b1712;transform:rotate(-.5deg);box-shadow:0 1px 1px rgba(60,40,10,.25),0 14px 28px -10px rgba(60,40,10,.38)}
+.rcal::before,.rcal::after{content:'';position:absolute;top:-12px;width:92px;height:28px;background:var(--tp);opacity:.92}
+.rcal::before{left:18%;transform:rotate(-4deg)}.rcal::after{right:16%;transform:rotate(3deg)}
+.rc-top{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:4px 16px;align-items:end;border-bottom:3px solid #1b1712;padding-bottom:12px}
+.rc-num{font:900 92px/.8 var(--f-disp);letter-spacing:-.04em}
+.rc-old canvas{display:block}
+.rc-meta{display:grid;gap:2px;justify-items:end;text-align:right;align-self:stretch;align-content:end}
+.rc-meta .y{font:700 14px var(--f-mono);letter-spacing:.06em}.rc-meta .m{font:800 22px var(--f-disp);text-transform:uppercase}
+.rc-meta .s{font:600 15px var(--f-jp);color:#a3281c}
+.rc-g{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));margin-top:6px}
+.rc-g .wd{font:600 16px var(--f-jp);text-align:center;padding:8px 0 6px;border-bottom:1px solid rgba(27,23,18,.35)}
+.rc-g .su{color:#b3261b}.rc-g .sa{color:#1d4e89}
+.rc-g .d{position:relative;min-height:62px;padding:6px 0 4px;border-bottom:1px solid rgba(27,23,18,.16);display:grid;justify-items:center;align-content:start;gap:2px}
+.rc-g .d b{font:800 26px/1 var(--f-disp);letter-spacing:-.02em;position:relative;z-index:1}
+.rc-g .d small{font:600 14px/1.1 var(--f-jp);color:#b3261b;white-space:nowrap;margin-top:8px;position:relative;z-index:1}
+.rc-g .d.today::after{content:'';position:absolute;inset:3px 4px;border:2px solid #1b1712}
+.rc-g .d canvas{position:absolute;left:50%;top:20px;transform:translate(-50%,-50%);pointer-events:none}
+.rc-g .d.out b{color:rgba(27,23,18,.25)}
+.rc-dd{position:absolute;pointer-events:none;mix-blend-mode:multiply}
+.rc-nav{position:absolute;right:14px;top:8px;display:flex;gap:6px;z-index:2}
+.rc-nav button{background:none;border:0;color:#1b1712;font:800 20px var(--f-disp);padding:0 8px;cursor:pointer}
+.rc-nav button:disabled{opacity:.25;cursor:default}
+/* the month's micro-seasons */
+.rc-ko{display:grid;margin-top:16px;border-top:3px solid #1b1712}
+.kor{display:grid;grid-template-columns:44px 52px auto auto minmax(0,1fr);gap:2px 10px;align-items:baseline;padding:8px 2px;border-bottom:1px dashed rgba(27,23,18,.3);cursor:pointer;color:#1b1712}
+.kor .sk2{font:700 15px var(--f-jp);color:#a3281c}.kor .kd{font:700 14px var(--f-mono)}.kor .kj{font:600 19px var(--f-jp)}
+.kor .kn{display:grid;justify-items:start;justify-self:start;min-width:0}
+.kor .kn .kk{font:500 15px var(--f-jp);color:#7a6f5f;border-bottom:1px dotted rgba(27,23,18,.35)}
+/* the romaji goes under the kana, within their width, so the row keeps its columns */
+.kor .kn .rr{display:none;width:0;min-width:100%;box-sizing:border-box;font:600 14px/1.35 var(--f-mono);background:rgba(246,217,47,.5);padding:1px 4px;margin-top:2px}
+.kor:hover .kn .rr,.kor:focus-visible .kn .rr{display:block}
+.kor .fr{font-size:15px;color:#4c4337}
+.kor.cur{background:linear-gradient(90deg,rgba(246,217,47,.42),rgba(246,217,47,.12))}
+.kor .kx{grid-column:1/-1;display:grid;gap:10px;padding:10px 0 6px 54px;cursor:auto}
+.kor .kx .rd{font:600 17px var(--f-jp)}.kor .kx .rd span{font:600 14px var(--f-mono);color:#4c4337;margin-left:8px}
+.kor .kx p{margin:0;font-size:15px;line-height:1.5;max-width:56ch}
+.kor .kx .chip{background:#fbf6ea;color:#1b1712}
+@media (max-width:700px){.kor{grid-template-columns:38px 44px minmax(0,1fr);gap:0 8px}.kor .kn{display:none}.kor .fr{grid-column:3;font-size:14px;line-height:1.35}.kor .kx{padding-left:0}}
+/* dishes in season + the year */
+.shun{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (min-width:1000px){.shun{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.shun button{display:grid;justify-items:start;align-content:start;gap:2px;padding:10px 12px;background:var(--sheet);border:2px solid var(--rule);box-shadow:3px 3px 0 var(--rule);color:var(--ink);font:inherit;text-align:left;cursor:pointer;min-width:0}
+.shun button:hover{background:var(--lime);color:#121212}
+.shun canvas{display:block;max-width:100%}.shun .r{font:500 14px var(--f-jp);color:var(--mute)}.shun .m{font-size:14px}
+.shun button:hover .r{color:#333}
+.year{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px 12px}
+@media (min-width:1000px){.year{grid-template-columns:repeat(6,minmax(0,1fr))}}
+.year .mo{display:grid;gap:4px;background:none;border:0;padding:4px;color:var(--ink);font:inherit;cursor:pointer;text-align:left}
+.year .mo:hover{outline:2px solid var(--rule)}
+.year .mo b{font:600 15px var(--f-jp);display:flex;gap:6px;align-items:baseline}.year .mo b span{font:700 14px var(--f-mono);color:var(--mute)}
+.year .mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.year .mg i{aspect-ratio:1;background:color-mix(in srgb,var(--ink) 8%,transparent);border-radius:50%}
+.year .mg i.r{background:var(--acc)}.year .mg i.e{background:none}
+.year .mo.now b{color:var(--acc)}.year .mo.sel{outline:2px solid var(--rule)}
+/* stamp-rally booklet */
+.book{position:relative;padding:12px;background:#7d2b20 repeating-linear-gradient(45deg,rgba(0,0,0,.06) 0 2px,transparent 2px 5px);border-radius:7px;box-shadow:0 2px 2px rgba(40,15,5,.35),0 18px 30px -12px rgba(40,15,5,.55)}
+.book .pgs{display:grid;grid-template-columns:minmax(0,1fr);background:#f6efdb var(--washi) center/380px;position:relative}
+.book .pg+.pg{display:none}
+@media (min-width:1000px){.book .pgs{grid-template-columns:repeat(2,minmax(0,1fr))}.book .pg+.pg{display:grid}
+ .book .pgs::after{content:'';position:absolute;top:0;bottom:0;left:50%;width:70px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(60,35,10,.16) 46%,rgba(60,35,10,.28) 50%,rgba(60,35,10,.16) 54%,transparent);pointer-events:none}
+}
+@media (max-width:999px){.book.p2 .pg{display:none}.book.p2 .pg+.pg{display:grid}}
+.book .pg{padding:16px 16px 12px;display:grid;gap:12px;color:#1b1712}
+.book .pg header{display:flex;justify-content:space-between;align-items:baseline;border-bottom:2px solid #1b1712;padding-bottom:6px}
+.book .pg header b{font:700 16px var(--f-jp)}.book .pg header span{font:700 14px var(--f-mono);color:#7a6f5f}
+.book .bx{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.book .cell{--rs:62px;position:relative;display:grid;justify-items:center;gap:4px;padding:8px 4px 6px;border:1.5px dashed rgba(27,23,18,.35);background:none;color:#1b1712;font:inherit;cursor:pointer}
+@media (min-width:1000px){.book .cell{--rs:72px}}
+.book .cell:hover{background:rgba(246,217,47,.25)}
+.book .cell .ring{width:var(--rs);height:var(--rs);border-radius:50%;border:1.5px solid rgba(27,23,18,.18);display:grid;place-items:center;font:600 28px var(--f-jp);color:rgba(27,23,18,.16)}
+.book .cell canvas{position:absolute;left:50%;top:calc(8px + var(--rs)/2)}
+.book .cell b{font-size:15px;font-weight:700;line-height:1.1;text-align:center}.book .cell small{font:500 14px var(--f-jp);color:#7a6f5f}
+.book .cell .pc{font:700 14px var(--f-mono);color:#7a6f5f}.book .cell.got .pc{color:#a3281c}
+.book .pg footer{text-align:center;font:600 15px var(--f-jp);color:#7a6f5f}
+.book .tabs2{display:flex;justify-content:center;gap:10px;margin-top:10px}
+.book .tabs2 button{background:#e8dcbc;border:2px solid #1b1712;font:700 15px var(--f-jp);padding:4px 10px;box-shadow:2px 2px 0 #1b1712;color:#1b1712;cursor:pointer}
+.book .tabs2 button[aria-pressed="true"]{background:#f6d92f}
+@media (min-width:1000px){.book .tabs2{display:none}}
+/* tiered milestones */
+.miles{display:grid}
+.track{border-bottom:1px dashed color-mix(in srgb,var(--ink) 30%,transparent);padding:18px 0;display:grid;gap:10px}
+.track:first-child{border-top:3px solid var(--rule)}
+.track .th{display:flex;align-items:center;gap:12px}
+.ico2{flex:none;width:34px;height:34px;display:grid;place-items:center;background:var(--rule);color:var(--sheet);font:600 19px var(--f-jp);box-shadow:3px 3px 0 var(--acc)}
+.track .tx{flex:1;min-width:0;display:grid;gap:1px}.track .tx b{font-size:17px;font-weight:700}.track .tx small{font-size:14px;color:var(--mute)}
+.track .nx{font:700 14px var(--f-mono);white-space:nowrap}
+.tiers{display:flex;align-items:flex-end;justify-content:space-between;gap:6px}
+.tier{display:grid;justify-items:center;gap:4px}
+.tier .tph{border:2px dashed color-mix(in srgb,var(--rule) 45%,transparent);border-radius:50%;display:grid;place-items:center;font-family:var(--f-jp);font-weight:600;color:color-mix(in srgb,var(--ink) 22%,transparent)}
+.tier.next .tph{border-color:var(--rule);color:color-mix(in srgb,var(--ink) 40%,transparent)}
+.tier.later{opacity:.55}
+.tier .tl{font:700 14px var(--f-mono)}.tier.got .tl{color:var(--acc)}
+.tier .pb{width:100%;min-width:30px;height:6px;border:2px solid var(--rule);position:relative;box-sizing:content-box}.tier .pb i{position:absolute;inset:0 auto 0 0;background:var(--ink)}
+/* a shop's page */
+.sd{display:grid;gap:18px}
+.sd-top{display:flex;gap:18px;align-items:center}.sd-top canvas{flex:none}
+.sd-top .ring{flex:none;width:104px;height:104px;border-radius:50%;border:2px dashed color-mix(in srgb,var(--rule) 45%,transparent);display:grid;place-items:center;font:600 44px var(--f-jp);color:color-mix(in srgb,var(--ink) 25%,transparent)}
+.sd-top h2{margin:0;font:900 30px/1 var(--f-disp)}.sd-top .jp{font:600 20px var(--f-jp);color:var(--acc)}
+.sd-top p{margin:6px 0 0;font-size:15px;color:var(--mute)}
+.sd-pc{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.sd-pc b{font:900 40px var(--f-disp)}
+.sd .lab2{font:700 14px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute)}
+.sd-w{display:flex;flex-wrap:wrap;gap:8px}
+.sd-w button{font:500 20px var(--f-jp);padding:4px 10px;border:2px solid var(--rule);background:var(--sheet);color:var(--ink);cursor:pointer}
+.sd-w button:hover{background:var(--lime);color:#121212}
+.sd-w button.no{border-style:dashed;color:color-mix(in srgb,var(--ink) 50%,transparent);border-color:color-mix(in srgb,var(--rule) 45%,transparent)}
+.sd .drow{display:flex;gap:10px;flex-wrap:wrap}
+/* settings panel (i) */
+.ipan{display:grid;gap:14px}
+.ipan .lab2{font:700 14px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin:10px 0 -6px}
+.ipan .card2{border:2px solid var(--rule);background:var(--sheet);box-shadow:4px 4px 0 var(--rule)}
+.ipan .stats3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-bottom:2px solid var(--rule)}
+.ipan .stats3>div{padding:12px 10px 10px;display:grid;gap:2px}.ipan .stats3>div+div{border-left:2px solid var(--rule)}
+.ipan .stats3 b{font:900 30px/1 var(--f-disp)}.ipan .stats3 b small{font-size:16px;font-weight:800;margin-left:2px}
+.ipan .stats3 span{font-size:14px;color:var(--mute)}.ipan .stats3 span em{font-style:normal;font-family:var(--f-jp);color:var(--acc);margin-right:4px}
+.ipan .row2{display:flex;align-items:center;gap:12px;padding:12px;min-height:58px;box-sizing:border-box;width:100%;background:none;border:0;color:var(--ink);text-align:left;font:inherit;cursor:pointer;text-decoration:none}
+.ipan button.row2:hover,.ipan a.row2:hover,.ipan summary.row2:hover{background:color-mix(in srgb,var(--lime) 45%,transparent)}
+.ipan .card2>*+*{border-top:2px solid var(--rule)}
+.ipan .card2>.vol,.ipan .card2>.hint{border-top:0}
+.ipan .ico{flex:none;width:38px;height:38px;display:grid;place-items:center;background:var(--rule);color:var(--sheet);font:600 21px var(--f-jp);box-shadow:3px 3px 0 var(--acc);overflow:hidden}
+.ipan .ico.g{background:#fff;box-shadow:none;border:2px solid var(--rule)}
+.ipan .ico img{width:100%;height:100%;object-fit:cover}
+.ipan .tx{flex:1;min-width:0;display:grid;gap:1px}.ipan .tx b{font-size:17px;font-weight:700}.ipan .tx small{font-size:14px;color:var(--mute)}
+.ipan .chev{font:800 20px var(--f-disp);flex:none}
+.ipan .swi{flex:none;appearance:none;-webkit-appearance:none;margin:0;width:52px;height:30px;border:2px solid var(--rule);background:var(--sheet) linear-gradient(var(--rule),var(--rule)) 3px 50%/20px 20px no-repeat;transition:background .2s;cursor:pointer}
+.ipan .swi:checked{background:var(--acc) linear-gradient(#fff6e6,#fff6e6) 25px 50%/20px 20px no-repeat}
+.ipan .swi:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.ipan .vol{display:flex;align-items:center;gap:10px;padding:0 12px 14px 62px;margin-top:-6px}
+.ipan .vol input{flex:1;accent-color:var(--acc)}.ipan .vol span{font:700 14px var(--f-mono);color:var(--mute);min-width:2ch}
+.ipan .mini{display:flex;flex:none;min-width:38px}.ipan .mini canvas{margin-left:-14px}.ipan .mini canvas:first-child{margin-left:0}
+.ipan .mini .e{width:38px;height:38px;border:2px dashed color-mix(in srgb,var(--rule) 45%,transparent);border-radius:50%;display:grid;place-items:center;font:600 18px var(--f-jp);color:var(--mute)}
+.ipan .hint{margin:0;padding:0 12px 12px 62px}
+.ipan .hint:empty{display:none}
+.ipan details.xfer>summary{list-style:none}.ipan details.xfer>summary::-webkit-details-marker{display:none}
+.ipan details.xfer[open] .chev{transform:rotate(90deg)}
+.ipan details.xfer .moreb{display:grid;gap:10px;padding:4px 12px 14px}
+.ipan .sbtns{display:flex;gap:6px;flex:none}
+.ipan .foot{display:grid;gap:6px;font-size:15px;color:var(--mute);padding-top:10px;border-top:2px solid var(--rule)}
+.ipan .foot .who{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.ipan .foot .who b{color:var(--ink);font:900 18px var(--f-disp)}.ipan .foot .jp{font-family:var(--f-jp);color:var(--acc)}.ipan .foot u{color:var(--ink);text-decoration:none;font-weight:700}
+.ipan .foot details summary{cursor:pointer;color:var(--ink)}
+.ipan .foot ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
+/* end of session */
+#card .end-st{position:absolute;right:-6px;top:-30px;pointer-events:none;z-index:2}
+#card .newst{display:flex;align-items:center;gap:12px;border:2px solid var(--rule);background:var(--lime);color:#121212;padding:8px 12px;box-shadow:4px 4px 0 var(--rule);text-decoration:none}
+#card .newst b{font:800 18px var(--f-disp);display:block}#card .newst span{font-size:15px}
+:root[data-theme="dark"] #card .newst .stmp{mix-blend-mode:multiply}
+@keyframes stland{0%{opacity:0;transform:scale(1.7) rotate(-6deg)}60%{opacity:1;transform:scale(.94)}100%{opacity:1;transform:none}}
+.stland{animation:stland .42s cubic-bezier(.3,.7,.3,1) both}
+@media (prefers-reduced-motion:reduce){.stland{animation:none}}
 </style>
 
 <div id="ground" aria-hidden="true"></div>
@@ -784,7 +952,7 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:sof
 <header class="top">
   <canvas id="logo" width="152" height="152" aria-hidden="true"></canvas>
   <div class="mast"><h1><a class="home" href="#revisions" aria-label="Menyomi">Menyomi <span class="jp">めん読み</span></a></h1></div>
-  <div class="hctl"><button class="btn" id="langbtn" lang="en">EN</button><button class="btn" id="credbtn" aria-label="Réglages, progression et crédits" data-en-al="Settings, progress and credits" title="Réglages, progression et crédits">i</button></div>
+  <div class="hctl"><button class="btn" id="langbtn" lang="en">EN</button><button class="btn" id="stampbtn" lang="ja" aria-label="Carnet de tampons" data-en-al="Stamp book" title="Carnet de tampons">帳</button><button class="btn" id="credbtn" aria-label="Réglages, progression et crédits" data-en-al="Settings, progress and credits" title="Réglages, progression et crédits">i</button></div>
 </header>
 <nav class="tabs" aria-label="Sections">
   <a href="#revisions"><span class="j">復習</span><span class="f" data-en="Reviews">Révisions</span><span class="s" data-en="Review">Revoir</span></a>
@@ -870,6 +1038,7 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:sof
   <div class="klist" id="klist"></div>
 </section>
 
+<section class="view" id="v-carnet"></section>
 <section class="view" id="v-vocab">
   <div class="vhead"><input class="field search" id="vsearch" type="search" placeholder="tori, 鶏, とり, poulet…" data-en-ph="tori, 鶏, とり, chicken…" aria-label="Chercher un mot" data-en-al="Search a word"><span class="mono" id="vcount" style="color:var(--mute)"></span><span id="vlf"></span></div>
   <div class="vtabs" id="vtabs" role="group" aria-label="Classement"></div>
@@ -891,6 +1060,7 @@ const EN = __EN__;
 const EXPL = __EXPL__;
 const NX = __NX__;
 const PARTS = __PARTS__;
+const SEASONS = __SEASONS__;
 const VOICE = __VOICE__;
 // pre-rendered VOICEVOX clips packed in voice.mp3 ([offset,length] per word); the browser's Japanese voice fills in when a clip is missing or the file can't load
 const say=(()=>{ let buf=null, ld=null, ctx=null, cur=[]; const dec={};
@@ -913,7 +1083,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-say]'); i
 const xp=w=>{ const e=EXPL[w]; return e?`<p class="xp">${esc(e[LANG==='en'?1:0])}</p>`:''; };
 const LANG=(()=>{ let v=null; try{ v=localStorage.getItem('menyomi.lang'); }catch(e){} if(v==='en'||v==='fr') return v; const l=(navigator.languages&&navigator.languages[0])||navigator.language||'fr'; return /^fr\b/i.test(l)?'fr':'en'; })(); document.documentElement.lang=LANG; const tr=(fr,en)=>LANG==='en'?en:fr;
 if(LANG==='en'){ document.documentElement.lang='en'; document.title='Menyomi';
-  document.querySelectorAll('[data-en]').forEach(e=>e.textContent=e.dataset.en); document.querySelectorAll('[data-en-ph]').forEach(e=>e.placeholder=e.dataset.enPh); document.querySelectorAll('[data-en-al]').forEach(e=>e.setAttribute('aria-label',e.dataset.enAl));
+  document.querySelectorAll('[data-en]').forEach(e=>e.textContent=e.dataset.en); document.querySelectorAll('[data-en-ph]').forEach(e=>e.placeholder=e.dataset.enPh); document.querySelectorAll('[data-en-al]').forEach(e=>{ e.setAttribute('aria-label',e.dataset.enAl); if(e.title) e.title=e.dataset.enAl; });
   DATA.words.forEach(w=>{ if(EN.w[w[0]]) w[2]=EN.w[w[0]]; }); Object.entries(EN.types).forEach(([k,v])=>{ if(DATA.types[k]) DATA.types[k].fr=v; }); }
 const KVG = DATA.kvg, KD = DATA.kd;
 // digits as stroke paths (109 grid) so the writing engine can draw prices
@@ -1472,9 +1642,8 @@ function swapCard(){ const el=document.getElementById('card'); const still=match
 function grade(id,g){ if(SWAP) return; rememberGrade(id); if(!SESSION) seen(id); REPLAY_ID=null; cancelAuto(); if(SESSION){ if(SESSION.test&&!SESSION.seen.has(id)){ SESSION.seen.add(id); SESSION.n++; if(g===0){ S.cards[id]=schedule(S.cards[id],0); store.set(SKEY,S); } else SESSION.ok++; }
     SESSION.q.shift(); if(g===0) SESSION.q.push(id); swapCard(); return; }
   const introduced=S.cards[id]?.introduced||(!S.cards[id]?Date.now():undefined); if(!S.cards[id]) S.newToday++; S.cards[id]=schedule(S.cards[id],g); if(introduced) S.cards[id].introduced=introduced; if(!S.todayIds.includes(id)){ S.todayIds.push(id); logDay(g>=2,id); } store.set(SKEY,S); swapCard(); }
-// one entry per day: [right at first try, cards seen]; the streak counts days in a row with at least one card
-function logDay(ok,id){ if(id){ const entries=S.activity[today()]||(S.activity[today()]={}); entries[id]||={ok,at:Date.now()}; const dates=Object.keys(S.activity).sort(); while(dates.length>90) delete S.activity[dates.shift()]; } const d=S.days||(S.days={}); const k=today(); const e=d[k]||(d[k]=[0,0]); e[1]++; if(ok) e[0]++; const ks=Object.keys(d).sort(); while(ks.length>90) delete d[ks.shift()]; }
-function streakDays(){ const d=S.days||{}; const key=i=>dayKey(Date.now()-i*DAY); let i=(d[today()]||[0,0])[1]?0:1, n=0; while(d[key(i)]&&d[key(i)][1]){ n++; i++; } return n; }
+// one entry per day: [right at first try, cards seen]; rdays keeps every day with a review for good (no streaks: only the total counts)
+function logDay(ok,id){ if(id){ const entries=S.activity[today()]||(S.activity[today()]={}); entries[id]||={ok,at:Date.now()}; const dates=Object.keys(S.activity).sort(); while(dates.length>90) delete S.activity[dates.shift()]; } const d=S.days||(S.days={}); const k=today(); const e=d[k]||(d[k]=[0,0]); e[1]++; S.rdays=S.rdays||[]; if(!S.rdays.includes(k)){ S.rdays.push(k); S.rdays.sort(); } S.nrev=(S.nrev||0)+1; if(ok) e[0]++; const ks=Object.keys(d).sort(); while(ks.length>90) delete d[ks.shift()]; }
 function redoToday(){ REPLAY_ID=null; LAST_GRADE=null; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),S.todayIds.slice())}; showCard(); }
 function nextSet(){ TESTRES=null; S.extraNew+=S.newPer; store.set(SKEY,S); showCard(); }
 const PHONE=()=>matchMedia('(max-width:700px)').matches; const DESK=()=>matchMedia('(min-width:1000px)').matches;
@@ -1501,7 +1670,7 @@ let FXC=null; function playFx(ok,ctx){ const c=ctx||(FXC||(FXC=new (window.Audio
     const s=c.createBufferSource(), bp=c.createBiquadFilter(), gn=c.createGain(); s.buffer=n; bp.type='bandpass'; bp.frequency.value=1400; bp.Q.value=1.6; gn.gain.value=.85; s.connect(bp).connect(gn).connect(out); s.start(t0); }
 }
 // short buzz on phones: one tap for right, a double knock for wrong; plus the sound unless muted
-const buzz=ok=>{ try{ if(navigator.vibrate&&matchMedia('(pointer:coarse)').matches) navigator.vibrate(ok?18:[28,70,28]); }catch(e){} try{ if(SOUND_ON()) playFx(ok); }catch(e){} };
+const buzz=ok=>{ try{ if(VIB_ON()&&navigator.vibrate&&matchMedia('(pointer:coarse)').matches) navigator.vibrate(ok?18:[28,70,28]); }catch(e){} try{ if(SOUND_ON()) playFx(ok); }catch(e){} };
 function toGrades(){ cancelAuto(); const s=document.querySelector('#card .grades .sug'); const g0=s?+s.dataset.g:0; if(s) buzz(g0>=2);
   // phone: the check button turns into "Next", which takes the suggested grade
   if(PHONE()&&s){ const b=document.querySelector('#card form.answerbar button[type=submit], #card #wcheck'); if(b){ b.disabled=false; b.classList.add('gonext'); b.innerHTML=tr('Suivant →','Next →'); b.onclick=e=>{ e.preventDefault(); e.stopPropagation(); if(document.body.contains(s)) s.click(); }; } }
@@ -1552,15 +1721,21 @@ function showCard(){
   if(rollDay()) store.set(SKEY,S); renderStats(); if(curAnim) curAnim.stop=true; cardShownAt=performance.now(); setTimeout(()=>document.querySelectorAll('#card .answerbar').forEach(f=>{ const i=f.querySelector('input'); const u=()=>f.classList.toggle('empty',!i.value.trim()); i.addEventListener('input',u); u(); }),0); setTimeout(()=>{ if(matchMedia('(pointer:fine)').matches && location.hash.replace('#','')==='revisions'||location.hash===''){ const inp=document.querySelector('#card .answerbar input:not(:disabled)'); if(inp&&matchMedia('(pointer:fine)').matches) inp.focus({preventScroll:true}); } },60);
   const el=document.getElementById('card'); const id=nextCard(); el.classList.remove('wcard','donecard','intro'); el.style.marginTop='';
   { const vr=document.getElementById('v-revisions'); vr.classList.toggle('busy',!!id); vr.classList.toggle('sess',!!SESSION); if(id) fitStage(); }
-  if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const st=streakDays();
+  if(!id){ const t=S.todayIds.length; const now=Date.now(); const dd=(S.days||{})[today()]||[0,0]; const nd=reviewDays().size, fresh=checkStamps();
     const words=[...new Set(S.todayIds.map(i=>i.slice(2)))].filter(w=>WMAP[w]);
     el.innerHTML=`<h2>${tr('Terminé','All done')} <span class="jp">お疲れ様</span></h2>
-    <div class="stats dstats"><span class="stat"><b>${st}<small>${tr(' j',' d')}</small></b><span>連続 ${tr('série','streak')}</span></span>${dd[1]?`<span class="stat"><b>${Math.round(100*dd[0]/dd[1])}<small>%</small></b><span>${tr('justes','right')}</span></span>`:''}</div>
+    <div class="stats dstats"><span class="stat"><b>${nd}<small>${tr(' j',' d')}</small></b><span>日 ${nd>1?tr('révisés','reviewed'):tr('révisé','reviewed')}</span></span>${dd[1]?`<span class="stat"><b>${Math.round(100*dd[0]/dd[1])}<small>%</small></b><span>${tr('justes','right')}</span></span>`:''}</div>
     ${words.length?`<div class="dwords">${words.slice(0,24).map(w=>`<span lang="ja" title="${esc(WMAP[w][2])}">${esc(w)}</span>`).join('')}</div>`:''}
+    ${fresh.map(s=>`<a class="newst" href="#carnet" data-shop="${s[0]}"><span class="tx"><b>${tr('Nouveau tampon','New stamp')}</b><span>${esc(shopLabel(s))} · ${Math.round(100*shopPct(s[0]))} % ${tr('des mots lus','of the words read')}</span></span></a>`).join('')}
     <div class="drow">${t?`<button class="btn" id="dredo">${tr('Refaire','Redo')}<span class="lg">${tr(' ceux du jour',' today’s')}</span> (${t})</button>`:''}<button class="btn k" id="dnext">Set<span class="lg">${tr(' suivant',' next')}</span> +${S.newPer}</button><a class="btn r" href="#menu" id="dmenu">${tr('Défi','Menu')}<span class="lg">${tr(' menu',' challenge')}</span></a></div>`;
     el.insertAdjacentHTML('beforeend',dailyReport()); if(el.querySelector('#review-difficult')) el.querySelector('#review-difficult').onclick=reviewDifficult;
     el.querySelector('#dmenu').onclick=()=>{ window.MENU_FOCUS=words; qpool='known'; if(typeof menuDone!=='undefined'&&menuDone) setTimeout(()=>genMenu(),0); };
-    if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard'); centerDone(); return; }
+    if(el.querySelector('#dredo')) el.querySelector('#dredo').onclick=redoToday; el.querySelector('#dnext').onclick=nextSet; el.classList.add('donecard');
+    el.querySelectorAll('.newst').forEach(a=>{ const s=SHOPS.find(x=>x[0]===a.dataset.shop); a.prepend(shopStamp(s,62)); });
+    // the day's work gets its 済 stamp; it lands once a day, with the bell and a firm buzz
+    if(dd[1]){ const tk=today(), st=stampCanvas('済',{size:PHONE()?84:96,seed:77+dd[1],rot:-0.22,sub:tk.slice(5).replace('-','·'),font:1,kf:.46,ky:-.05,subY:.25}); st.classList.add('end-st'); el.style.position='relative'; el.appendChild(st);
+      if(lsGet('menyomi.donest')!==tk||fresh.length){ lsSet('menyomi.donest',tk); st.classList.add('stland'); setTimeout(()=>{ try{ if(VIB_ON()&&navigator.vibrate&&matchMedia('(pointer:coarse)').matches) navigator.vibrate(fresh.length?[40,40,90]:40); }catch(e){} try{ if(SOUND_ON()) playFx(true); }catch(e){} },260); } }
+    stampDot(); centerDone(); return; }
   const isNew=!S.cards[id], kind=id[0], key=id.slice(2);
   if(kind==='m' && !isNew && !isPhrase(key) && Math.random()<0.4 && huntPool(key).length>=3){ showHunt(el,id,key); return; }
   // first time a word is met: it is shown with its reading and meaning, the test comes back a minute later
@@ -2097,7 +2272,7 @@ function clickItem(it,btn){
   if(mmode==='explore' || it.isHeader){ const was=btn.classList.contains('sel'); clearSel(); if(!was){ btn.classList.add('sel'); document.getElementById('board').classList.add('hassel'); showInfo(it,undefined,btn); } return; }
   if(target==null) return; score.n++;
   const tw=MENU.flat[target].w;
-  if(it===MENU.flat[target]||it.w===MENU.flat[target].w){ buzz(true); score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
+  if(it===MENU.flat[target]||it.w===MENU.flat[target].w){ buzz(true); if(!qmiss){ S.firsts=(S.firsts||0)+1; store.set(SKEY,S); } score.ok++; streak++; btn.classList.add('good'); const note=qmiss?'':menuReview(tw,true); showInfo(it,true,btn,note); target=null; const sk=document.getElementById('qskip'); if(sk){ sk.textContent=tr('Suivant →','Next →'); sk.classList.add('go'); } }
   else { buzz(false); streak=0; const note=qmiss?'':menuReview(tw,false); qmiss=true; btn.classList.remove('bad'); void btn.offsetWidth; btn.classList.add('bad'); showInfo(it,false,btn,note); }
   updScore(); }
 function clearSel(){ document.querySelectorAll('.board .itm').forEach(b=>b.classList.remove('sel')); const bd=document.getElementById('board'); if(bd) bd.classList.remove('hassel'); hidePop(); }
@@ -2319,7 +2494,7 @@ document.getElementById('ksearch').oninput=renderKList;
 document.querySelector('.mast a.home').addEventListener('click',e=>{ e.preventDefault(); if(location.hash!=='#revisions') location.hash='revisions'; else route(); scrollTo({top:0,behavior:'smooth'}); });
 document.getElementById('logo').addEventListener('click',()=>document.querySelector('.mast a.home').click());
 document.addEventListener('click',e=>{ const b=e.target.closest('.asub [data-sub]'); if(b){ location.hash=b.dataset.sub; } });
-const VIEWS=['revisions','menu','atelier','main','kanji','vocab']; let menuDone=false, simDone=false;
+const VIEWS=['revisions','menu','atelier','main','kanji','vocab','carnet']; let menuDone=false, simDone=false;
 // Écrire and La main open on a different one of « my » kanji / words each day (cycling through them before repeating)
 let DAILY_SET=''; function dailyPicks(){ const k=today(); if(DAILY_SET===k) return; DAILY_SET=k; const dn=Math.round(Date.parse(k+'T12:00:00Z')/DAY);
   const of=(l,salt)=>{ l=shuffle(rng(salt),[...new Set(l)].sort()); return l[((dn%l.length)+l.length)%l.length]; };
@@ -2329,7 +2504,7 @@ function route(){ const h=location.hash.slice(1); const v=VIEWS.includes(h)?h:'r
   VIEWS.forEach(x=>document.getElementById('v-'+x).classList.toggle('on',x===v));
   const tv=v==='main'?'atelier':v; document.querySelectorAll('nav.tabs a').forEach(a=>a.setAttribute('aria-current',a.getAttribute('href')==='#'+tv?'page':'false'));
   if(v==='revisions') showCard(); if(v!=='revisions') cancelAuto(); if(v==='menu'&&!menuDone){menuDone=true; fillSelects(); genMenu();}
-  if(v==='revisions') setTimeout(centerDone,60); if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', ({menu:.62,main:1.75,atelier:1.15,kanji:1.1})[v]||1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
+  if(v==='revisions') setTimeout(centerDone,60); if(v==='atelier') renderAtelier(); if(v==='kanji') renderKList(); if(v==='vocab') renderVocab(); if(v==='carnet') renderCarnet(); { const sb=document.getElementById('stampbtn'); if(sb){ if(v==='carnet') sb.setAttribute('aria-current','page'); else sb.removeAttribute('aria-current'); } } if(v!=='carnet') stampDot(); if(window.setShade) setShade(v); document.getElementById('shade').style.setProperty('--tab', ({menu:.62,main:1.75,atelier:1.15,kanji:1.1})[v]||1); if(v==='main'&&!simDone){simDone=true; setupSim(); runSim(true);} }
 
 // ---------- window light: a shadow scene per tab behind a window frame; the slant follows the hour; at night the page dims and the window becomes a patch of moonlight
 (function shade(){ const A=document.getElementById('sunA'), B=document.getElementById('sunB'); const xa=A.getContext('2d'), xb=B.getContext('2d'); const root=document.documentElement;
@@ -2647,9 +2822,9 @@ function renderSync(host){ if(!host||!document.body.contains(host)) return; cons
   const onSite=/github\.io$|^localhost$|^127\./.test(location.hostname);
   const errMsg=e=>/popup-blocked|popup-closed|cancelled-popup/.test(e)? tr('Fenêtre de connexion fermée ou bloquée.','The sign-in window was closed or blocked.') : /unauthorized-domain|operation-not-supported|web-storage/.test(e)? tr('La connexion Google ne marche pas ici.','Google sign-in does not work here.') : /permission-denied/.test(e)? tr('Accès refusé par la base. Vérifie les règles Firestore.','The database refused access. Check the Firestore rules.') : e? tr('Synchronisation impossible pour l’instant.','Sync is not possible right now.') : '';
   if(u){ const t=SYNC.last? new Date(SYNC.last).toLocaleTimeString(LANG==='en'?'en-GB':'fr-FR',{hour:'2-digit',minute:'2-digit'}) : '…';
-    host.innerHTML=`<div class="syncbox on">${u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:GLOGO}<div><b>${esc(u.displayName||u.email||'Google')}</b><span>${SYNC.busy?tr('En attente de synchronisation','Waiting to sync'):tr('Synchronisé','Synced')} ${t}${SYNC.err?` · <span class="bad">${esc(errMsg(SYNC.err))}</span>`:''}</span></div><button class="btn" id="gsyncnow" title="${tr('Synchroniser maintenant','Sync now')}">↻</button><button class="btn ghost" id="gout">${tr('Déconnexion','Sign out')}</button></div>`;
+    host.innerHTML=`<div class="row2" style="cursor:auto"><span class="ico g">${u.photoURL?`<img src="${esc(u.photoURL)}" alt="" referrerpolicy="no-referrer">`:GLOGO}</span><span class="tx"><b>${esc(u.displayName||u.email||'Google')}</b><small>${SYNC.busy?tr('En attente de synchronisation','Waiting to sync'):tr('Synchronisé','Synced')} ${t}</small></span><span class="sbtns"><button class="btn" id="gsyncnow" title="${tr('Synchroniser maintenant','Sync now')}" aria-label="${tr('Synchroniser maintenant','Sync now')}">↻</button><button class="btn ghost" id="gout">${tr('Déconnexion','Sign out')}</button></span></div>${SYNC.err?`<p class="hint bad">${esc(errMsg(SYNC.err))}</p>`:''}`;
     host.querySelector('#gout').onclick=()=>SYNC.signOut().catch(()=>toast(tr('Synchronisation en échec. Exporte ta progression avant de te déconnecter.','Sync failed. Export your progress before signing out.'))); host.querySelector('#gsyncnow').onclick=()=>SYNC.pull(); return; }
-  host.innerHTML=`<div class="syncbox"><button class="btn gbtn" id="gin">${GLOGO}<span>${tr('Se connecter avec Google','Sign in with Google')}</span></button></div>${!onSite?`<p class="hint" style="margin:6px 0 0">${tr('Dans cet aperçu, Google bloque souvent la connexion. Elle marche sur','In this preview Google often blocks sign-in. It works on')} <a href="${SITE_URL}" target="_blank" rel="noopener">${tr('le site','the site')}</a>.</p>`:''}<p class="hint bad" id="gerr" style="margin:6px 0 0">${esc(errMsg(SYNC.err))}</p>`;
+  host.innerHTML=`<button class="row2" id="gin"><span class="ico g">${GLOGO}</span><span class="tx"><b>${tr('Se connecter avec Google','Sign in with Google')}</b><small>${tr('la même progression sur tous tes appareils','the same progress on all your devices')}</small></span><span class="chev" aria-hidden="true">→</span></button>${!onSite?`<p class="hint">${tr('Dans cet aperçu, Google bloque souvent la connexion. Elle marche sur','In this preview Google often blocks sign-in. It works on')} <a href="${SITE_URL}" target="_blank" rel="noopener">${tr('le site','the site')}</a>.</p>`:''}<p class="hint bad" id="gerr">${esc(errMsg(SYNC.err))}</p>`;
   host.querySelector('#gin').onclick=async e=>{ const b=e.currentTarget; b.disabled=true; try{ await SYNC.signIn(); }catch(er){ const m=host.querySelector('#gerr'); if(m) m.textContent=errMsg(String(er&&er.code||er)||'x'); } b.disabled=false; }; }
 
 // phone tab bar steps aside while typing (keyboard open) and while scrolling down
@@ -2665,23 +2840,188 @@ function renderSync(host){ if(!host||!document.body.contains(host)) return; cons
   addEventListener('scroll',()=>{ if(!mq.matches) return; const y=scrollY, dy=y-lastY; if(Math.abs(dy)<8) return;
     const atEnd=innerHeight+y>=document.documentElement.scrollHeight-4; B.classList.toggle('navhide',dy>0&&y>60&&!atEnd); lastY=y; },{passive:true});
   addEventListener('hashchange',()=>B.classList.remove('navhide')); })();
-document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslot').innerHTML=`<button class="btn k" id="otour">▶ ${tr('Rejouer le tutoriel','Replay the tutorial')}</button>`; document.getElementById('dlgbody').innerHTML=`<h2>${tr('Réglages et progression','Settings and progress')}</h2><div class="row"><button class="btn" id="settings-favorites">${tr('Mes favoris','Saved words')}</button></div><div id="insthost"></div><h2>${tr('Progression','Progress')}</h2>
-  <div id="synchost"></div><p class="hint">${tr('Une carte est un exercice ; un mot peut avoir plusieurs cartes. La progression reste ici sans connexion.','A card is an exercise; one word can have several cards. Progress stays here without an account.')}</p>
-  <details class="more"><summary>${tr('Transférer par code','Transfer with a code')}</summary><div class="moreb">
-  <p style="margin:0">${tr('Sans compte, elle reste dans ce navigateur. Pour la passer à un autre appareil, copiez le code ici et collez-le là-bas.','Without an account it stays in this browser. To move it to another device, copy the code here and paste it there.')}</p>
-  <div class="row"><button class="btn k" id="pcopy">${tr('Copier le code','Copy the code')}</button><button class="btn" id="pdl"${document.querySelector('link[rel=manifest]')?'':' hidden'}>${tr('Télécharger','Download')}</button></div>
-  <textarea class="field" id="pcode" rows="3" readonly hidden style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
-  <textarea class="field" id="ppaste" rows="3" placeholder="${tr('Collez un code ici…','Paste a code here…')}" style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
-  <div class="row"><button class="btn" id="pimp">${tr('Importer','Import')}</button><label class="btn ghost" style="cursor:pointer">${tr('ou un fichier…','or a file…')}<input type="file" id="pfile" accept=".json,.txt,application/json" hidden></label></div>
-  <p class="hint" id="pmsg" style="margin:0" aria-live="polite"></p>
-  </div></details>
-  <div class="sndrow"><label class="remsw"><input type="checkbox" id="sndcb"${SOUND_ON()?' checked':''}><span>${tr('Sons','Sounds')} <span lang="ja">鈴</span></span></label><input type="range" id="volr" min="0" max="1" step="0.05" value="${VOL()}" aria-label="${tr('Volume','Volume')}" title="${tr('Volume','Volume')}"></div>
-  <div id="remhost"></div>
-  <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
-  <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
-  <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version __BUILD__</p>
-  `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
+// ---------- stamp book (帳): review days on a retro wall calendar with the 72 micro-seasons, a stamp-rally booklet for the shops, and tiered milestones.
+// No streaks: only the total number of days with a review counts.
+var SHOPS=[['izakaya','酒','Izakaya','Izakaya'],['yakitori','鳥','Yakitori','Yakitori'],['sakaba','盃','Bar à saké','Sake bar'],['ramen','麺','Ramen','Ramen'],['soba','蕎','Soba','Soba'],['sushi','鮨','Sushi','Sushi'],['don','丼','Donburi','Donburi'],['teishoku','定','Teishoku','Teishoku'],
+  ['konbini','店','Konbini','Konbini'],['okonomiyaki','焼','Okonomiyaki','Okonomiyaki'],['kissaten','喫','Kissaten','Kissaten'],['cafe','珈','Café','Café'],['chaya','茶','Salon de thé','Tea house'],['kanmi','甘','Douceurs','Sweets'],['patisserie','菓','Pâtisserie','Patisserie'],['bakery','麦','Boulangerie','Bakery']];
+var OLDM=['睦月','如月','弥生','卯月','皐月','水無月','文月','葉月','長月','神無月','霜月','師走'];
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+const VIB_ON=()=>lsGet('menyomi.vib')!=='0';
+const shopLabel=s=>LANG==='en'?s[3]:s[2];
+function shopWords(k){ return TYPES[k]? [...new Set(TYPES[k].sections.flatMap(s=>s[1]))].filter(w=>WMAP[w]) : []; }
+function shopPct(k){ const ws=shopWords(k); return ws.length? ws.filter(knownWord).length/ws.length : 0; }
+// a shop gets its stamp once 80 % of its words are read; a stamp stays even if a word slips later
+function checkStamps(){ const got=[]; S.stamps=S.stamps||{}; for(const s of SHOPS) if(TYPES[s[0]]&&!S.stamps[s[0]]&&shopPct(s[0])>=.8){ S.stamps[s[0]]=Date.now(); got.push(s); } if(got.length) store.set(SKEY,S); return got; }
+function reviewDays(){ const s=new Set(S.rdays||[]); for(const [d,v] of Object.entries(S.days||{})) if(v[1]) s.add(d); return s; }
+function tracks(){ const days=reviewDays().size, words=WORDS.filter(w=>knownWord(w[0])).length, kan=CARDS.filter(id=>id[0]==='w'&&S.cards[id]&&S.cards[id].reps>0).length;
+  return [['日',tr('Jours de révision','Review days'),tr('jours avec une révision','days with a review'),days,[10,30,100,200,365]],
+    ['語',tr('Mots lus','Words read'),tr('mots appris','words learned'),words,[10,50,100,250,500]],
+    ['回',tr('Révisions','Reviews'),tr('cartes revues','cards reviewed'),S.nrev||0,[100,500,1000,5000,10000]],
+    ['書',tr('Kanji écrits','Kanji written'),tr('kanji tracés','kanji traced'),kan,[10,50,150,300,600]],
+    ['皆',tr('Trouvés du premier coup','Found at first try'),tr('plats trouvés sur un menu','dishes found on a menu'),S.firsts||0,[1,10,50,100,500]]]; }
+const tiersGot=()=>tracks().reduce((a,t)=>a+t[4].filter(x=>t[3]>=x).length,0);
+// the red dot on 帳: a shop stamp or a milestone tier not seen yet
+function stampDot(){ const b=document.getElementById('stampbtn'); if(!b) return; checkStamps(); const seen=+(lsGet('menyomi.stseen')||0), tseen=+(lsGet('menyomi.tseen')||0);
+  const on=Object.values(S.stamps||{}).some(at=>at>seen)||tiersGot()>tseen; let i=b.querySelector('i'); if(on&&!i) b.insertAdjacentHTML('beforeend','<i aria-hidden="true"></i>'); else if(!on&&i) i.remove(); }
+// rubber stamp: wobbly double ring (or square) in vermilion, the kanji written with the brush, uneven ink and paper tooth
+function stampCanvas(ch,o={}){ const size=o.size||90, r=rng(o.seed||7), D=Math.max(2,DPR||1)*1.25, S2=Math.round(size*D), col=o.col||'#c8261a';
+  const c=document.createElement('canvas'); c.width=S2; c.height=S2; c.style.width=size+'px'; c.style.height=size+'px'; c.className='stmp'; c.setAttribute('aria-hidden','true');
+  const x=c.getContext('2d'); x.save(); x.translate(S2/2,S2/2); x.rotate(o.rot!=null?o.rot:(r()-.5)*0.4); x.strokeStyle=col; x.fillStyle=col; x.lineCap='round'; x.lineJoin='round';
+  const lw=S2*(o.lw||0.05), shape=o.shape||'circle';
+  const wob=f=>{ x.beginPath(); for(let a=0;a<=72;a++){ const t=a/72*6.283, rr=S2*f*(1+(r()-.5)*0.03); const px=Math.cos(t)*rr, py=Math.sin(t)*rr; a?x.lineTo(px,py):x.moveTo(px,py); } x.closePath(); x.stroke(); };
+  if(shape==='circle'){ x.lineWidth=lw; wob(0.44); if(!o.single){ x.lineWidth=lw*.35; wob(0.36); } }
+  else { x.lineWidth=lw; const h=S2*.42; x.beginPath(); x.moveTo(-h,-h+S2*.04); x.lineTo(-h+(r()-.5)*S2*.01,h); x.lineTo(h,h+(r()-.5)*S2*.01); x.lineTo(h+(r()-.5)*S2*.01,-h); x.closePath(); x.stroke(); }
+  const kf=o.kf||(shape==='circle'&&!o.single?0.5:0.6);
+  if(ch.trim()&&KVG[ch]&&!o.font){ const k=document.createElement('canvas'); textCanvas(k,ch,{seed:o.seed||7,writer:makeWriter(rng(o.seed||7),'kaisho','brush',{weight:o.weight||1.3}),size:60,surface:'washi',transparent:true,color:col,pad:0.05});
+    const sc=S2*kf/Math.max(k.width,k.height); const w=k.width*sc, h=k.height*sc; x.drawImage(k,-w/2,-h/2+(o.ky||0)*S2,w,h); }
+  else if(ch.trim()){ x.font=`700 ${S2*kf*0.92}px "Klee One","Zen Kaku Gothic New",serif`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(ch,0,(o.ky||0)*S2+S2*.03); }
+  if(o.sub){ x.font=`700 ${S2*0.13}px "IBM Plex Mono",monospace`; x.textAlign='center'; x.textBaseline='middle'; x.fillText(o.sub,0,S2*(o.subY||0.29)); }
+  x.restore(); x.globalCompositeOperation='destination-out';
+  const a=r()*6.283, gx=S2/2+Math.cos(a)*S2*.55, gy=S2/2+Math.sin(a)*S2*.55, g=x.createRadialGradient(gx,gy,0,gx,gy,S2*.55); g.addColorStop(0,`rgba(0,0,0,${(.35+r()*.35).toFixed(2)})`); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle=g; x.fillRect(0,0,S2,S2);
+  for(let i=0;i<S2*1.6;i++){ x.globalAlpha=.25+r()*.75; x.beginPath(); x.arc(r()*S2,r()*S2,.6+r()*r()*S2*.012,0,7); x.fill(); }
+  for(let i=0;i<5;i++){ x.globalAlpha=.15+r()*.3; x.beginPath(); const y0=r()*S2; x.moveTo(0,y0); x.lineTo(S2,y0+(r()-.5)*S2*.2); x.lineWidth=.6+r()*1.6; x.strokeStyle='#000'; x.stroke(); }
+  x.globalAlpha=1; x.globalCompositeOperation='source-over'; return c; }
+const shopStamp=(s,size)=>{ const i=SHOPS.indexOf(s); return stampCanvas(s[1],{size,seed:31+i*7,shape:i%3===2?'square':'circle'}); };
+// ---- calendar data: Japanese public holidays, the solar term and micro-season of a day
+function jpHolidays(y){ const h={}, add=(m,d,n)=>{ h[m+'-'+d]=n; }, mon=(m,k)=>{ const f=new Date(y,m-1,1).getDay(); return 1+((8-f)%7)+(k-1)*7; }, b=y-1980, q=Math.floor(b/4);
+  add(1,1,'元日'); add(1,mon(1,2),'成人の日'); add(2,11,'建国記念の日'); add(2,23,'天皇誕生日'); add(3,Math.floor(20.8431+0.242194*b)-q,'春分の日'); add(4,29,'昭和の日');
+  add(5,3,'憲法記念日'); add(5,4,'みどりの日'); add(5,5,'こどもの日'); add(7,mon(7,3),'海の日'); add(8,11,'山の日'); add(9,mon(9,3),'敬老の日'); add(9,Math.floor(23.2488+0.242194*b)-q,'秋分の日');
+  add(10,mon(10,2),'スポーツの日'); add(11,3,'文化の日'); add(11,23,'勤労感謝の日');
+  for(const k of Object.keys(h)){ const [m,d]=k.split('-').map(Number); if(new Date(y,m-1,d).getDay()!==0) continue; const t=new Date(y,m-1,d+1); while(h[(t.getMonth()+1)+'-'+t.getDate()]) t.setDate(t.getDate()+1); h[(t.getMonth()+1)+'-'+t.getDate()]='振替休日'; }
+  // a weekday squeezed between two holidays is one too (Silver Week)
+  const r=new Date(y,8,1); for(;r.getMonth()===8;r.setDate(r.getDate()+1)){ const k=(m,d)=>h[m+'-'+d], d=r.getDate(); if(!k(9,d)&&k(9,d-1)&&k(9,d+1)&&r.getDay()!==0) h['9-'+d]='国民の休日'; }
+  return h; }
+const koIdx=(m,d)=>{ const md=m*100+d; let best=-1, bmd=-1, top=-1, tmd=-1; SEASONS.ko.forEach((k,i)=>{ const v=k[0]*100+k[1]; if(v<=md&&v>bmd){ best=i; bmd=v; } if(v>tmd){ top=i; tmd=v; } }); return best<0?top:best; };
+const sekkiOf=i=>Math.floor(i/3);
+const SEASON_JP=['春','夏','秋','冬'];
+const roma=rd=>rd.split(/\s+/).map(romaji1).join(' ');
+// doodles on the wall calendar, by month: spring flowers, summer sun and waves, autumn leaves, winter mountain and cranes
+const CAL_DD=m=>[[['fuji','#3d5a7a'],['tsuru','#1b1712'],['kumo','#5d6e7e']],[['sakura','#d46a86'],['dango','#6f8f3a'],['kumo','#5d6e7e']],[['sun','#d9861c'],['nami','#2f6f9a'],['kumo','#5d6e7e']],[['momiji','#b5481e'],['icho','#c49a1c'],['kumo','#5d6e7e']]][Math.floor((m%12)/3)];
+let CKM=null; // month shown on the calendar: [year, month 1-12]
+let CKW=null; // layout the page was drawn for, to redraw when it changes
+function renderCarnet(){ const v=document.getElementById('v-carnet'); if(!v) return; const wide=DESK(); CKW=wide; const now=new Date(Date.now()-DAY0*36e5);
+  if(!CKM) CKM=[now.getFullYear(),now.getMonth()+1]; const [Y,M]=CKM, isNow=Y===now.getFullYear()&&M===now.getMonth()+1;
+  checkStamps(); const rd=reviewDays(), nst=Object.keys(S.stamps||{}).length, mdays=[...rd].filter(d=>d.startsWith(`${Y}-${String(M).padStart(2,'0')}-`)).length;
+  lsSet('menyomi.stseen',String(Date.now())); lsSet('menyomi.tseen',String(tiersGot())); stampDot();
+  const MN=LANG==='en'?['January','February','March','April','May','June','July','August','September','October','November','December']:['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const ti=isNow?koIdx(M,now.getDate()):koIdx(M,15), sk=SEASONS.sekki[sekkiOf(ti)], season=SEASON_JP[Math.floor(((sekkiOf(ti))%24)/6)];
+  const first=koIdx(M,1), inMonth=SEASONS.ko.map((k,i)=>i).filter(i=>SEASONS.ko[i][0]===M), rows=SEASONS.ko[first][0]===M&&SEASONS.ko[first][1]===1?inMonth:[first,...inMonth];
+  const nd=new Date(Y,M,0).getDate(), todayKo=isNow?koIdx(M,now.getDate()):-1, L=LANG==='en';
+  const rowHTML=(i,n)=>{ const k=SEASONS.ko[i], st=k[0]===M?k[1]:1, nx=rows[n+1]!=null?SEASONS.ko[rows[n+1]][1]-1:nd, skn=k[8]||(n===0?SEASONS.sekki[sekkiOf(i)][0]:'');
+    return `<div class="kor${i===todayKo?' cur':''}" role="button" tabindex="0" aria-expanded="false" data-ko="${i}"><span class="sk2" lang="ja">${skn}</span><span class="kd">${st===nx?st:st+'–'+nx}</span><span class="kj" lang="ja">${k[2]}</span>${wide?`<span class="kn"><span class="kk" lang="ja">${k[3].replace(/\s+/g,'')}</span><span class="rr">${roma(k[3])}</span></span>`:''}<span class="fr">${esc(L?k[5]:k[4])}</span></div>`; };
+  v.innerHTML=`<div class="ck">
+   <div class="ck-h"><h1>${tr('Carnet de tampons','Stamp book')} <span class="jp">スタンプ帳</span></h1><p><b>${rd.size}</b> ${rd.size>1?tr('jours de révision','review days'):tr('jour de révision','review day')} · <b>${nst}</b> ${nst>1?tr('boutiques tamponnées','shops stamped'):tr('boutique tamponnée','shop stamped')}</p></div>
+   <div class="ck-cols"><div class="ck-l">
+    <div><div class="ck-lab">${tr('Calendrier','Calendar')} <i>${mdays} ${mdays>1?tr('jours ce mois-ci','days this month'):tr('jour ce mois-ci','day this month')}</i></div>
+     <div class="rcal" style="--washi:url(${surfaceURL('washi')});--tp:${TAPES[2]}">
+      <div class="rc-nav"><button id="ckprev" aria-label="${tr('Mois précédent','Previous month')}">‹</button><button id="cknext" aria-label="${tr('Mois suivant','Next month')}"${isNow?' disabled':''}>›</button></div>
+      <div class="rc-top"><div class="rc-num">${M}</div><div class="rc-old" lang="ja"></div><div class="rc-meta"><span class="y">${Y} · 令和${Y-2018}年</span><span class="m">${MN[M-1]}</span><span class="s" lang="ja">${season} · ${sk[0]}の候</span></div></div>
+      <div class="rc-g">${['日','月','火','水','木','金','土'].map((d,i)=>`<div class="wd ${i===0?'su':i===6?'sa':''}" lang="ja">${d}</div>`).join('')}</div>
+      <div class="rc-ko">${rows.map(rowHTML).join('')}</div>
+     </div></div>
+    <div><div class="ck-lab">旬 · ${tr('De saison','In season')} <i>${tr('sur les menus en ce moment','on the menus right now')}</i></div><div class="shun"></div></div>
+    ${wide?`<div><div class="ck-lab">${tr('L’année','The year')} <i>${Y}</i></div><div class="year"></div></div>`:''}</div>
+   <div class="ck-l">
+    <div><div class="ck-lab">${tr('Boutiques','Shops')} <i>${tr('tampon à 80 % des mots lus','stamp at 80 % of the words read')}</i></div><div class="book"><div class="pgs" style="--washi:url(${surfaceURL('washi')})"></div><div class="tabs2" role="group"><button aria-pressed="true" lang="ja">一</button><button aria-pressed="false" lang="ja">二</button></div></div></div>
+    <div><div class="ck-lab">${tr('Étapes','Milestones')} <i>${tr('5 paliers chacune','5 tiers each')}</i></div><div class="miles"></div></div>
+    ${wide?'':`<div><div class="ck-lab">${tr('L’année','The year')} <i>${Y}</i></div><div class="year"></div></div>`}</div></div></div>`;
+  // calendar: old month name with the brush, days with review stamps, holidays and solar terms
+  const oc=document.createElement('canvas'); v.querySelector('.rc-old').appendChild(oc); textCanvas(oc,OLDM[M-1],{seed:800+M,writer:makeWriter(rng(800+M),'kaisho','brush',{weight:1}),size:wide?40:34,vertical:true,surface:'washi',transparent:true,color:'#1b1712',pad:0.05}); oc.setAttribute('aria-label',OLDM[M-1]);
+  const g=v.querySelector('.rc-g'), hol=jpHolidays(Y), off=new Date(Y,M-1,1).getDay(), cells=Math.ceil((off+nd)/7)*7, pd=new Date(Y,M-1,0).getDate(), skStart={};
+  SEASONS.ko.forEach(k=>{ if(k[8]&&k[0]===M) skStart[k[1]]=k[8]; });
+  for(let n=0;n<cells;n++){ const d=n-off+1, inm=d>=1&&d<=nd, day=inm?d:d<1?pd+d:d-nd, dow=n%7, c=document.createElement('div'), key=`${Y}-${String(M).padStart(2,'0')}-${String(d).padStart(2,'0')}`, hn=inm&&hol[M+'-'+d];
+    c.className='d'+(inm?'':' out')+(isNow&&d===now.getDate()?' today':''); const col=inm&&(dow===0||hn)?'#b3261b':inm&&dow===6?'#1d4e89':'';
+    c.innerHTML=`<b${col?` style="color:${col}"`:''}>${day}</b>${inm&&skStart[d]?`<small lang="ja">${skStart[d]}</small>`:hn?`<small lang="ja" title="${hn}">${wide?hn:'祝'}</small>`:''}`;
+    if(inm&&rd.has(key)){ c.appendChild(stampCanvas(' ',{size:wide?46:34,seed:d*17+M,single:1,lw:wide?.075:.065})); c.title=tr('Révision faite','Reviewed'); }
+    g.appendChild(c); }
+  const cal=v.querySelector('.rcal'); CAL_DD(M).forEach(([id,col],i)=>{ if(!DCH[id]) return; const c=document.createElement('canvas'); c.className='rc-dd'; c.setAttribute('aria-hidden','true');
+    c.style.cssText=[wide?'left:36%;top:30px;transform:rotate(14deg)':'left:-16px;top:-22px;transform:rotate(-18deg)','right:22px;bottom:14px;transform:rotate(-12deg)','left:44%;top:-30px'][i]; cal.appendChild(c);
+    textCanvas(c,DCH[id],{seed:31+i*26+M,writer:makeWriter(rng(31+i*26+M),'hurry','brush',{weight:.8}),size:[wide?64:46,wide?52:42,wide?62:48][i],surface:'washi',transparent:true,color:col,pad:0.05}); c.style.width=''; });
+  v.querySelector('#ckprev').onclick=()=>{ CKM=M===1?[Y-1,12]:[Y,M-1]; renderCarnet(); };
+  v.querySelector('#cknext').onclick=()=>{ if(!isNow){ CKM=M===12?[Y+1,1]:[Y,M+1]; renderCarnet(); } };
+  // a micro-season opens on click: its reading, its kanji and what it describes
+  v.querySelectorAll('.kor').forEach(row=>{ const tog=e=>{ if(e.target.closest('.kx')) return; const open=row.querySelector('.kx'); v.querySelectorAll('.kor .kx').forEach(x=>{ x.parentNode.setAttribute('aria-expanded','false'); x.remove(); }); if(open) return;
+      const k=SEASONS.ko[+row.dataset.ko]; row.setAttribute('aria-expanded','true'); row.insertAdjacentHTML('beforeend',`<div class="kx"><div class="rd" lang="ja">${k[3]}<span>${roma(k[3])}</span></div>${kanjiChips(k[2])}<p>${esc(L?k[7]:k[6])}</p></div>`); };
+    row.onclick=tog; row.onkeydown=e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); tog(e); } }; });
+  // dishes in season: written with the brush, each opens its card
+  const sh=v.querySelector('.shun'), sw=((SEASONS.shun[M]||SEASONS.shun[String(M)])||[]).slice(0,wide?6:4); sh.parentNode.hidden=!sw.length;
+  sw.forEach((w,i)=>{ const b=document.createElement('button'); b.setAttribute('aria-label',w); sh.appendChild(b); const c=document.createElement('canvas'); b.appendChild(c);
+    textCanvas(c,w,{seed:900+i*13+M,writer:makeWriter(rng(900+i*13+M),'hurry','brush',{weight:.9}),size:wide?30:26,surface:'washi',transparent:true,pad:0.05}); c.style.width='';
+    b.insertAdjacentHTML('beforeend',`<span class="r" lang="ja">${esc(WMAP[w][1])}</span><span class="m">${esc(WMAP[w][2])}</span>`); b.onclick=()=>openWord(w); });
+  // the year: a dot per day, red when there was a review; a month opens on the calendar
+  const yr=v.querySelector('.year'); for(let m=1;m<=12;m++){ const f=new Date(Y,m-1,1).getDay(), n=new Date(Y,m,0).getDate(); let cs='';
+    for(let i=0;i<f;i++) cs+='<i class="e"></i>'; for(let d=1;d<=n;d++) cs+=`<i${rd.has(`${Y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`)?' class="r"':''}></i>`;
+    const b=document.createElement('button'); b.className='mo'+(Y===now.getFullYear()&&m===now.getMonth()+1?' now':'')+(m===M?' sel':''); b.disabled=Y===now.getFullYear()&&m>now.getMonth()+1; b.style.opacity=b.disabled?.45:'';
+    b.innerHTML=`<b><span>${m}</span><span lang="ja" style="font:inherit;color:inherit">${OLDM[m-1]}</span></b><div class="mg">${cs}</div>`; b.onclick=()=>{ CKM=[Y,m]; renderCarnet(); v.querySelector('.rcal').scrollIntoView({block:'start',behavior:'smooth'}); }; yr.appendChild(b); }
+  // the booklet: two pages of eight shops
+  const pgs=v.querySelector('.book .pgs'), PGN=[['食事 · 酒場',0],['喫茶 · 甘味 · 軽食',8]];
+  PGN.forEach(([hd,o],pi)=>{ const pg=document.createElement('div'); pg.className='pg'; pg.innerHTML=`<header><b lang="ja">${hd}</b><span>${pi+1} / 2</span></header><div class="bx"></div><footer lang="ja">${pi?'二':'一'}</footer>`; pgs.appendChild(pg);
+    SHOPS.slice(o,o+8).forEach((s,i)=>{ if(!TYPES[s[0]]) return; const got=!!(S.stamps||{})[s[0]], pc=Math.round(100*shopPct(s[0])), c=document.createElement('button'); c.className='cell'+(got?' got':'');
+      c.innerHTML=`<div class="ring" lang="ja">${got?'':s[1]}</div><b>${esc(shopLabel(s))}</b><small lang="ja">${TYPES[s[0]].jp}</small><span class="pc">${pc} %</span>`; pg.querySelector('.bx').appendChild(c);
+      if(got){ const r=rng(77+i+pi*9), st=shopStamp(s,wide?78:66); st.style.transform=`translate(calc(-50% + ${((r()-.5)*14).toFixed(1)}px),calc(-50% + ${((r()-.5)*12).toFixed(1)}px))`; c.appendChild(st); }
+      c.onclick=()=>openShop(s[0]); }); });
+  const bk=v.querySelector('.book'); bk.querySelectorAll('.tabs2 button').forEach((b,i)=>b.onclick=()=>{ bk.classList.toggle('p2',i===1); bk.querySelectorAll('.tabs2 button').forEach((x,j)=>x.setAttribute('aria-pressed',String(i===j))); });
+  // milestones: five tiers each, the stamps grow bigger and finer
+  const mi=v.querySelector('.miles'), Z=wide?[46,56,66,78,92]:[36,43,51,60,70], fmt=n=>n.toLocaleString(L?'en':'fr');
+  tracks().forEach(([k,nm,what,cur,th],ti)=>{ const got=th.filter(x=>cur>=x).length, nx=th[got]; const d=document.createElement('div'); d.className='track';
+    d.innerHTML=`<div class="th"><span class="ico2" lang="ja">${k}</span><span class="tx"><b>${nm}</b><small>${tr('palier','tier')} ${got} ${tr('sur','of')} 5 · ${fmt(cur)} ${what}</small></span>${nx?`<span class="nx">${fmt(cur)} / ${fmt(nx)}</span>`:''}</div><div class="tiers"></div>`;
+    const row=d.querySelector('.tiers'); th.forEach((x,i)=>{ const c=document.createElement('div'); c.className='tier'+(i<got?' got':i===got?' next':' later'); const s=Z[i];
+      if(i<got) c.appendChild(stampCanvas(k,{size:s,seed:500+ti*31+i*7,shape:['circle','circle','square','circle','square'][i],single:i===0,lw:[.05,.05,.055,.06,.07][i],weight:1.1+i*.12}));
+      else c.insertAdjacentHTML('beforeend',`<div class="tph" lang="ja" style="width:${s}px;height:${s}px;font-size:${Math.round(s*.42)}px;${[2,4].includes(i)?'border-radius:0':''}">${k}</div>`);
+      c.insertAdjacentHTML('beforeend',`<span class="tl">${fmt(x)}</span>${i===got?`<span class="pb"><i style="width:${Math.round(100*cur/x)}%"></i></span>`:''}`); row.appendChild(c); }); mi.appendChild(d); }); }
+addEventListener('resize',()=>{ clearTimeout(renderCarnet._t); renderCarnet._t=setTimeout(()=>{ const v=document.getElementById('v-carnet'); if(v&&v.classList.contains('on')&&CKW!==DESK()) renderCarnet(); },250); });
+// a shop's page: its stamp, the words still to read and those already read, all clickable
+function openShop(k){ const s=SHOPS.find(x=>x[0]===k), t=TYPES[k]; if(!s||!t) return; const ws=shopWords(k), miss=ws.filter(w=>!knownWord(w)), read=ws.filter(knownWord), at=(S.stamps||{})[k], pc=Math.round(100*read.length/Math.max(1,ws.length));
+  const B=document.getElementById('dlgbody'); document.getElementById('dlgslot').innerHTML='';
+  const wb=(w,no)=>`<button class="${no?'no':''}" data-w="${esc(w)}" lang="ja" title="${esc(WMAP[w][2])}">${esc(w)}</button>`;
+  B.innerHTML=`<div class="sd"><div class="sd-top">${at?'':`<div class="ring" lang="ja">${s[1]}</div>`}<div><h2>${esc(shopLabel(s))}</h2><div class="jp" lang="ja">${t.jp}</div><p>${at?tr('Tamponné le ','Stamped on ')+new Date(at).toLocaleDateString(LANG==='en'?'en-GB':'fr-FR',{day:'numeric',month:'long',year:'numeric'}):tr('Tampon à 80 % des mots lus','Stamp at 80 % of the words read')}</p></div></div>
+    <div class="sd-pc"><b>${pc} %</b><span>${read.length} ${tr('mots lus sur','words read out of')} ${ws.length}</span></div>
+    ${miss.length?`<div class="lab2">${tr('À lire encore','Still to read')}</div><div class="sd-w">${miss.map(w=>wb(w,1)).join('')}</div>`:''}
+    ${read.length?`<div class="lab2">${tr('Déjà lus','Already read')}</div><div class="sd-w">${read.map(w=>wb(w)).join('')}</div>`:''}
+    <div class="drow">${miss.length?`<button class="btn k" id="sdrev">${tr('Réviser les','Review the')} ${miss.length} ${tr('restants','remaining')}</button>`:''}<button class="btn r" id="sdmenu">${tr('Lire un menu de ce type','Read a menu of this kind')}</button></div></div>`;
+  if(at) B.querySelector('.sd-top').prepend(shopStamp(s,104));
+  B.querySelectorAll('.sd-w button').forEach(b=>b.onclick=()=>openWord(b.dataset.w));
+  const rv=B.querySelector('#sdrev'); if(rv) rv.onclick=()=>{ miss.forEach(w=>addReview(firstId(w))); dlg.close(); toast(tr(`${miss.length} mots ajoutés aux révisions`,`${miss.length} words added to the reviews`)); location.hash='revisions'; };
+  B.querySelector('#sdmenu').onclick=()=>{ dlg.close(); location.hash='menu'; setTimeout(()=>{ const mt=document.getElementById('mtype'); if(mt){ mt.value=k; genMenu(); } },60); };
+  if(!dlg.open) dlg.showModal(); dlg.scrollTop=0; }
+document.getElementById('stampbtn').onclick=()=>{ if(dlg.open) dlg.close(); location.hash='carnet'; };
+document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslot').innerHTML=''; const rd=reviewDays(); let rr=0, rs=0; Object.values(S.days||{}).forEach(v=>{ rr+=v[0]; rs+=v[1]; });
+  const nw=WORDS.filter(w=>knownWord(w[0])).length, nst=Object.keys(S.stamps||{}).length, nfav=Object.values(S.favorites||{}).filter(f=>f.on).length;
+  const row=(ico,t,sub,id,tag='button',chev='→')=>`<${tag} class="row2"${id?` id="${id}"`:''}><span class="ico" lang="ja">${ico}</span><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span>${chev?`<span class="chev" aria-hidden="true">${chev}</span>`:''}</${tag}>`;
+  const sw=(ico,t,sub,id,on)=>`<label class="row2"><span class="ico" lang="ja">${ico}</span><span class="tx"><b>${t}</b>${sub?`<small>${sub}</small>`:''}</span><input type="checkbox" class="swi" id="${id}"${on?' checked':''}></label>`;
+  document.getElementById('dlgbody').innerHTML=`<div class="ipan">
+  <div class="card2"><div class="stats3"><div><b>${rd.size}<small>${tr('j','d')}</small></b><span><em lang="ja">日</em>${tr('révisés','reviewed')}</span></div><div><b>${nw}</b><span><em lang="ja">語</em>${tr('mots','words')}</span></div><div><b>${rs?Math.round(100*rr/rs):'–'}${rs?'<small>%</small>':''}</b><span><em lang="ja">正</em>${tr('justes','right')}</span></div></div>
+   <button class="row2" id="icarnet"><span class="mini"></span><span class="tx"><b>${tr('Carnet de tampons','Stamp book')}</b><small>${nst} ${nst>1?tr('boutiques','shops'):tr('boutique','shop')} · ${rd.size} ${rd.size>1?tr('jours','days'):tr('jour','day')}</small></span><span class="chev" aria-hidden="true">→</span></button>
+   ${row('星',tr('Mes favoris','Saved words'),nfav?`${nfav} ${nfav>1?tr('mots','words'):tr('mot','word')}`:'','settings-favorites')}</div>
+  <div class="lab2">${tr('Sauvegarde','Backup')}</div>
+  <div class="card2"><div id="synchost"></div>
+   <details class="xfer"><summary class="row2"><span class="ico" lang="ja">移</span><span class="tx"><b>${tr('Transférer par code','Transfer with a code')}</b><small>${tr('sans compte','no account needed')}</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="moreb">
+   <p style="margin:0">${tr('Sans compte, la progression reste dans ce navigateur. Pour la passer à un autre appareil, copiez le code ici et collez-le là-bas.','Without an account progress stays in this browser. To move it to another device, copy the code here and paste it there.')}</p>
+   <div class="row"><button class="btn k" id="pcopy">${tr('Copier le code','Copy the code')}</button><button class="btn" id="pdl"${document.querySelector('link[rel=manifest]')?'':' hidden'}>${tr('Télécharger','Download')}</button></div>
+   <textarea class="field" id="pcode" rows="3" readonly hidden style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
+   <textarea class="field" id="ppaste" rows="3" placeholder="${tr('Collez un code ici…','Paste a code here…')}" style="width:100%;font-family:var(--f-mono);font-size:14px"></textarea>
+   <div class="row"><button class="btn" id="pimp">${tr('Importer','Import')}</button><label class="btn ghost" style="cursor:pointer">${tr('ou un fichier…','or a file…')}<input type="file" id="pfile" accept=".json,.txt,application/json" hidden></label></div>
+   <p class="hint" id="pmsg" style="margin:0;padding:0" aria-live="polite"></p></div></details></div>
+  <div class="lab2">${tr('Application','App')}</div>
+  <div class="card2"><div id="insthost"></div>${row('案',tr('Rejouer le tutoriel','Replay the tutorial'),'','otour')}</div>
+  <div class="lab2">${tr('Réglages','Settings')}</div>
+  <div class="card2">${sw('鈴',tr('Sons','Sounds'),'','sndcb',SOUND_ON())}
+   <div class="vol"><span lang="ja" aria-hidden="true">音</span><input type="range" id="volr" min="0" max="1" step="0.05" value="${VOL()}" aria-label="${tr('Volume','Volume')}"><span id="volv">${Math.round(VOL()*100)}</span></div>
+   ${'vibrate' in navigator?sw('振',tr('Vibrations','Vibrations'),tr('bonne et mauvaise réponse','right and wrong answers'),'vibcb',VIB_ON()):''}<div id="remhost"></div></div>
+  <div class="foot"><div class="who"><b>MENYOMI</b><span class="jp" lang="ja">めん読み</span><span>${tr('Fait par','Made by')} <u>${tr('Charles « istallri »','Charles “istallri”')}</u></span></div>
+   <details><summary>${tr('Crédits','Credits')}</summary><ul>
+   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
+   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul></details>
+   <span class="mono" style="font-size:14px">Version __BUILD__</span></div></div>`;
+  const B=document.getElementById('dlgbody'); { const mm=B.querySelector('.mini'), got=SHOPS.filter(s=>(S.stamps||{})[s[0]]).sort((a,b)=>S.stamps[b[0]]-S.stamps[a[0]]).slice(0,3);
+    if(got.length) got.forEach(s=>mm.appendChild(shopStamp(s,44))); else mm.innerHTML='<span class="e" lang="ja">帳</span>'; }
+  B.querySelector('#icarnet').onclick=()=>{ dlg.close(); location.hash='carnet'; };
+  B.querySelector('#settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();}; bindProgress(B); renderInstall(B.querySelector('#insthost')); renderReminder(B.querySelector('#remhost'));
+  { const vr=B.querySelector('#volr'); vr.oninput=()=>{ lsSet('menyomi.vol',vr.value); B.querySelector('#volv').textContent=Math.round(vr.value*100); }; vr.onchange=()=>playFx(true); }
+  B.querySelector('#sndcb').onchange=e=>{ lsSet('menyomi.snd',e.target.checked?'1':'0'); if(e.target.checked) playFx(true); };
+  { const vb=B.querySelector('#vibcb'); if(vb) vb.onchange=e=>{ lsSet('menyomi.vib',e.target.checked?'1':'0'); if(e.target.checked) try{ navigator.vibrate(18); }catch(err){} }; }
+  { const h=B.querySelector('#synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } B.querySelector('#otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
 const ONB={ch:'牛', word:'牛丼', others:['親子丼','カツ丼','天丼']};
@@ -2748,7 +3088,7 @@ async function setReminder(on){ try{ localStorage.setItem('menyomi.rem',on?'1':'
   pushDue(); return 'ok'; }
 function renderReminder(host){ if(!host) return; const can=document.querySelector('link[rel=manifest]')&&'Notification' in window&&'serviceWorker' in navigator; if(!can){ host.innerHTML=''; return; }
   const on=REM_ON()&&Notification.permission==='granted';
-  host.innerHTML=`<label class="remsw"><input type="checkbox" id="remcb"${on?' checked':''}><span>${tr('Rappel quotidien quand des cartes attendent','Daily reminder when cards are waiting')}</span></label><p class="hint" id="remmsg" style="margin:0" aria-live="polite"></p>`;
+  host.innerHTML=`<label class="row2"><span class="ico" lang="ja">鐘</span><span class="tx"><b>${tr('Rappel quotidien','Daily reminder')}</b><small>${tr('quand des cartes attendent','when cards are waiting')}</small></span><input type="checkbox" class="swi" id="remcb"${on?' checked':''}></label><p class="hint" id="remmsg" aria-live="polite"></p>`;
   host.querySelector('#remcb').onchange=async e=>{ const r=await setReminder(e.target.checked); const m=host.querySelector('#remmsg');
     if(r==='denied'){ e.target.checked=false; m.textContent=tr('Notifications refusées dans les réglages du navigateur.','Notifications are blocked in the browser settings.'); }
     else if(r==='nosync'&&e.target.checked) m.textContent=tr('Ce navigateur ne réveille pas l’appli en arrière-plan : installe-la depuis Chrome.','This browser cannot wake the app in the background: install it from Chrome.'); else m.textContent=''; }; }
@@ -2760,13 +3100,12 @@ let INSTALL=null; const STANDALONE=()=>matchMedia('(display-mode: fullscreen),(d
 addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); INSTALL=e; const h=document.getElementById('insthost'); if(h) renderInstall(h); });
 addEventListener('appinstalled',()=>{ INSTALL=null; const h=document.getElementById('insthost'); if(h) renderInstall(h); });
 function renderInstall(host){ if(STANDALONE()){ host.innerHTML=''; return; } const onSite=!!document.querySelector('link[rel=manifest]'); const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  const DL='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3v11m-5-5 5 5 5-5M4 20h16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"/></svg>';
+  const T=tr('Installer sur l’écran d’accueil','Install on the home screen'), I='<span class="ico" lang="ja">携</span>';
   let inner;
-  if(!onSite) inner=`<a class="btn k" href="${SITE_URL}" target="_blank" rel="noopener">${DL}<span>${tr('Installer l’appli','Install the app')}</span></a>`;
-  else if(INSTALL) inner=`<button class="btn k" id="instbtn">${DL}<span>${tr('Installer l’appli','Install the app')}</span></button>`;
-  else if(ios) inner=`<p class="hint" style="margin:0">${tr('Safari : Partager ⎋ puis « Sur l’écran d’accueil »','Safari: Share ⎋ then “Add to Home Screen”')}</p>`;
-  else inner=`<p class="hint" style="margin:0">${tr('Menu ⋮ du navigateur puis « Installer l’application »','Browser menu ⋮ then “Install app”')}</p>`;
-  host.innerHTML=`<div class="instbox">${inner}</div>`;
+  if(!onSite) inner=`<a class="row2" href="${SITE_URL}" target="_blank" rel="noopener">${I}<span class="tx"><b>${T}</b><small>${tr('marche hors ligne','works offline')}</small></span><span class="chev" aria-hidden="true">↗</span></a>`;
+  else if(INSTALL) inner=`<button class="row2" id="instbtn">${I}<span class="tx"><b>${T}</b><small>${tr('marche hors ligne','works offline')}</small></span><span class="chev" aria-hidden="true">→</span></button>`;
+  else inner=`<div class="row2" style="cursor:auto">${I}<span class="tx"><b>${T}</b><small>${ios?tr('Safari : Partager ⎋ puis « Sur l’écran d’accueil »','Safari: Share ⎋ then “Add to Home Screen”'):tr('Menu ⋮ du navigateur puis « Installer l’application »','Browser menu ⋮ then “Install app”')}</small></span></div>`;
+  host.innerHTML=inner;
   const b=host.querySelector('#instbtn'); if(b) b.onclick=async()=>{ const e=INSTALL; if(!e) return; INSTALL=null; try{ e.prompt(); await e.userChoice; }catch(err){} renderInstall(host); }; }
 // idle: after a minute with no input everything but the seal fades away, leaving the paper and the moving shadow; any input brings it back in 0.7 s.
 // The tap or key that wakes the page does nothing else, so a sleeping screen can't be answered by accident.

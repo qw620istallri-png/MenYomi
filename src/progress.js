@@ -4,7 +4,7 @@ const Progress = (() => {
   const finite = v => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= Number.MAX_SAFE_INTEGER;
   const dict = () => Object.create(null);
   const localDay=t=>{const d=new Date(t-4*36e5);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');};
-  const fresh = () => ({version:2,cards:{},day:'',newToday:0,newBase:0,newPer:10,todayIds:[],extraNew:0,queue:[],removed:{},favorites:{},activity:{},activityRemoved:{},legacyDays:{},lessonSeen:{},lessonPassed:{},days:{}});
+  const fresh = () => ({version:2,cards:{},day:'',newToday:0,newBase:0,newPer:10,todayIds:[],extraNew:0,queue:[],removed:{},favorites:{},activity:{},activityRemoved:{},legacyDays:{},lessonSeen:{},lessonPassed:{},days:{},rdays:[],stamps:{},firsts:0,nrev:0});
   function validate(input, ids, words) {
     if(!object(input)||!object(input.cards)||Object.keys(input.cards).length>10000) return null;
     const out=fresh(), cardSet=new Set(ids), wordSet=new Set(words);
@@ -50,6 +50,14 @@ const Progress = (() => {
         else {if(!object(entries)) return null;out[field][d]=dict();for(const [id,at] of Object.entries(entries)){if(!cardSet.has(id)||!finite(at))return null;out[field][d][id]=at;}}
       }
     }
+    // every day with a review, kept for good (days/activity only keep 90): the stamp book counts them
+    if(input.rdays!==undefined&&(!Array.isArray(input.rdays)||input.rdays.length>40000||input.rdays.some(d=>typeof d!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(d)))) return null;
+    out.rdays=[...new Set([...(input.rdays||[]),...Object.keys(out.days).filter(d=>out.days[d][1]>0)])].sort();
+    if(input.stamps!==undefined&&!object(input.stamps)) return null;
+    out.stamps=dict();
+    for(const [k,at] of Object.entries(input.stamps||{})) { if(!/^[a-z_]{1,24}$/.test(k)||!finite(at)) return null; out.stamps[k]=at; }
+    for(const key of ['firsts','nrev']) { if(input[key]!==undefined&&(!finite(input[key])||!Number.isInteger(input[key]))) return null; out[key]=input[key]||0; }
+    if(input.nrev===undefined) out.nrev=Object.values(out.days).reduce((a,v)=>a+v[1],0);
     if(input.legacyDays===undefined) for(const [d,counts] of Object.entries(out.days)) {const es=Object.values(out.activity[d]||{});out.legacyDays[d]=[Math.max(0,counts[0]-es.filter(e=>e.ok).length),Math.max(0,counts[1]-es.length)];}
     if(input.newBase===undefined) out.newBase=Math.max(0,out.newToday-Object.values(out.cards).filter(c=>c.introduced&&localDay(c.introduced)===out.day).length);
     for(const [id,at] of Object.entries(out.removed)) if(out.cards[id]&&(out.cards[id].at||0)<=at) delete out.cards[id];
@@ -87,6 +95,9 @@ const Progress = (() => {
     out.newToday=(out.newBase||0)+introduced;
     for(const [d,v] of Object.entries(out.activity)) { const es=Object.values(v), m=out.legacyDays[d]||[0,0]; out.days[d]=[m[0]+es.filter(e=>e.ok).length,m[1]+es.length]; }
     for(const d of Object.keys(out.days).sort().slice(0,-90)) for(const key of ['days','legacyDays','activity','activityRemoved']) delete out[key][d];
+    out.rdays=[...new Set([...(a.rdays||[]),...(b.rdays||[]),...Object.keys(out.days).filter(d=>out.days[d][1]>0)])].sort();
+    out.stamps={...(b.stamps||{})}; for(const [k,at] of Object.entries(a.stamps||{})) if(!out.stamps[k]||at<out.stamps[k]) out.stamps[k]=at;
+    out.firsts=Math.max(a.firsts||0,b.firsts||0); out.nrev=Math.max(a.nrev||0,b.nrev||0);
     if((b.tp||0)>(a.tp||0)) { out.newPer=b.newPer; out.tp=b.tp; }
     return out;
   }
