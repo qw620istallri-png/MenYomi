@@ -21,14 +21,17 @@ const Ambience=(()=>{
   let currentView='revisions';const textures={};let woodURL='';
   function texture(kind){
   if(kind==='current')return '';
-  const S=512,bases={washi:[241,234,219],mineral:[222,219,209],shikkui:[240,238,229],kinari:[234,226,209],matcha:[225,230,218],sakura:[238,226,222]},base=bases[kind];
-  const fine=valueNoise(S,70,151),broad=valueNoise(S,5,97),r=rng(915+kind.length);
+  // the cloudy materials get a tile twice as large, so their soft patches do not visibly repeat
+  const S=kind==='matcha'||kind==='shikkui'?1024:512,K=(S/512)**2,bases={washi:[241,234,219],mineral:[222,219,209],shikkui:[240,238,229],kinari:[234,226,209],matcha:[225,230,218],sakura:[238,226,222]},base=bases[kind];
+  const fine=valueNoise(S,70*S/512,151),broad=valueNoise(S,5*S/512,97);let r;
   const c=noiseTile(S,43,(q,X,Y)=>{
     const granular=kind==='mineral'?15:kind==='washi'?8:kind==='sakura'?5:3;
     const n=(q()-.5)*granular+(fine(X,Y)-.5)*(kind==='mineral'?14:3)+(broad(X,Y)-.5)*(kind==='shikkui'?9:kind==='matcha'?15:4);
     return [base[0]+n,base[1]+n,base[2]+n];
   });
   const x=c.getContext('2d');
+  // fibres and strokes are drawn nine times, shifted by one tile each way, so whatever crosses an edge comes back on the other side: no seams when the tile repeats
+  const paint=()=>{
   if(kind==='washi'){
     for(let i=0;i<1800;i++){
       const a=r()*S,b=r()*S,l=3+r()*27,angle=r()*6.28;
@@ -47,15 +50,17 @@ const Ambience=(()=>{
     for(let i=0;i<1800;i++){x.fillStyle='rgba(115,97,66,.055)';x.fillRect(r()*S,r()*S,1,2+r()*3);}
   }else if(kind==='shikkui'){
     x.filter='blur(5px)';x.lineWidth=14;
-    for(let i=0;i<34;i++){const a=r()*S,b=r()*S;x.strokeStyle=i%2?'rgba(173,163,139,.10)':'rgba(255,255,252,.53)';x.beginPath();x.moveTo(a-90,b+20);x.quadraticCurveTo(a,b-22,a+100,b);x.stroke();}x.filter='none';
+    for(let i=0;i<34*K;i++){const a=r()*S,b=r()*S;x.strokeStyle=i%2?'rgba(173,163,139,.10)':'rgba(255,255,252,.53)';x.beginPath();x.moveTo(a-90,b+20);x.quadraticCurveTo(a,b-22,a+100,b);x.stroke();}x.filter='none';
   }else if(kind==='matcha'){
     x.filter='blur(8px)';x.lineWidth=22;
-    for(let i=0;i<32;i++){const a=r()*S,b=r()*S;x.strokeStyle=i%2?'rgba(115,133,99,.07)':'rgba(255,255,241,.35)';x.beginPath();x.moveTo(a,b);x.quadraticCurveTo(a+60,b-70,a+170,b-50);x.stroke();}x.filter='none';
-    for(let i=0;i<800;i++){const a=r()*S,b=r()*S;x.strokeStyle='rgba(105,120,92,.07)';x.lineWidth=.4;x.beginPath();x.moveTo(a,b);x.lineTo(a+5,b+2);x.stroke();}
+    for(let i=0;i<32*K;i++){const a=r()*S,b=r()*S,t=(r()-.5)*1.2,l=.6+r()*.8;x.strokeStyle=i%2?'rgba(115,133,99,.07)':'rgba(255,255,241,.35)';x.save();x.translate(a,b);x.rotate(t);x.scale(l,l);x.beginPath();x.moveTo(0,0);x.quadraticCurveTo(60,-70,170,-50);x.stroke();x.restore();}x.filter='none';
+    for(let i=0;i<800*K;i++){const a=r()*S,b=r()*S;x.strokeStyle='rgba(105,120,92,.07)';x.lineWidth=.4;x.beginPath();x.moveTo(a,b);x.lineTo(a+5,b+2);x.stroke();}
   }else if(kind==='sakura'){
     for(let i=0;i<13000;i++){const a=r()*S,b=r()*S;x.fillStyle=i%5?'rgba(255,250,241,.56)':'rgba(151,116,111,.09)';x.fillRect(a,b,.5+r()*1.3,.4+r()*.8);}
     for(let i=0;i<100;i++){const a=r()*S,b=r()*S;x.strokeStyle='rgba(255,251,242,.48)';x.lineWidth=.5;x.beginPath();x.moveTo(a,b);x.lineTo(a+10+r()*18,b+1+r()*3);x.stroke();}
   }
+  };
+  for(const dx of [-S,0,S]) for(const dy of [-S,0,S]){ r=rng(915+kind.length); x.save(); x.translate(dx,dy); paint(); x.restore(); }
   return c.toDataURL();
 }
 
@@ -63,10 +68,11 @@ const Ambience=(()=>{
     currentView=views.includes(view)?view:'revisions';const choice=selection(currentView),root=document.documentElement;
     if(!(choice.background in textures))textures[choice.background]=texture(choice.background);
     root.style.setProperty('--background-texture',textures[choice.background]?'url('+textures[choice.background]+')':'none');
-    root.dataset.background=choice.background;return choice;
+    root.style.setProperty('--background-size',tileSize(choice.background));root.dataset.background=choice.background;return choice;
   }
   // review page: show one background by name
-  function background(kind){ if(!(kind in textures))textures[kind]=texture(kind); const root=document.documentElement; root.style.setProperty('--background-texture',textures[kind]?'url('+textures[kind]+')':'none'); root.dataset.background=kind; }
+  function background(kind){ if(!(kind in textures))textures[kind]=texture(kind); const root=document.documentElement; root.style.setProperty('--background-texture',textures[kind]?'url('+textures[kind]+')':'none'); root.style.setProperty('--background-size',tileSize(kind)); root.dataset.background=kind; }
+  const tileSize=kind=>kind==='matcha'||kind==='shikkui'?'1024px 1024px':'512px 512px';
   function swing(element,strength=1){
     if(!element.animate||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
     element.getAnimations().forEach(a=>a.cancel());const paper=element.classList.contains('note');

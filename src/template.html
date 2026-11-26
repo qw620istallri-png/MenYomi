@@ -763,7 +763,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var
 ::selection{background:var(--lime);color:#1b1814}
 
 /* Soft daily materials sit behind the existing window light and foliage. */
-#ground{position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:var(--background-texture);background-size:512px 512px;opacity:.88}
+#ground{position:fixed;inset:0;z-index:-2;pointer-events:none;background-image:var(--background-texture);background-size:var(--background-size,512px 512px);opacity:.88}
 /* at night the light texture would wash the room out: only its grain is kept (strong contrast), tinted blue and screened onto the dark, so the material still shows in moonlight */
 html.night #ground,html[data-theme="dark"] #ground{opacity:1;mix-blend-mode:screen;filter:brightness(.55) contrast(10) brightness(.12) sepia(1) hue-rotate(185deg) saturate(3)}
 .board .itm.wood-plaque{isolation:isolate;border-radius:5px 5px 9px 8px;background:linear-gradient(90deg,#b98c55,#deb77e 10%,#d9b27a 63%,#bb9059 100%);box-shadow:5px 10px 5px #2e1c1740,1px 2px 2px #2e1c1750,inset -3px 0 3px #77502738;transform:rotate(var(--plate-angle,0deg));transform-origin:50% 2px}
