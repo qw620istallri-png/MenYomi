@@ -30,6 +30,8 @@ html{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 #light{position:fixed;inset:0;z-index:-1;pointer-events:none}
 #light .g{position:absolute;inset:0;background:linear-gradient(309deg,var(--glow),var(--glow) 18%,transparent 62%)}
 #light .b{position:absolute;inset:0;background:linear-gradient(355deg,var(--glow) 0%,transparent 28%);opacity:.45}
+html.idle,html.idle *{cursor:none!important}
+header.top{transition:border-color .7s ease-out}html.idle header.top{border-bottom-color:transparent;transition:border-color 2.6s ease-in-out}
 #shade{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:40;opacity:calc(var(--sun) * var(--tab,1));mix-blend-mode:var(--sunblend);transition:opacity 1.2s}
 #veil{position:fixed;inset:0;pointer-events:none;z-index:39;mix-blend-mode:multiply;opacity:0;transition:opacity 2s;background:radial-gradient(110% 80% at 4% 106%,#ffd9a0 0%,rgba(255,217,160,0) 34%),#4d5886}
 html.night{--sunblend:screen;color-scheme:dark}
@@ -2766,6 +2768,21 @@ function renderInstall(host){ if(STANDALONE()){ host.innerHTML=''; return; } con
   else inner=`<p class="hint" style="margin:0">${tr('Menu ⋮ du navigateur puis « Installer l’application »','Browser menu ⋮ then “Install app”')}</p>`;
   host.innerHTML=`<div class="instbox">${inner}</div>`;
   const b=host.querySelector('#instbtn'); if(b) b.onclick=async()=>{ const e=INSTALL; if(!e) return; INSTALL=null; try{ e.prompt(); await e.userChoice; }catch(err){} renderInstall(host); }; }
+// idle: after a minute with no input everything but the seal fades away, leaving the paper and the moving shadow; any input brings it back in 0.7 s.
+// The tap or key that wakes the page does nothing else, so a sleeping screen can't be answered by accident.
+(()=>{ const OUT=2600, IN=700; let last=Date.now(), idle=false, at=0, swallow=false;
+  const els=()=>[...document.querySelectorAll('.wrap>*:not(.top),.top>*:not(#logo),#onb,#dlg,.toast')];
+  const sleep=()=>{ idle=true; at=Date.now(); document.documentElement.classList.add('idle');
+    els().forEach(e=>{ e.getAnimations().forEach(a=>{ if(a.id==='idlein') a.cancel(); }); const from=getComputedStyle(e).opacity; e.animate([{opacity:from},{opacity:0}],{duration:OUT,easing:'ease-in-out',fill:'forwards',id:'idle'}); }); };
+  const wake=ms=>{ idle=false; document.documentElement.classList.remove('idle');
+    els().forEach(e=>{ const a=e.getAnimations().find(a=>a.id==='idle'); if(!a) return; const from=getComputedStyle(e).opacity; a.cancel(); const to=getComputedStyle(e).opacity; if(ms) e.animate([{opacity:from},{opacity:to}],{duration:ms,easing:'ease-out',id:'idlein'}); }); };
+  const act=e=>{ last=Date.now(); if(!idle) return; const deep=Date.now()-at>800; wake(IN);
+    if(deep&&(e.type==='pointerdown'||e.type==='keydown')){ swallow=e.type==='pointerdown'; e.preventDefault(); e.stopPropagation(); } };
+  ['pointermove','pointerdown','keydown','wheel','touchstart','input'].forEach(t=>addEventListener(t,act,{capture:true,passive:t!=='pointerdown'&&t!=='keydown'}));
+  addEventListener('click',e=>{ if(swallow){ swallow=false; e.preventDefault(); e.stopPropagation(); } },true);
+  addEventListener('pointerup',()=>setTimeout(()=>{ swallow=false; },350),true);
+  document.addEventListener('visibilitychange',()=>{ last=Date.now(); if(!document.hidden&&idle) wake(0); });
+  setInterval(()=>{ if(!idle&&!document.hidden&&Date.now()-last>(window.IDLE_MS||60e3)) sleep(); },1000); })();
 // installed before the manifest asked for fullscreen: the system bars keep the install-time colour, so go fullscreen on the first tap
 if(matchMedia('(display-mode: standalone)').matches && document.documentElement.requestFullscreen && matchMedia('(pointer: coarse)').matches){
   addEventListener('click',()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); },true); }

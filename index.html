@@ -43,6 +43,8 @@ html{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/20
 #light{position:fixed;inset:0;z-index:-1;pointer-events:none}
 #light .g{position:absolute;inset:0;background:linear-gradient(309deg,var(--glow),var(--glow) 18%,transparent 62%)}
 #light .b{position:absolute;inset:0;background:linear-gradient(355deg,var(--glow) 0%,transparent 28%);opacity:.45}
+html.idle,html.idle *{cursor:none!important}
+header.top{transition:border-color .7s ease-out}html.idle header.top{border-bottom-color:transparent;transition:border-color 2.6s ease-in-out}
 #shade{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:40;opacity:calc(var(--sun) * var(--tab,1));mix-blend-mode:var(--sunblend);transition:opacity 1.2s}
 #veil{position:fixed;inset:0;pointer-events:none;z-index:39;mix-blend-mode:multiply;opacity:0;transition:opacity 2s;background:radial-gradient(110% 80% at 4% 106%,#ffd9a0 0%,rgba(255,217,160,0) 34%),#4d5886}
 html.night{--sunblend:screen;color-scheme:dark}
@@ -3067,7 +3069,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
   <h2 style="margin-top:12px">Menyomi <span class="jp">めん読み</span></h2><p style="margin:0;font-size:18px">${tr('Fait par','Made by')} <b>${tr('Charles « istallri »','Charles “istallri”')}</b></p><ul style="margin:0;padding-left:18px;display:grid;gap:4px">
   <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
   <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul>
-  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 0cde5ff618</p>
+  <p class="mono" style="margin:4px 0 0;font-size:14px;color:var(--mute)">Version 2 · 5e45b2754e</p>
   `; document.getElementById('settings-favorites').onclick=()=>{dlg.close();vTab='favorites';location.hash='vocab';renderVocab();};bindProgress(document.getElementById('dlgbody')); renderInstall(document.getElementById('insthost')); renderReminder(document.getElementById('remhost')); { const vr=document.getElementById('volr'); vr.oninput=()=>{ try{ localStorage.setItem('menyomi.vol',vr.value); }catch(err){} }; vr.onchange=()=>playFx(true); } document.getElementById('sndcb').onchange=e=>{ try{ localStorage.setItem('menyomi.snd',e.target.checked?'1':'0'); }catch(err){} if(e.target.checked) playFx(true); }; { const h=document.getElementById('synchost'); renderSync(h); const un=SYNC.sub(()=>renderSync(h)); dlg.addEventListener('close',un,{once:true}); } document.getElementById('otour').onclick=()=>{ dlg.close(); openTour(); }; dlg.showModal(); };
 
 // ---------- first-run tour: write a kanji, learn the word it belongs to, find it on a menu
@@ -3146,7 +3148,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes','cards')} · ${es.filter(([,e])=>e.ok).length} ${tr('justes du premier coup','right first time')}</p>${wrong.length?`<p class="rwords">${tr('À retrouver','To revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}</p><button class="btn" id="review-difficult" title="${tr('Retravailler mes hésitations','Practise my difficult cards')}">${tr('Retravailler','Practise')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · 0cde5ff618';
+const BUILD='2 · 5e45b2754e';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
@@ -3179,6 +3181,21 @@ function renderInstall(host){ if(STANDALONE()){ host.innerHTML=''; return; } con
   else inner=`<p class="hint" style="margin:0">${tr('Menu ⋮ du navigateur puis « Installer l’application »','Browser menu ⋮ then “Install app”')}</p>`;
   host.innerHTML=`<div class="instbox">${inner}</div>`;
   const b=host.querySelector('#instbtn'); if(b) b.onclick=async()=>{ const e=INSTALL; if(!e) return; INSTALL=null; try{ e.prompt(); await e.userChoice; }catch(err){} renderInstall(host); }; }
+// idle: after a minute with no input everything but the seal fades away, leaving the paper and the moving shadow; any input brings it back in 0.7 s.
+// The tap or key that wakes the page does nothing else, so a sleeping screen can't be answered by accident.
+(()=>{ const OUT=2600, IN=700; let last=Date.now(), idle=false, at=0, swallow=false;
+  const els=()=>[...document.querySelectorAll('.wrap>*:not(.top),.top>*:not(#logo),#onb,#dlg,.toast')];
+  const sleep=()=>{ idle=true; at=Date.now(); document.documentElement.classList.add('idle');
+    els().forEach(e=>{ e.getAnimations().forEach(a=>{ if(a.id==='idlein') a.cancel(); }); const from=getComputedStyle(e).opacity; e.animate([{opacity:from},{opacity:0}],{duration:OUT,easing:'ease-in-out',fill:'forwards',id:'idle'}); }); };
+  const wake=ms=>{ idle=false; document.documentElement.classList.remove('idle');
+    els().forEach(e=>{ const a=e.getAnimations().find(a=>a.id==='idle'); if(!a) return; const from=getComputedStyle(e).opacity; a.cancel(); const to=getComputedStyle(e).opacity; if(ms) e.animate([{opacity:from},{opacity:to}],{duration:ms,easing:'ease-out',id:'idlein'}); }); };
+  const act=e=>{ last=Date.now(); if(!idle) return; const deep=Date.now()-at>800; wake(IN);
+    if(deep&&(e.type==='pointerdown'||e.type==='keydown')){ swallow=e.type==='pointerdown'; e.preventDefault(); e.stopPropagation(); } };
+  ['pointermove','pointerdown','keydown','wheel','touchstart','input'].forEach(t=>addEventListener(t,act,{capture:true,passive:t!=='pointerdown'&&t!=='keydown'}));
+  addEventListener('click',e=>{ if(swallow){ swallow=false; e.preventDefault(); e.stopPropagation(); } },true);
+  addEventListener('pointerup',()=>setTimeout(()=>{ swallow=false; },350),true);
+  document.addEventListener('visibilitychange',()=>{ last=Date.now(); if(!document.hidden&&idle) wake(0); });
+  setInterval(()=>{ if(!idle&&!document.hidden&&Date.now()-last>(window.IDLE_MS||60e3)) sleep(); },1000); })();
 // installed before the manifest asked for fullscreen: the system bars keep the install-time colour, so go fullscreen on the first tap
 if(matchMedia('(display-mode: standalone)').matches && document.documentElement.requestFullscreen && matchMedia('(pointer: coarse)').matches){
   addEventListener('click',()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:'hide'}).catch(()=>{}); },true); }
