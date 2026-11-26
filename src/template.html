@@ -366,6 +366,8 @@ kbd.k{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:
 .board .items{display:flex;flex-direction:row-reverse;flex-wrap:wrap;gap:16px 12px;justify-content:center;align-items:flex-start}
 .board .itm{border:none;padding:0;background:none;position:relative;cursor:pointer;transition:transform .15s}
 .board .itm canvas{display:block;max-width:100%}
+.board canvas.doodle{display:block;align-self:flex-end;justify-self:end;margin:-4px 6px 0 auto;transform:rotate(-5deg);max-width:34%;height:auto;pointer-events:none}
+.board canvas.doodle.free{align-self:center;margin:-10px 0 0 min(42%,300px);max-width:28%}
 .board .itm:hover{transform:translateY(-3px);box-shadow:0 0 0 2px rgba(27,24,20,.5)}
 .board .itm{border-radius:2px;transition:transform .15s,opacity .2s,filter .2s,box-shadow .15s,background-color .15s}
 .board .itm.sel{background-color:rgba(246,217,47,.62);box-shadow:0 0 0 4px var(--acc),0 0 0 11px rgba(232,69,44,.22),0 10px 24px rgba(40,20,0,.3);transform:scale(1.05);z-index:3}
@@ -955,7 +957,7 @@ const lerp=(a,b,t)=>a+(b-a)*t, clamp=(x,a,b)=>Math.max(a,Math.min(b,x)), smooth=
 // ---------- glyphs
 const mpath=document.getElementById('mpath'); const GL={};
 function sampleD(d){mpath.setAttribute('d',d); const L=mpath.getTotalLength(); const n=Math.max(4,Math.ceil(L/1.5)); const pts=[]; for(let i=0;i<=n;i++){const p=mpath.getPointAtLength(L*i/n); pts.push([p.x,p.y])} return pts;}
-function glyph(ch){ if(!(ch in GL)){const g=KVG[ch]; GL[ch]=g?{strokes:g.d.map(sampleD),types:g.t,comps:g.c||[]}:null;} return GL[ch]; }
+function glyph(ch){ if(!(ch in GL)){const g=KVG[ch]||DGL[ch]; GL[ch]=g?{strokes:g.d.map(sampleD),types:g.t,comps:g.c||[]}:null;} return GL[ch]; }
 function deform(g, mess, r, slant=0, skill=0.6){
   const ang=(r()-.5)*0.10*mess, sh=(r()-.5)*0.3*mess+slant, sx=1+(r()-.5)*0.16*mess, sy=1+(r()-.5)*0.14*mess, c0=54.5, ca=Math.cos(ang), sa=Math.sin(ang);
   const T=(x,y)=>{x-=c0;y-=c0;x=x*sx-y*sh;y=y*sy;return [c0+x*ca-y*sa, c0+x*sa+y*ca]};
@@ -1234,6 +1236,35 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
 }
 
 __AMBIENCE__
+
+__DOODLES__
+// doodles become private-use glyphs, so the writer traces them like any character
+const DGL={}, DCH={}; Object.keys(DOODLES).forEach((id,i)=>{ const ch=String.fromCharCode(0xE000+i); DCH[id]=ch; DGL[ch]={d:DOODLES[id].d,t:DOODLES[id].t,c:[]}; });
+const isDoodle=c=>c in DGL;
+const D_TYPE={izakaya:['chochin','sake','beer','okame','hyottoko'],sakaba:['sake','chochin','okame','tengu'],yakitori:['kushi','chochin','beer'],ramen:['ramen','steam','tengu'],
+  soba:['take','steam'],teishoku:['onigiri','sun','bonsai','steam'],sushi:['tai','wave','nami'],don:['steam','onigiri'],kissaten:['cup','kumo','heart'],kanmi:['dango','ougi','kumo'],
+  chaya:['ougi','take','geisha','kumo'],okonomiyaki:['steam','hyottoko'],cafe:['cup','heart','kira'],patisserie:['cake','heart','kira'],bakery:['melon','croissant','heart']};
+const D_REGION={kyoto:['pagoda','geisha','torii'],tohoku:['kokeshi'],tokyo:['fuji'],hiroshima:['torii'],okinawa:['wave']};
+const D_MODERN=['cafe','patisserie','bakery'];
+function seasonDoodles(){ const d=new Date(), mo=d.getMonth()+1, day=d.getDate();
+  if((mo===12&&day>=28)||(mo===1&&day<=15)) return ['sun','tsuru','daruma','fuji'];
+  if(mo===5&&day<=6) return ['kabuto']; if(mo>=3&&mo<=5) return ['sakura']; if(mo>=9&&mo<=11) return ['momiji','icho']; if(mo===7||mo===8) return ['wave']; return []; }
+// which drawings a menu gets: one by the first heading, marks on a few dishes, one at the bottom
+function menuDoodles(m){ const r=rng(m.seed+4242), out={head:{},pre:{},suf:{},corner:null};
+  const modern=D_MODERN.includes(m.tk), base=D_TYPE[m.tk]||[], extra=[...(m.rk&&D_REGION[m.rk]||[]),...seasonDoodles().filter(id=>!modern||['sakura','momiji','icho'].includes(id))];
+  const sea=seasonDoodles();
+  if(base.length&&r()<.55){ const si=m.sections.findIndex(s=>!s.accent); const h=m.sections[si]?.h||'';
+    out.head[si]=h==='季節限定'&&sea.length&&r()<.8? pick(r,sea.filter(x=>['sakura','momiji','icho'].includes(x)).concat(['kira'])) : pick(r,base); }
+  m.sections.forEach((s,si)=>s.items.forEach((it,ii)=>{ const k=si+':'+ii, w=it.w;
+    if(/辛|担々|キムチ/.test(w)&&r()<.7) out.suf[k]=r()<.3?'hannya':'chili';
+    else if(/きつね/.test(w)&&r()<.7) out.suf[k]='kitsune';
+    else if(/鯛/.test(w)&&r()<.5) out.suf[k]='tai'; }));
+  if(r()<.65){ const cand=[]; m.sections.forEach((s,si)=>s.items.forEach((it,ii)=>{ if(ii&&it.price!=='時価'&&!out.suf[si+':'+ii]) cand.push(si+':'+ii); }));
+    if(cand.length) out.pre[pick(r,cand)]=pick(r,modern?['heart','kira','nijumaru','arrow']:['nijumaru','nijumaru','hanamaru','arrow','kira']); }
+  const pool=[...base,...extra,...extra,...(modern?[]:['daruma','kabuto','tsuru','fuji'].filter(()=>r()<.25))].filter(id=>!Object.values(out.head).includes(id));
+  if(!m.vertical&&pool.length&&r()<.7) out.corner=pick(r,pool);
+  for(const o of [out.head,out.pre,out.suf]) for(const k in o) o[k]=DCH[o[k]];
+  return out; }
 
 // ---------- SRS (SM-2 variant)
 const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,Progress.fresh()); if(!S||typeof S!=='object') S=Progress.fresh();
@@ -1745,7 +1776,7 @@ async function renderMenu(){
   const signW=makeWriter(r,'kaisho', m.layout==='slate'?'chalk':'brush',{weight:1.25});
   textCanvas(b.querySelector('#signc'), m.shop.jp, {seed:m.seed+1, writer:signW, size:clamp(vw/ ([...m.shop.jp].length+1.5),34,64), surface: m.layout==='slate'?'board':'noren', color: m.layout==='slate'?'#ffe27a':'#f5f1e8', pad:0.4});
   b.querySelector('#signbtn').onclick=e=>showSign(e.currentTarget);
-  const box=b.querySelector('#mitems'); const items=[]; MENU.flat=[];
+  const box=b.querySelector('#mitems'); const items=[]; MENU.flat=[]; const DD=menuDoodles(m);
   const ink = m.tool==='chalk'?null: m.tool==='pen'?'#1d2a6b':null;
   const tasks=[];
   let vsize=clamp(vw/18,34,62);
@@ -1765,26 +1796,29 @@ async function renderMenu(){
     const size = m.vertical? vsize : clamp(vw/20,30,50);
     const hw=Object.assign({},m.writer,{weight:m.writer.weight*1.1});
     if(m.vertical){ const surf = m.layout==='wood'?'wood':m.layout==='sheet'?null: pick(r,['red','yellow']); const hcol = surf==='red'?'#f6f1e6':hcolor; if(surf==='wood') Ambience.wood(hb,m.seed+si*101);
-      tasks.push(()=>textCanvas(hc,sec.h,{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',color:hcol,pad:0.32,minH:size*3.2})); }
-    else tasks.push(()=>textCanvas(hc,sec.h,{seed:m.seed+si*101,writer:hw,size:size*1.15,surface:'washi',transparent:true,color:hcolor,pad:0.22,align:'start',minW:Math.min(560,vw-60),after:(lx,W,H)=>{lx.save(); lx.lineWidth=3*DPR; lx.beginPath(); lx.moveTo(size*DPR*0.3,H-size*DPR*0.15); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); lx.restore();}}));
+      tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.1,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',color:hcol,pad:0.32,minH:size*3.2})); }
+    else tasks.push(()=>textCanvas(hc,sec.h+(DD.head[si]||''),{seed:m.seed+si*101,writer:hw,size:size*1.15,surface:'washi',transparent:true,color:hcolor,pad:0.22,align:'start',minW:Math.min(560,vw-60),after:(lx,W,H)=>{lx.save(); lx.lineWidth=3*DPR; lx.beginPath(); lx.moveTo(size*DPR*0.3,H-size*DPR*0.15); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); lx.restore();}}));
     hb.onclick=()=>clickItem({w:sec.h,isHeader:true},hb);
     sec.items.forEach((it,ii)=>{ const btn=document.createElement('button'); btn.className='itm'; btn.setAttribute('aria-label',tr('Plat','Dish')); const cv=document.createElement('canvas'); btn.appendChild(cv); host.appendChild(btn);
       const idx=MENU.flat.length; MENU.flat.push({...it, sec:sec.h, btn}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
-      const pt=priceText(it.price, m.pstyle); const seed=m.seed+si*101+ii*7+3;
+      const pt=priceText(it.price, m.pstyle); const seed=m.seed+si*101+ii*7+3; const dk=si+':'+ii, txt=(DD.pre[dk]||'')+it.w+(DD.suf[dk]||'');
       if(m.vertical){
         const surf = m.layout==='wood'?'wood': m.layout==='sheet'? null : pick(r,['washi','kinari','white','washi']);
         if(surf==='wood') Ambience.wood(btn,seed); const text = it.w + '　' ; const ptxt = pt;
-        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,it.w+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
+        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
           after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
-      else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...it.w].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
-        tasks.push(()=>textCanvas(cv,it.w,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,align:'start',minW:W0,color:ink,
+      else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...txt].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
+        tasks.push(()=>textCanvas(cv,txt,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,align:'start',minW:W0,color:ink,
           after:(lx,W,H,Lay)=>{ const ps=isz*0.8*DPR; const s2=String(pt); const chs=[...s2]; const its=[]; let x=W-isz*0.25*DPR; const adv=c=>/[0-9]/.test(c)?0.6:1;
             for(let i=chs.length-1;i>=0;i--){ const a=adv(chs[i])*ps; x-=a; its.unshift({ch:chs[i],cx:x+a/2,cy:H/2,size:ps*(/[0-9]/.test(chs[i])?0.8:0.9)}); }
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length);
             const endText=Lay.items.length? Lay.items[Lay.items.length-1].cx+isz*DPR*0.6 : isz*DPR; lx.save(); lx.setLineDash([2*DPR,7*DPR]); lx.lineWidth=2*DPR; lx.lineCap='round'; lx.beginPath(); lx.moveTo(endText,H*0.62); lx.lineTo(x-isz*DPR*0.3,H*0.62); lx.stroke(); lx.restore(); }})); }
     });
   });
+  if(DD.corner){ const hosts=box.querySelectorAll('.rows'), host=hosts.length?hosts[hosts.length-1]:box, dc=document.createElement('canvas'); dc.className='doodle'+(host===box?' free':''); dc.setAttribute('aria-hidden','true'); host.appendChild(dc);
+    const dw=Object.assign({},m.writer,{weight:m.writer.weight*(m.tool==='brush'?0.6:0.85)}), dcol=m.tool==='chalk'?pick(r,['#ffd84d','#ff9ccf','#9fe3ff','#f4efe2']):ink;
+    tasks.push(()=>textCanvas(dc,DCH[DD.corner],{seed:m.seed+4343,writer:dw,size:clamp(vw/8,64,104),surface:'washi',transparent:true,color:dcol,pad:0.08})); }
   if(!m.vertical && m.tax){ const nb=document.createElement('p'); nb.className='hint'; nb.style.cssText='margin:0;font-size:15px;color:#333'; const hosts=box.querySelectorAll('.rows'); if(hosts.length){ const tc=document.createElement('canvas'); hosts[hosts.length-1].appendChild(tc); tasks.push(()=>textCanvas(tc,'税込',{seed:m.seed+999,writer:m.writer,size:22,surface:'washi',transparent:true,pad:0.2,align:'end',minW:Math.min(560,vw-60),color:ink})); } }
   sceneTasks(b,m,vw,ink).forEach(t=>tasks.push(t));
   for(const tk of tasks){ if(gen!==menuGen) return; tk(); await nextFrame(); }
