@@ -1286,6 +1286,8 @@ function nextSet(){ TESTRES=null; S.extraNew+=S.newPer; store.set(SKEY,S); showC
 const PHONE=()=>matchMedia('(max-width:700px)').matches; const DESK=()=>matchMedia('(min-width:1000px)').matches;
 // a right answer moves on by itself with the suggested grade; a tap on the card keeps it on screen
 let autoT=null; function cancelAuto(){ clearTimeout(autoT); autoT=null; document.querySelectorAll('#card .grades .auto').forEach(b=>b.classList.remove('auto')); }
+// a click or tap anywhere (except on a grade or Next) pauses the auto-advance, to take time with the card
+addEventListener('pointerdown',e=>{ if(!autoT) return; const t=e.target; if(t&&t.closest&&t.closest('#card .grades button,#card .gonext')) return; cancelAuto(); },true);
 document.getElementById('card').addEventListener('pointerdown',e=>{ if(autoT&&!e.target.closest('.grades button')) cancelAuto(); });
 // feedback sounds, synthesised: a small temple bell (rin) when right, a deep bamboo knock when wrong
 const VOL=()=>{ try{ const v=parseFloat(localStorage.getItem('menyomi.vol')); return isFinite(v)?Math.min(1,Math.max(0,v)):1; }catch(e){ return 1; } };
