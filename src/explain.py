@@ -250,6 +250,8 @@ add("""
 テイクアウト|À emporter, de l’anglais take out. Plus courant que お持ち帰り dans les chaînes.|Takeaway, from English take out. More common than お持ち帰り in chains.
 イートイン|Sur place, de l’anglais eat in.|Eat in, from English.
 店内でお召し上がりですか|Question au comptoir : « Vous consommez sur place ? ». お召し上がり est la forme polie de manger.|Asked at the counter: “For here?”. お召し上がり is the polite verb for eating.
+こちらでお召し上がりですか|« Vous mangez ici ? » La question classique au comptoir, souvent suivie de お持ち帰りですか.|“Will you eat here?” The classic counter question, often followed by お持ち帰りですか.
+お持ち帰りですか|« Ou c’est à emporter ? » La deuxième moitié de la question du comptoir.|“Or is it to take away?” The second half of the counter question.
 テイクアウトで|Réponse : « À emporter ».|Answer: “To go”.
 店内で|Réponse : « Sur place ».|Answer: “For here”.
 ホットとアイスどちらになさいますか|« Chaud ou glacé, lequel prendrez-vous ? » Question très fréquente au comptoir.|“Hot or iced, which would you like?” A very common counter question.
