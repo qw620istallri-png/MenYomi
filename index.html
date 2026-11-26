@@ -828,6 +828,8 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:.1;mix-blend-mode:sof
 .rc-nav{position:absolute;right:14px;top:8px;display:flex;gap:6px;z-index:2}
 .rc-nav button{background:none;border:0;color:#1b1712;font:800 20px var(--f-disp);padding:0 8px;cursor:pointer}
 .rc-nav button:disabled{opacity:.25;cursor:default}
+/* the calendar and the booklet are printed paper: they keep daylight ink whatever the hour's palette, so chips and text stay readable at dusk */
+.rcal,.book .pgs{--paper:#f7f0e1;--sheet:#fffaf1;--ink:#1b1814;--mute:#6a6056;--rule:#1b1814;--soft:#ece1c9;--acc:#bf3520;color:#1b1712}
 /* the month's micro-seasons */
 .rc-ko{display:grid;margin-top:16px;border-top:3px solid #1b1712}
 .kor{display:grid;grid-template-columns:44px 52px auto auto minmax(0,1fr);gap:2px 10px;align-items:baseline;padding:8px 2px;border-bottom:1px dashed rgba(27,23,18,.3);cursor:pointer;color:#1b1712}
@@ -3413,7 +3415,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
    <details><summary>${tr('Crédits','Credits')}</summary><ul>
    <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
    <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul></details>
-   <span class="mono" style="font-size:14px">Version 2 · c8132eae68</span></div></div>`;
+   <span class="mono" style="font-size:14px">Version 2 · 315d88f744</span></div></div>`;
   const B=document.getElementById('dlgbody'); { const mm=B.querySelector('.mini'), got=SHOPS.filter(s=>(S.stamps||{})[s[0]]).sort((a,b)=>S.stamps[b[0]]-S.stamps[a[0]]).slice(0,3);
     if(got.length) got.forEach(s=>mm.appendChild(shopStamp(s,44))); else mm.innerHTML='<span class="e" lang="ja">帳</span>'; }
   B.querySelector('#icarnet').onclick=()=>{ dlg.close(); location.hash='carnet'; };
@@ -3499,7 +3501,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes','cards')} · ${es.filter(([,e])=>e.ok).length} ${tr('justes du premier coup','right first time')}</p>${wrong.length?`<p class="rwords">${tr('À retrouver','To revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}</p><button class="btn" id="review-difficult" title="${tr('Retravailler mes hésitations','Practise my difficult cards')}">${tr('Retravailler','Practise')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · c8132eae68';
+const BUILD='2 · 315d88f744';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
