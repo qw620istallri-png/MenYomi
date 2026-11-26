@@ -2514,7 +2514,7 @@ function shopName(r,t){ const pat=pick(r,t.names), n=pick(r,t.names_n||DATA.name
 const LAYOUTS={
   tanzaku:{wall:'wall',label:'bandes de papier',en:'paper strips'}, wood:{wall:'darkwood',label:'plaques de bois',en:'wooden plaques'}, sheet:{wall:'wall',label:'grande feuille',en:'large sheet'},
   poster:{wall:'wall',label:'affiches',en:'posters'}, slate:{wall:'board',label:'ardoise',en:'slate'}, card:{wall:'wood',label:'carte',en:'menu card'}, receipt:{wall:'wood',label:'ticket de caisse',en:'till receipt'} };
-let MENU=null, mmode='meaning', lastQ='meaning', lastTarget=-1, streak=0, target=null, score={ok:0,n:0}, menuGen=0, qmiss=false;
+let MENU=null, mmode='meaning', lastQ='meaning', QCLUE=(()=>{ try{ return localStorage.getItem('menyomi.qclue')||'auto'; }catch(e){ return 'auto'; } })(), lastTarget=-1, streak=0, target=null, score={ok:0,n:0}, menuGen=0, qmiss=false;
 let qpool='known'; try{ const v=localStorage.getItem('menyomi.qpool'); if(v==='all'||v==='known') qpool=v; }catch(e){}
 const knownWord=w=>['r:','m:','k:','p:'].some(p=>S.cards[p+w]&&S.cards[p+w].reps>0);
 const knownKanji=c=>(S.cards['w:'+c]&&S.cards['w:'+c].reps>0)||WORDS.some(w=>w[0].includes(c)&&knownWord(w[0]));
@@ -2595,14 +2595,19 @@ async function renderMenu(){
       else if(ID.rule==='dots'){ for(let x=x0;x<W*0.6;x+=size*DPR*0.22){ lx.beginPath(); lx.arc(x,y,2*DPR,0,7); lx.fill(); } }
       else { lx.beginPath(); lx.moveTo(x0,y); lx.quadraticCurveTo(W*0.3,H-size*DPR*0.05,W*0.55,H-size*DPR*0.18); lx.stroke(); } lx.restore();}}));
     hb.onclick=()=>clickItem({w:sec.h,isHeader:true},hb);
+    // vertical menus: every strip gets the same length, so the prices line up along the bottom like on a real board
+    const VMAX=m.vertical? Math.max(...m.sections.flatMap((s2,sj)=>s2.items.map((x,ij)=>[...((DD.pre[sj+':'+ij]||'')+x.w+(DD.suf[sj+':'+ij]||''))].length+Math.ceil([...priceText(x.price,m.pstyle)].length*0.55)+1))) : 0;
+    const VH=m.vertical? Math.max(...m.sections.flatMap((s2,sj)=>s2.items.map((x,ij)=>{ const t=(DD.pre[sj+':'+ij]||'')+x.w+(DD.suf[sj+':'+ij]||''); return layoutText(t+'　'.repeat(VMAX-[...t].length),{size,vertical:true,pad:0.28,writer:m.writer,r:rng(1)}).H/DPR; })))+2 : 0;
     sec.items.forEach((it,ii)=>{ const btn=document.createElement('button'); btn.className='itm'; btn.setAttribute('aria-label',tr('Plat','Dish')); const cv=document.createElement('canvas'); btn.appendChild(cv); host.appendChild(btn);
       const idx=MENU.flat.length; MENU.flat.push({...it, sec:sec.h, btn}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
       const pt=priceText(it.price, m.pstyle); const seed=m.seed+si*101+ii*7+3; const dk=si+':'+ii, txt=(DD.pre[dk]||'')+it.w+(DD.suf[dk]||'');
       if(m.vertical){
         const surf = m.layout==='wood'?'wood': m.layout==='sheet'? null : pick(r,['washi','kinari','white','washi']);
         if(surf==='wood') Ambience.wood(btn,seed); const text = it.w + '　' ; const ptxt = pt;
-        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt+'　'.repeat(Math.ceil(pn*0.55)+1),{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,
-          after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
+        tasks.push(()=>{ const n=[...it.w].length, pn=[...ptxt].length; textCanvas(cv,txt+'　'.repeat(Math.max(Math.ceil(pn*0.55)+1,VMAX-[...txt].length)),{seed,writer:m.writer,size,vertical:true,dcolor:ID.dcol,surface:surf||'washi',transparent:!surf||surf==='wood',pad:0.28,valign:'start',color:ink,minH:VH,
+          after:(lx,W,H,Lay,rr)=>{ const ps=size*0.6*DPR; const its=[]; let y=H - pn*ps*1.02 - size*0.3*DPR; const top=y; [...ptxt].forEach(c=>{ its.push({ch:c,cx:W/2,cy:y+ps/2,size:ps*0.95}); y+=ps*1.02; });
+            // a dotted leader from the dish down to its price, as on the horizontal menus
+            const ink2=Lay.items.filter(q=>q.ch!=='　'), end=ink2.length? ink2[ink2.length-1].cy+size*DPR*0.62 : 0; if(top-end>size*DPR*0.9){ lx.save(); lx.setLineDash([2*DPR,7*DPR]); lx.lineWidth=2*DPR; lx.lineCap='round'; lx.strokeStyle=ink; lx.globalAlpha=.7; lx.beginPath(); lx.moveTo(W/2,end); lx.lineTo(W/2,top-size*DPR*0.25); lx.stroke(); lx.restore(); }
             const sim=simulate(its,m.writer,rng(seed+5)); const tl=new Tool(lx,m.writer.tool,ps*0.09*m.writer.weight,rng(seed+6)); play(tl,sim.samples,0,sim.samples.length); }}); }); }
       else { const W0=Math.min(560,vw-60); const u=c=>/[0-9]/.test(c)?.6:SMALLKANA.includes(c)?.62:isKana(c)?.86:1, isz=Math.min(size,W0/(1.7+[...txt].reduce((a,c)=>a+u(c),0)+0.8*[...String(pt)].reduce((a,c)=>a+(/[0-9]/.test(c)?.6:1),0)));
         tasks.push(()=>textCanvas(cv,txt,{seed,writer:m.writer,size:isz,surface:m.layout==='slate'?'board':'washi',transparent:true,pad:0.18,dcolor:ID.dcol,align:'start',minW:W0,color:ink,
@@ -2750,14 +2755,17 @@ function newQuest(){ const q=document.getElementById('mquest'); target=null; doc
   // each word is asked once per menu; when none is left, a new menu is drawn
   const asked=MENU.asked||(MENU.asked=new Set()); let pool=base.filter(i=>!asked.has(i)); if(!pool.length){ genMenu(); return; } const fp=pool.filter(i=>MENU.focus&&MENU.focus.has(MENU.flat[i].w)); if(fp.length) pool=fp;
   let t=0; for(let k=0;k<6;k++){ t=pool[Math.floor(Math.random()*pool.length)]; if(t!==lastTarget||pool.length<2) break; } asked.add(t); lastTarget=t; target=t; const w=WMAP[MENU.flat[target].w];
+  // clue: the one asked for, or in auto the side of the word that is the least worked (meaning card vs reading card), a coin toss when even
+  if(QCLUE!=='auto') mmode=QCLUE; else { const st=id=>{ const c=S.cards[id]; return !CARDS.includes(id)?Infinity:!c?-1:c.reps>0?c.ivl+c.reps:0; }, a=st('m:'+w[0]), b=st('r:'+w[0]); mmode=a<b?'meaning':b<a?'reading':Math.random()<.5?'meaning':'reading'; }
+  lastQ=mmode;
   const kanaOnly=!hasKanji(w[0]); const main = mmode==='meaning'? w[2] : kanaOnly? toRomaji(w[1]) : w[1]; const hidden = mmode==='meaning'? `${w[1]} · ${toRomaji(w[1])}` : w[2];
   const nk=MENU.flat.filter(x=>knownWord(x.w)).length;
   q.innerHTML=`<div class="quest">
     <b>${esc(main)}${mmode==='reading'&&!kanaOnly?` <span class="mono" style="font-size:16px;text-transform:none;opacity:.8">${esc(toRomaji(w[1]))}</span>`:''}</b>
-    <button class="spoiler" id="qsp" title="${tr('Afficher l’indice','Show the hint')}">${esc(hidden)}</button><span class="sc"></span><button class="qset" id="qset" aria-expanded="${QSET}" aria-label="${tr('Réglages du défi','Challenge settings')}" title="${tr('Réglages du défi','Challenge settings')}">⚙</button><button class="btn" id="qskip">${tr('Passer','Skip')}</button><div class="qgroups"${QSET?'':' hidden'}><div class="qmode" role="group" aria-label="${tr('Indice donné','Clue')}"><button data-q="meaning" aria-pressed="${mmode==='meaning'}">${tr('Sens','Meaning')}</button><button data-q="reading" aria-pressed="${mmode==='reading'}">${tr('Lecture','Reading')}</button></div><div class="qmode" role="group" aria-label="${tr('Mots demandés','Words asked')}"><button data-p="known" aria-pressed="${qpool==='known'}" title="${tr('Mots déjà appris sur ce menu','Words you have learned on this menu')}">${tr('Mes mots','My words')} ${nk}</button><button data-p="all" aria-pressed="${qpool==='all'}">${tr('Tous','All')}</button></div></div></div>`;
+    <button class="spoiler" id="qsp" title="${tr('Afficher l’indice','Show the hint')}">${esc(hidden)}</button><span class="sc"></span><button class="qset" id="qset" aria-expanded="${QSET}" aria-label="${tr('Réglages du défi','Challenge settings')}" title="${tr('Réglages du défi','Challenge settings')}">⚙</button><button class="btn" id="qskip">${tr('Passer','Skip')}</button><div class="qgroups"${QSET?'':' hidden'}><div class="qmode" role="group" aria-label="${tr('Indice donné','Clue')}"><button data-q="auto" aria-pressed="${QCLUE==='auto'}" title="${tr('Sens ou lecture, selon ce qui est le moins travaillé pour chaque mot','Meaning or reading, whichever the word needs most')}">Auto</button><button data-q="meaning" aria-pressed="${QCLUE==='meaning'}">${tr('Sens','Meaning')}</button><button data-q="reading" aria-pressed="${QCLUE==='reading'}">${tr('Lecture','Reading')}</button></div><div class="qmode" role="group" aria-label="${tr('Mots demandés','Words asked')}"><button data-p="known" aria-pressed="${qpool==='known'}" title="${tr('Mots déjà appris sur ce menu','Words you have learned on this menu')}">${tr('Mes mots','My words')} ${nk}</button><button data-p="all" aria-pressed="${qpool==='all'}">${tr('Tous','All')}</button></div></div></div>`;
   q.querySelector('#qset').onclick=e=>{ QSET=!QSET; e.currentTarget.setAttribute('aria-expanded',QSET); q.querySelector('.qgroups').hidden=!QSET; };
   updScore(); q.querySelector('#qskip').onclick=()=>{ streak=0; newQuest(); }; q.querySelector('#qsp').onclick=e=>e.currentTarget.classList.toggle('on');
-  q.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ mmode=lastQ=b.dataset.q; newQuest(); });
+  q.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{ QCLUE=b.dataset.q; try{ localStorage.setItem('menyomi.qclue',QCLUE); }catch(e){} newQuest(); });
   q.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{ qpool=b.dataset.p; try{ localStorage.setItem('menyomi.qpool',qpool); }catch(e){} if(qpool==='known'&&!nk) genMenu(); else newQuest(); }); }
 document.querySelector('#v-menu .modes').addEventListener('click',e=>{ const b=e.target.closest('[data-m]'); if(!b) return; mmode=b.dataset.m==='explore'?'explore':lastQ; score={ok:0,n:0}; streak=0; newQuest(); });
 const freeMenu=e=>{ const type=document.getElementById('mtype').value,region=document.getElementById('mreg').value; if(e?.target.id==='mtype') document.getElementById('mtype').value=type; if(e?.target.id==='mreg') document.getElementById('mreg').value=region; genMenu(); };
@@ -3447,7 +3455,7 @@ document.getElementById('credbtn').onclick=()=>{ document.getElementById('dlgslo
    <details><summary>${tr('Crédits','Credits')}</summary><ul>
    <li>${tr('Tracés','Strokes')} : <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> © Ulrich Apel, CC BY-SA 3.0</li><li>${tr('Sens et lectures','Meanings and readings')} : KANJIDIC2 (EDRDG), CC BY-SA 4.0</li>
    <li>Plamondon, Sigma-Lognormal ; Berio, Fol Leymarie, Plamondon, IGS 2017</li><li>${tr('Lumière inspirée de','Light inspired by')} sunlit (Jacky Zhao)</li><li>${tr('Voix','Voices')} : VOICEVOX:No.7, VOICEVOX Nemo</li><li>Archivo, IBM Plex Mono, Zen Kaku Gothic New, Klee One, Yomogi (OFL)</li></ul></details>
-   <span class="mono" style="font-size:14px">Version 2 · b9924589e3</span></div></div>`;
+   <span class="mono" style="font-size:14px">Version 2 · da014bf391</span></div></div>`;
   const B=document.getElementById('dlgbody'); { const mm=B.querySelector('.mini'), got=SHOPS.filter(s=>(S.stamps||{})[s[0]]).sort((a,b)=>S.stamps[b[0]]-S.stamps[a[0]]).slice(0,3);
     if(got.length) got.forEach(s=>mm.appendChild(shopStamp(s,44))); else mm.innerHTML='<span class="e" lang="ja">帳</span>'; }
   B.querySelector('#icarnet').onclick=()=>{ dlg.close(); location.hash='carnet'; };
@@ -3533,7 +3541,7 @@ function dailyReport(){
   return `<section class="session-report"><h3>${tr('Ton bilan du jour','Your day in review')}</h3><p>${es.length} ${tr('cartes','cards')} · ${es.filter(([,e])=>e.ok).length} ${tr('justes du premier coup','right first time')}</p>${wrong.length?`<p class="rwords">${tr('À retrouver','To revisit')} : ${words.length?words.map(w=>`<span lang="ja">${esc(w)}</span>`).join(' · '):tr('les kanji écrits aujourd’hui','today’s handwritten kanji')}</p><button class="btn" id="review-difficult" title="${tr('Retravailler mes hésitations','Practise my difficult cards')}">${tr('Retravailler','Practise')} (${wrong.length})</button>`:`<p>${tr('Tout juste au premier essai. Essaie maintenant un menu !','All correct on the first try. Try a menu now!')}</p>`}</section>`;
 }
 
-const BUILD='2 · b9924589e3';
+const BUILD='2 · da014bf391';
 try{ const pv=localStorage.getItem('menyomi.ver'); if(pv&&pv!==BUILD) setTimeout(()=>toast(tr('Mis à jour ✓ ','Updated ✓ ')+BUILD.split(' · ').slice(0,2).join(' · ')),900); localStorage.setItem('menyomi.ver',BUILD); }catch(e){}
 // ---------- daily reminder: the service worker wakes about once a day (periodic sync) and reads the due dates the page leaves in a cache
 const REM_ON=()=>{ try{ return localStorage.getItem('menyomi.rem')==='1'; }catch(e){ return false; } };
