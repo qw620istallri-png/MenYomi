@@ -474,6 +474,17 @@ add("""
 ごちそうさまでした|Dit en partant ou en reposant les baguettes : merci pour ce festin.|Said when leaving or putting down your chopsticks: thanks for the feast.
 ありがとうございました|Le merci du personnel quand vous partez, au passé : « merci d’être venus ».|The staff’s thanks as you leave, in the past: “thank you for coming”.
 またお越しください|« Revenez » : souvent lancé juste après ありがとうございました.|“Come again”: often called out right after ありがとうございました.
+かき氷|Glace pilée arrosée de sirop, le dessert de l’été. Le fanion 氷 (glace) devant la boutique annonce qu’on en sert.|Shaved ice drenched in syrup, the summer dessert. A 氷 (ice) banner outside means the shop serves it.
+味|« Goût ». Après un nom, 〜味 indique le parfum : レモン味, parfum citron.|“Taste”. After a noun, 〜味 gives the flavour: レモン味, lemon flavour.
+レモン味|Sirop au citron, acidulé et jaune pâle.|Lemon syrup, tangy and pale yellow.
+いちご味|Sirop à la fraise, rouge vif : le parfum le plus demandé.|Strawberry syrup, bright red: the most popular flavour.
+メロン味|Sirop au melon, d’un vert éclatant.|Melon syrup, a vivid green.
+抹茶味|Sirop au matcha, plus amer et moins sucré. Avec des haricots rouges, cela devient un 宇治金時.|Matcha syrup, more bitter and less sweet. With red beans it becomes 宇治金時.
+練乳|Lait concentré sucré versé par-dessus, en supplément ou déjà compris.|Sweetened condensed milk poured on top, as an extra or included.
+売り切れました|« C’est épuisé ». 売り切れる : être vendu jusqu’au dernier. Souvent précédé d’un すみません.|“It’s sold out”. 売り切れる: to sell out. Usually after a すみません.
+じゃあ|« Alors, dans ce cas » : pour changer d’avis ou se rabattre sur autre chose.|“Well then”: to change your mind or settle for something else.
+冷たいうちにどうぞ|« Prenez-le tant que c’est froid ». 〜うちに : pendant que, avant que ça change.|“Have it while it’s cold”. 〜うちに: while, before it changes.
+温かいうちにどうぞ|« Prenez-le tant que c’est chaud », en servant un plat qui sort du feu.|“Have it while it’s hot”, said when serving a dish fresh from the stove.
 """)
 
 NX = {}

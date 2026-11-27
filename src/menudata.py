@@ -874,3 +874,32 @@ PRICES.update({
  'konbini:プリン':(150,280),'konbini:シュークリーム':(130,200),'konbini:ロールケーキ':(180,280),'konbini:エクレア':(150,220),'konbini:大福':(130,180),'konbini:団子':(120,160),
  'konbini:メロンパン':(130,180),'konbini:カレーパン':(140,190),'konbini:あんパン':(120,160),'レジ袋':(3,5),
 })
+
+# ---------- kakigōri (shaved ice) and its flavours, and what the staff says when a flavour has run out
+KAKI_W = [
+ ('かき氷','かきごおり','glace pilée (kakigōri)','shaved ice'),
+ ('味','あじ','goût, parfum','taste, flavour'),
+ ('レモン味','レモンあじ','parfum citron','lemon flavour'),
+ ('いちご味','いちごあじ','parfum fraise','strawberry flavour'),
+ ('メロン味','メロンあじ','parfum melon','melon flavour'),
+ ('抹茶味','まっちゃあじ','parfum matcha','matcha flavour'),
+ ('練乳','れんにゅう','lait concentré sucré','sweetened condensed milk'),
+]
+KAKI_TALK = [
+ ('売り切れました','うりきれました','c’est épuisé (dit le personnel)','it’s sold out (staff)'),
+ ('じゃあ','じゃあ','alors, dans ce cas…','well then…'),
+ ('冷たいうちにどうぞ','つめたいうちにどうぞ','à déguster tant que c’est froid','enjoy it while it’s cold'),
+ ('温かいうちにどうぞ','あたたかいうちにどうぞ','à déguster tant que c’est chaud','enjoy it while it’s hot'),
+]
+for w,r,f,e in KAKI_W+KAKI_TALK: W[w]=(r,f)
+NEW_W.extend(KAKI_W+KAKI_TALK)
+T['kanmi']['sections'].insert(1,('かき氷',['レモン味','いちご味','メロン味','抹茶味','宇治金時','練乳'],(500,950)))
+PHRASES['talk'].extend(x[0] for x in KAKI_TALK)
+# sweet shops and tea houses: the flavour someone wanted has run out, or the dish is served right away
+PHRASES['kanmi'] = [
+ [('c','すみません'),('c','{d}を|ください'),('s','すみません、|売り切れました'),('c','じゃあ、これを|ください')],
+ [('c','{d}を|ください'),('s','少々お待ちください'),('s','お待たせしました'),('s','冷たいうちにどうぞ')],
+ [('s','お決まりですか'),('c','{d}を|ください'),('s','すみません、|売り切れました'),('c','じゃあ'),('c','これを|ください')],
+]
+SCENES.append([('s','お待たせしました'),('s','温かいうちにどうぞ'),('c','いただきます')])
+PRICES.update({'かき氷':(500,900),'レモン味':(500,800),'いちご味':(500,800),'メロン味':(500,800),'抹茶味':(600,950),'練乳':(100,200)})
