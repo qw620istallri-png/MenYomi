@@ -59,3 +59,13 @@ test('review days, shop stamps and counters survive the 90-day trim and merge',(
   assert.deepEqual({...m.stamps},{ramen:4,sushi:9});assert.equal(m.firsts,7);assert.equal(m.nrev,40);
   for(const bad of [{cards:{},rdays:'x'},{cards:{},rdays:['2025-1-2']},{cards:{},stamps:{'Bad!':1}},{cards:{},firsts:-1}]) assert.equal(P.validate(bad,ids,words),null);
 });
+
+test('renamed words keep their cards and history',()=>{
+  const old={cards:{'r:焼き':card(1),'m:焼き':card(2)},todayIds:['r:焼き'],favorites:{'焼き':{on:true,at:1}},activity:{'2026-11-25':{'r:焼き':{ok:true,at:1}}}};
+  const moved=P.rename(old,{'焼き':'焼鳥'});const result=P.validate(moved,ids,words);
+  assert.deepEqual(Object.keys(result.cards).sort(),['m:焼鳥','r:焼鳥']);assert.deepEqual(result.todayIds,['r:焼鳥']);assert.equal(result.favorites['焼鳥'].on,true);assert.ok(result.activity['2026-11-25']['r:焼鳥']);
+});
+test('FSRS memory state survives validation',()=>{
+  const result=P.validate({cards:{'r:焼鳥':card(1,{s:3.7,d:5.2,lr:1})}},ids,words);
+  assert.equal(result.cards['r:焼鳥'].s,3.7);assert.equal(result.cards['r:焼鳥'].d,5.2);assert.equal(result.cards['r:焼鳥'].lr,1);
+});

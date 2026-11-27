@@ -10,8 +10,9 @@ const Progress = (() => {
     const out=fresh(), cardSet=new Set(ids), wordSet=new Set(words);
     for(const [id,c] of Object.entries(input.cards)) {
       if(!cardSet.has(id)||!object(c)||!['due','ivl','ease','reps','lapses'].every(k=>finite(c[k]))||c.ease<1||c.ease>100||!Number.isInteger(c.reps)||!Number.isInteger(c.lapses)) return null;
-      if(['at','introduced'].some(k=>c[k]!==undefined&&!finite(c[k]))) return null;
-      out.cards[id]={due:c.due,ivl:c.ivl,ease:c.ease,reps:c.reps,lapses:c.lapses,...(c.at!==undefined?{at:c.at}:{}),...(c.introduced!==undefined?{introduced:c.introduced}:{})};
+      if(['at','introduced','s','d','lr'].some(k=>c[k]!==undefined&&!finite(c[k]))) return null;
+      out.cards[id]={due:c.due,ivl:c.ivl,ease:c.ease,reps:c.reps,lapses:c.lapses};
+      for(const k of ['at','introduced','s','d','lr']) if(c[k]!==undefined) out.cards[id][k]=c[k]; // s, d, lr: FSRS memory state
     }
     if(input.day!==undefined&&(typeof input.day!=='string'||(input.day!==''&&!/^\d{4}-\d{2}-\d{2}$/.test(input.day)))) return null;
     out.day=input.day||'';
@@ -111,6 +112,17 @@ const Progress = (() => {
       return result;
     });
   }
-  return {fresh,validate,merge,commit};
+  // words renamed between versions: their cards, history and favourites move to the new word before validation
+  function rename(input, map) {
+    if(!object(input)||!object(input.cards)) return input;
+    const id=k=>{ const w=k.slice(2); return map[w]!==undefined&&k[1]===':'?k.slice(0,2)+map[w]:k; };
+    const keys=o=>{ if(!object(o)) return o; const r={}; for(const [k,v] of Object.entries(o)) r[id(k)]=v; return r; };
+    const out={...input,cards:keys(input.cards),removed:keys(input.removed)};
+    for(const k of ['todayIds','queue']) if(Array.isArray(input[k])) out[k]=input[k].map(x=>typeof x==='string'?id(x):x);
+    for(const k of ['activity','activityRemoved']) if(object(input[k])) out[k]=Object.fromEntries(Object.entries(input[k]).map(([d,e])=>[d,keys(e)]));
+    for(const k of ['favorites','lessonSeen','lessonPassed']) if(object(input[k])) out[k]=Object.fromEntries(Object.entries(input[k]).map(([w,v])=>[map[w]??w,v]));
+    return out;
+  }
+  return {fresh,validate,merge,commit,rename};
 })();
 if(typeof module!=='undefined') module.exports=Progress;

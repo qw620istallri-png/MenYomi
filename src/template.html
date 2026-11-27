@@ -555,7 +555,7 @@ dialog::backdrop{background:rgba(12,12,12,.62)}
 .skwrap{margin-bottom:16px}
 .skwrap .skills{margin-bottom:0;border-bottom:none}
 .skset{display:flex;align-items:center;justify-content:space-between;gap:12px;border:2px solid var(--rule);background:var(--sheet);padding:8px 12px}
-.skset select{padding:4px 8px}
+.skset select{padding:4px 8px}.skset+.skset{margin-top:-2px}.skset input[type=checkbox]{width:22px;height:22px;margin:0;accent-color:var(--acc)}
 .wtools{display:flex;flex-wrap:wrap;gap:8px}
 .wtools #wcheck{background:var(--ink);color:var(--paper)}
 .wtools #wundo,.wtools #wclear{min-width:44px;justify-content:center;font-size:18px;padding-inline:10px}
@@ -980,7 +980,7 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:1;mix-blend-mode:scre
 <section class="view" id="v-revisions">
   <div class="vhead"><div class="stats" id="stats"></div>
     <div class="rctl" id="rctl"></div></div>
-  <div class="skwrap" id="skwrap" hidden><div class="skills" id="skills"></div><div class="skset"><label class="lab" for="newper" data-en="New cards per day">Nouvelles cartes par jour</label><select id="newper"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option><option value="30">30</option></select></div></div>
+  <div class="skwrap" id="skwrap" hidden><div class="skills" id="skills"></div><div class="skset"><label class="lab" for="newper" data-en="New cards per day">Nouvelles cartes par jour</label><select id="newper"><option value="5">5</option><option value="10" selected>10</option><option value="20">20</option><option value="30">30</option></select></div><div class="skset"><label class="lab" for="wrare" data-en="Also write rare kanji">Écrire aussi les kanji rares</label><input type="checkbox" id="wrare"></div></div>
   <div class="panel card" id="card"></div>
 </section>
 
@@ -1154,7 +1154,10 @@ const KR={'あ':'a','い':'i','う':'u','え':'e','お':'o','か':'ka','き':'ki
 const toHira=s=>s.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));
 // a phrase's romaji is spaced word by word (okaikei onegai shimasu reads better than one long string)
 const RD_SPLIT=(()=>{ const m={}; try{ for(const ps of Object.values(PARTS)){ const full=ps.map(p=>p[1]).join(''); if(!m[full]) m[full]=ps.map(p=>p[1]); } }catch(e){} return m; })();
-function toRomaji(s){ const sp=RD_SPLIT[s]; if(sp) return sp.map((x,i)=>(x==='は'?'wa':x==='へ'?'e':romaji1(x))+(i<sp.length-1&&x!=='お'&&x!=='ご'?' ':'')).join(''); return romaji1(s); }
+const roDiv=w=>{ const c=typeof S!=='undefined'&&S.cards[firstId(w[0])]; return `<div class="ro"${c&&c.reps>0&&c.ivl>=7?' hidden':''}>${esc(toRomaji(w[1]))}</div>`; };
+document.addEventListener('click',e=>{ const rd=e.target.closest&&e.target.closest('#card .answer .rd'); if(!rd||e.target.closest('button')) return; const ro=rd.parentElement.querySelector('.ro'); if(ro&&ro.hidden) ro.hidden=false; });
+const GLUE=new Set(['ます','ませ','ました','ません','ましょう']);
+function toRomaji(s){ const sp=RD_SPLIT[s]; if(sp) return sp.map((x,i)=>(x==='は'?'wa':x==='へ'?'e':romaji1(x))+(i<sp.length-1&&x!=='お'&&x!=='ご'&&!GLUE.has(sp[i+1])?' ':'')).join(''); return romaji1(s); }
 function romaji1(s){ s=toHira(s); let out=''; const ch=[...s];
   for(let i=0;i<ch.length;i++){ const c=ch[i], n=ch[i+1];
     if(c==='っ'){ const nx=KR[n]||''; out+= nx.startsWith('ch')?'t':(nx[0]||''); continue; }
@@ -1603,7 +1606,7 @@ function shortTicket(m,r,vw){ const its=shuffle(r,m.flat.filter(x=>!x.kind&&type
   const L=[...(ID.logo?[{logo:DCH[ID.logo]}]:[]),{t:m.shop.jp,c:1,big:[...m.shop.jp].length<=8?1:0,sign:1,band:ID.band},{gap:6},{t:nowStamp(r,ID.cols<28)},{gap:4},...its.map(x=>({t:x.w,p:yen(x.price),item:x})),{rule:ID.rule==='double'?'eq':'dots'},{t:'合計',p:yen(sum),big:1,word:'合計',price:sum},{gap:8}];
   return {lines:L,seed:m.seed+67,cols:ID.cols,width,style:{bold:ID.bold}}; }
 
-// ---------- SRS (SM-2 variant)
+// ---------- SRS (FSRS)
 const SKEY='kanjipinceau.v2'; let S=store.get(SKEY,Progress.fresh()); if(!S||typeof S!=='object') S=Progress.fresh();
 const MIN=60e3, DAY=864e5;
 // days follow the local calendar and turn over at 4 AM (a late-night session still counts for the evening)
@@ -1613,17 +1616,27 @@ const dayStart=n=>{ const d=new Date(Date.now()-DAY0*36e5); d.setHours(0,0,0,0);
 const dueIn=ivl=>dayStart(Math.max(1,Math.round(ivl)));
 function rollDay(){ if(S.day!==today()){ S.day=today(); S.newToday=0; S.newBase=0; S.extraNew=0; S.todayIds=[]; return true; } return false; } rollDay();
 S.todayIds=S.todayIds||[]; S.extraNew=S.extraNew||0; let SESSION=null, TESTRES=null; let SKON=false; try{ SKON=localStorage.getItem('menyomi.skills')==='1'; }catch(e){}
-const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','饂飩','寿司'];
+const CORE_ORDER=['定食','焼鳥','唐揚げ','刺身','枝豆','冷奴','味噌汁','生ビール','日本酒','焼魚','親子丼','牛丼','天丼','ご飯','大盛','並','お品書き','本日のおすすめ','飲物','焼物','揚物','一品料理','麺類','醤油ラーメン','味噌ラーメン','塩ラーメン','餃子','炒飯','蕎麦','ざる蕎麦','うどん','天ぷら'];
 // restaurant phrases: written notices and spoken formulas; kana-only ones get a meaning card only
 const PH=DATA.phrases||{signs:[],talk:[],scenes:[]}; const PHSET=new Set([...PH.signs,...PH.talk]);
 const isPhrase=w=>PHSET.has(w), hasKanji=w=>/[一-鿿]/.test(w), firstId=w=>(hasKanji(w)?'r:':'m:')+w;
 const PH_FIRST=['いらっしゃいませ','すみません','ください','お会計','いただきます','ごちそうさまでした','お冷','禁煙','お会計お願いします','営業中','食券','少々お待ちください','ありがとうございました','現金のみ','お持ち帰り','以上です'];
-function buildCards(){ const ABBR_IDS=new Set(Object.keys(((typeof DATA!=='undefined'&&DATA.types.konbini)||{}).abbr||{})); const ids=[], seen=new Set(); const base=[...CORE_ORDER.filter(w=>WMAP[w]), ...WORDS.map(w=>w[0]).filter(w=>!CORE_ORDER.includes(w)&&!isPhrase(w))];
+function buildCards(){ const ABBR_IDS=new Set(Object.keys(((typeof DATA!=='undefined'&&DATA.types.konbini)||{}).abbr||{})); const ids=[], seen=new Set(); const ORD=((typeof DATA!=='undefined'&&DATA.order)||CORE_ORDER).filter(w=>WMAP[w]&&!isPhrase(w)), OS=new Set(ORD); const base=[...ORD, ...WORDS.map(w=>w[0]).filter(w=>!OS.has(w)&&!isPhrase(w))];
   const ph=[...new Set([...PH_FIRST,...PH.talk,...PH.signs])].filter(w=>WMAP[w]); const order=[];
   base.forEach((w,i)=>{ order.push(w); if(i>=5&&(i-5)%4===0&&ph.length) order.push(ph.shift()); }); order.push(...ph);
-  order.forEach(w=>{ if(!hasKanji(w)){ ids.push('m:'+w); if(!isPhrase(w)) ids.push('r:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){seen.add(c); ids.push('w:'+c)} }); }); return ids; }
+  order.forEach(w=>{ if(!hasKanji(w)){ ids.push('m:'+w); if(!isPhrase(w)) ids.push('r:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); return; } ids.push('r:'+w); ids.push('m:'+w); ids.push('k:'+w); ids.push('p:'+w); if(ABBR_IDS.has(w)) ids.push('h:'+w); [...w].forEach(c=>{ if(isKanji(c) && KVG[c] && !seen.has(c)){ const f=rareK(c)&&familyOf(c); if(f&&!seen.has(f)){ seen.add(f); ids.push('w:'+f); } seen.add(c); ids.push('w:'+c); } }); }); return ids; }
+// writing cards: jōyō kanji, kanji of the first 200 words and kanji met in 3+ words; a rare kanji brings instead its family component
+// (魚 for 鮪, 鰤, 鯵…). Rare kanji stay writable on request, or once their card was started.
+const KDD=(typeof DATA!=='undefined'&&DATA.kd)||{}, KCOUNT={}, VFORMS=new Set(Object.values((typeof DATA!=='undefined'&&DATA.variants)||{}).flat().map(v=>v[0]));
+WORDS.forEach(w=>{ if(!VFORMS.has(w[0])) new Set([...w[0]]).forEach(c=>{ KCOUNT[c]=(KCOUNT[c]||0)+1; }); });
+const TOPK=new Set(((typeof DATA!=='undefined'&&DATA.order)||[]).slice(0,200).join(''));
+const rareK=c=>!(KDD[c]&&['1','2','3','4','5','6','8','S'].includes(KDD[c][5]))&&(KCOUNT[c]||0)<3&&!TOPK.has(c);
+const familyOf=c=>{ const walk=ns=>{ for(const n of ns||[]){ if(n.e&&n.e!==c&&['left','top'].includes(n.p)&&KVG[n.e]&&KDD[n.e]) return n.e; } return null; }; return KVG[c]?walk(KVG[c].c):null; };
+const WRARE=()=>{ try{ return localStorage.getItem('menyomi.wrare')==='1'; }catch(e){ return false; } };
+const wOpen=c=>!rareK(c)||WRARE();
 const CARDS=buildCards();
-const validateState=v=>Progress.validate(v,CARDS,WORDS.map(w=>w[0]));
+const RENAMED={'売り切れました':'売り切れなんです','冷たいうちにどうぞ':'溶けないうちにどうぞ'};
+const validateState=v=>Progress.validate(Progress.rename(v,RENAMED),CARDS,WORDS.map(w=>w[0]));
 { const valid=validateState(S); if(!valid){ store.set('menyomi.recovery',S,true); S=Progress.fresh(); setTimeout(()=>toast(tr('Une sauvegarde illisible a été conservée pour récupération.','An unreadable save was kept for recovery.')),0); } else S=valid; rollDay(); }
 let LAST_GRADE=null, reviewPad=null, REPLAY_ID=null;
 const copySession=x=>x?{...x,q:x.q.slice(),...(x.seen?{seen:new Set(x.seen)}:{})}:null;
@@ -1639,20 +1652,40 @@ function undoGrade(){
 }
 
 // meaning and recall cards wait until the reading was learned on an earlier day, so the answer is not still on screen
-const canIntro=id=>{ if(id[0]==='h'){ const c=S.cards[firstId(id.slice(2))]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); } if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return c.due-c.ivl*DAY < t0.getTime(); };
+const canIntro=id=>{ if(id[0]==='w') return wOpen(id[2]); if(id[0]==='h'){ const c=S.cards[firstId(id.slice(2))]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return (c.lr||c.due-c.ivl*DAY) < t0.getTime(); } if(id[0]!=='p'&&id[0]!=='m'&&id[0]!=='k') return true; if(!hasKanji(id.slice(2))) return true; const c=S.cards['r:'+id.slice(2)]; if(!c||!(c.reps>0)) return false; const t0=new Date(); t0.setHours(0,0,0,0); return (c.lr||c.due-c.ivl*DAY) < t0.getTime(); };
 // cards sharing a word or a kanji with the last few shown are held back while something else is waiting
 let RECENT=[]; const seen=id=>{ RECENT.push(id); if(RECENT.length>3) RECENT.shift(); }; const kset=id=>new Set([...id.slice(2)].filter(isKanji));
 const related=(a,b)=>{ if(a.slice(2)===b.slice(2)) return true; const B=kset(b); for(const c of kset(a)) if(B.has(c)) return true; return false; };
 const fresh=id=>!RECENT.some(r=>r!==id&&related(r,id));
+const isFirst=id=>id[0]!=='w'&&id===firstId(id.slice(2));
+function newPool(){ const all=CARDS.filter(id=>!S.cards[id]&&canIntro(id)), quota=S.newPer+S.extraNew, half=Math.ceil(quota/2);
+  const words=Object.entries(S.cards).filter(([id,c])=>c.introduced&&dayKey(c.introduced)===today()&&isFirst(id)).length, follow=Math.max(0,S.newToday-words);
+  const firsts=all.filter(isFirst), others=all.filter(id=>!isFirst(id));
+  if(follow>=quota-half&&firsts.length) return firsts; if(words>=half&&others.length) return others; return all; }
 function nextCard(){ if(REPLAY_ID) return REPLAY_ID; if(SESSION){ if(SESSION.q.length) return SESSION.q[0]; endSession(); } const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).sort((a,b)=>S.cards[a].due-S.cards[b].due);
-  const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); const nw=S.newToday<S.newPer+S.extraNew? CARDS.filter(id=>!S.cards[id]&&canIntro(id)).slice(0,40).filter((id,i,l)=>id[0]!=='w'||!l.slice(0,i).some(o=>o[0]==='r'&&o.includes(id[2]))) : [];
+  const qd=(S.queue||[]).find(id=>!S.cards[id]&&CARDS.includes(id)); const nw=S.newToday<S.newPer+S.extraNew? newPool().slice(0,40).filter((id,i,l)=>id[0]!=='w'||!l.slice(0,i).some(o=>o[0]==='r'&&o.includes(id[2]))) : [];
   const lk=(RECENT[RECENT.length-1]||'')[0], pickFresh=l=>l.find(id=>fresh(id)&&id[0]!==lk)||l.find(fresh); const f=pickFresh(due)||(qd&&fresh(qd)?qd:null)||pickFresh(nw); if(f) return f;
   if(due.length) return due[0]; if(qd) return qd; if(nw.length) return nw[0];
   const soon=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now+20*MIN).sort((a,b)=>S.cards[a].due-S.cards[b].due); return soon.find(fresh)||soon[0]||null; }
-function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now();
-  if(c.reps===0){ if(g===0)c.due=now+MIN; else if(g===1)c.due=now+6*MIN; else if(g===2){c.reps=1;c.ivl=1;c.due=dueIn(1)} else {c.reps=1;c.ivl=4;c.due=dueIn(4)} }
-  else { if(g===0){c.lapses++;c.ease=Math.max(1.3,c.ease-0.2);c.ivl=1;c.reps=0;c.due=now+10*MIN} else { if(g===1){c.ivl=Math.max(1,c.ivl*1.2);c.ease=Math.max(1.3,c.ease-0.15)} else if(g===2)c.ivl*=c.ease; else {c.ivl*=c.ease*1.3;c.ease+=0.15} c.ivl=Math.round(c.ivl*10)/10; c.reps++; c.due=dueIn(c.ivl); } }
-  c.at=now; return c; }
+// FSRS-4.5 (default weights): each card keeps a stability s (days until recall falls to 90 %) and a difficulty d.
+// Short learning steps stay for new and forgotten cards; cards from the old SM-2 start from their interval and ease.
+const FW=[0.4872,1.4003,3.7145,13.8206,5.1618,1.2298,0.8975,0.031,1.6474,0.1367,1.0461,2.1072,0.0793,0.3246,1.587,0.2272,2.8755];
+const fR=(t,st)=>Math.pow(1+19/81*t/st,-0.5), fD0=G=>Math.min(10,Math.max(1,FW[4]-(G-3)*FW[5]));
+const fNextD=(d,G)=>Math.min(10,Math.max(1,FW[7]*fD0(3)+(1-FW[7])*(d-FW[6]*(G-3))));
+const fRecall=(d,st,r,G)=>st*(Math.exp(FW[8])*(11-d)*Math.pow(st,-FW[9])*(Math.exp(FW[10]*(1-r))-1)*(G===2?FW[15]:1)*(G===4?FW[16]:1)+1);
+const fForget=(d,st,r)=>Math.min(st,FW[11]*Math.pow(d,-FW[12])*(Math.pow(st+1,FW[13])-1)*Math.exp(FW[14]*(1-r)));
+const fState=c=>c.s>0&&c.d>0? {s:c.s,d:c.d} : {s:Math.max(.5,c.ivl||1),d:Math.min(10,Math.max(1,5-((c.ease||2.5)-2.5)*4))};
+function schedule(c,g){ c=c?{...c}:{ivl:0,ease:2.5,reps:0,lapses:0,due:0}; const now=Date.now(), G=g+1;
+  if(c.reps===0){ // learning (new, or just forgotten): minutes-long steps, then a first interval in days
+    if(!c.lapses){ c.s=FW[G-1]; c.d=fD0(G); } else if(!(c.s>0&&c.d>0)) Object.assign(c,fState(c));
+    if(g===0) c.due=now+(c.lapses?10:1)*MIN; else if(g===1) c.due=now+6*MIN;
+    else { c.reps=1; c.ivl=g===2? Math.max(1,c.lapses?Math.round(c.s):1) : Math.max(2,Math.round(c.s*(c.lapses?FW[16]:1))); c.due=dueIn(c.ivl); } }
+  else { const st=fState(c), t=Math.max(0,(now-(c.lr||c.due-(c.ivl||0)*DAY))/DAY), r=fR(t,st.s);
+    if(g===0){ c.s=Math.max(.1,fForget(st.d,st.s,r)); c.lapses++; c.reps=0; c.ivl=1; c.due=now+10*MIN; }
+    else { c.s=fRecall(st.d,st.s,r,G); c.ivl=Math.min(36500,Math.max(1,Math.round(c.s))); c.reps++; c.due=dueIn(c.ivl); }
+    c.d=fNextD(st.d,G); }
+  c.ease=Math.round(Math.min(3.5,Math.max(1.3,2.5+(5-c.d)/4))*100)/100; // kept for older app versions that sync the same save
+  c.lr=now; c.at=now; return c; }
 const fmtDelay=ms=>{const m=ms/MIN; if(m<60) return Math.round(m)+' min'; const d=ms/DAY; if(d<1) return Math.round(m/60)+' h'; if(d<30) return Math.round(d)+tr(' j',' d'); return Math.round(d/30)+tr(' mois',' mo');};
 // next card: the old one fades up and out, the new one settles in (short, so the flow stays quick)
 let SWAP=false;
@@ -1704,7 +1737,7 @@ function toGrades(){ cancelAuto(); const s=document.querySelector('#card .grades
 function gradeButtons(id,sug){ const lab=LANG==='en'?['Again','Hard','Good','Easy']:['À revoir','Difficile','Bien','Facile']; return `<div class="grades">${lab.map((l,g)=>`<button data-g="${g}"${g===sug?' class="sug"':''}><kbd class="k">${g+1}</kbd>${l}<small>${SESSION?(g===0?(SESSION.test?tr('remise en révision','back to reviews'):tr('encore une fois','once more')):(SESSION.test?tr('test','test'):tr('entraînement','practice'))):tr('dans ','in ')+fmtDelay(schedule(S.cards[id],g).due-Date.now())}</small></button>`).join('')}</div>`; }
 function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.filter(id=>S.cards[id]&&S.cards[id].due<=now).length; const learned=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
   const nw=Math.max(0,Math.min(S.newPer+S.extraNew-S.newToday, CARDS.filter(id=>!S.cards[id]&&canIntro(id)).length)); const t=S.todayIds.length;
-  const prog=`<button class="stat stog${SKON?' on':''}" id="skbtn" aria-expanded="${SKON}" aria-controls="skwrap" title="${tr('Progression','Progress')}"><b>${learned}<small>/${CARDS.length}</small></b><span>${tr('cartes apprises','cards learned')} <span class="car" aria-hidden="true">▾</span></span></button>`;
+  const prog=`<button class="stat stog${SKON?' on':''}" id="skbtn" aria-expanded="${SKON}" aria-controls="skwrap" title="${tr('Progression','Progress')}"><b>${learned}<small>/${CARDS.filter(id=>S.cards[id]||id[0]!=='w'||wOpen(id[2])).length}</small></b><span>${tr('cartes apprises','cards learned')} <span class="car" aria-hidden="true">▾</span></span></button>`;
   document.getElementById('stats').innerHTML= SESSION? `<span class="stat"><b>${SESSION.q.length}</b><span>${SESSION.test?tr('à tester','to test'):tr('à refaire','to redo')}</span></span>${SESSION.test?`<span class="stat"><b>${SESSION.ok}<small>/${SESSION.n}</small></b><span>${tr('justes','right')}</span></span>`:`<span class="stat"><b>·</b><span>${tr('pratique','practice')}</span></span>`}${prog}`
     : `<span class="stat"><b>${due}</b><span>${tr('à revoir','due')}</span></span><span class="stat"><b>${nw}</b><span>${tr('nouvelles','new')}</span></span>${prog}`;
   const c=document.getElementById('rctl'); const known=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0).length;
@@ -1716,6 +1749,7 @@ function renderStats(){ renderSkills(); const now=Date.now(); const due=CARDS.fi
   const b=id=>c.querySelector(id); if(b('#rstop')) b('#rstop').onclick=()=>{ endSession(); showCard()}; if(b('#rredo')) b('#rredo').onclick=redoToday; if(b('#rnext')) b('#rnext').onclick=nextSet; if(b('#rtest')) b('#rtest').onclick=testMe; }
 function endSession(){ if(SESSION&&SESSION.test&&SESSION.n) TESTRES={ok:SESSION.ok,n:SESSION.n}; SESSION=null; }
 function testMe(){ REPLAY_ID=null; LAST_GRADE=null; const pool=CARDS.filter(id=>S.cards[id]&&S.cards[id].reps>0); if(!pool.length) return; TESTRES=null; SESSION={q:shuffle(rng(newSeed()),pool).slice(0,20),test:true,ok:0,n:0,seen:new Set()}; showCard(); }
+{ const wr=document.getElementById('wrare'); wr.checked=WRARE(); wr.onchange=()=>{ try{ localStorage.setItem('menyomi.wrare',wr.checked?'1':'0'); }catch(e){} showCard(); }; }
 const newper=document.getElementById('newper'); newper.value=String(S.newPer); newper.onchange=()=>{S.newPer=+newper.value; S.tp=Date.now(); store.set(SKEY,S); showCard();};
 // a phrase is detailed word by word (reading, meaning, then that word's kanji); a plain word by its kanji
 const GRAM=/^[ぁ-ゖ]{1,2}$/;
@@ -1776,7 +1810,7 @@ function showCard(){
       <div class="stage" id="pst" hidden><canvas id="pc"></canvas></div><div id="pans"></div>`;
     const reveal=res=>{ const desk=DESK(); el.querySelector('#pform').querySelectorAll('input,button').forEach(x=>x.disabled=true); const a=el.querySelector('#pans');
       a.innerHTML=`${res===true?`<p class="feedback ok" style="margin:0 0 10px">${tr('Juste !','Correct!')}</p>`:res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        ${desk?'':'<div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div>'}<div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
+        ${desk?'':'<div class="stage" style="min-height:0"><canvas id="pc"></canvas></div><div style="height:12px"></div>'}<div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div>${roDiv(w)}</div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       const ps=desk? el.querySelector('#pst') : a.querySelector('.stage'); if(desk) ps.hidden=false; const r=rng(newSeed()); const m=pick(r,MEDIA); const n=[...key].length; const box=ps.clientWidth-52; const pvh=desk? ps.clientHeight-64 : innerHeight*0.42;
       textCanvas(ps.querySelector('#pc'),key,{seed:newSeed(),writer:makeWriter(r,pick(r,['kaisho','hurry','gyosho']),m.tool),size:Math.floor(clamp(m.v?Math.min(desk?160:110,pvh/(n*0.95+0.6)):Math.min(desk?180:120,box/(n*0.95+0.6)),40,desk?180:120)),vertical:m.v,surface:m.surface,color:m.color,pad:0.32});
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
@@ -1804,7 +1838,7 @@ function showCard(){
     if(first){ el.querySelector('#rgot').onclick=()=>{ if(SWAP) return; rememberGrade(id); seen(id); REPLAY_ID=null; cancelAuto(); S.newToday++; S.cards[id]={...schedule(null,0),introduced:Date.now()}; store.set(SKEY,S); swapCard(); }; return; }
     const reveal=(res)=>{ const a=el.querySelector('#rans'); el.querySelector('#rform').querySelectorAll('input,button').forEach(x=>x.disabled=true);
       a.innerHTML=`${res===true?'<p class="feedback ok" style="margin:0 0 10px">'+tr('Juste !','Correct!')+'</p>':res===false?`<p class="feedback ko" style="margin:0 0 10px">${tr('Pas tout à fait.','Not quite.')}</p>`:''}
-        <div class="answer"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
+        <div class="answer"><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div>${roDiv(w)}<div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,res===true?2:0)}`;
       a.querySelectorAll('.grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
     el.querySelector('#rform').onsubmit=e=>{ e.preventDefault(); const v=el.querySelector('#rin').value; if(!v.trim()&&PHONE()){ reveal(null); return; } const r=checkAnswer(v,key,w[1]); if(r==null){el.querySelector('#rin').focus(); return;} reveal(r); };
     el.querySelector('#reveal').onclick=()=>reveal(null);
@@ -1849,7 +1883,7 @@ function showAbbr(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed());
   receiptStage(el.querySelector('#mst'),key,r,true);
   let tries=0, done=false;
   const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
-    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w" lang="ja">${esc(ABBR[key])} → ${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div><p class="hint" style="margin:10px 0 0">${tr('Katakana demi-largeur : les petits signes ﾞ et ﾟ suivent la syllabe au lieu d’y être attachés.','Half-width katakana: the small ﾞ and ﾟ marks follow the syllable instead of being attached.')}</p><div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w" lang="ja">${esc(ABBR[key])} → ${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div>${roDiv(w)}<div class="mn">${esc(w[2])}</div></div><p class="hint" style="margin:10px 0 0">${tr('Katakana demi-largeur : les petits signes ﾞ et ﾟ suivent la syllabe au lieu d’y être attachés.','Half-width katakana: the small ﾞ and ﾟ marks follow the syllable instead of being attached.')}</p><div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===key;
     if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(key)}"]`).classList.add('good'); finish(false); } } }); }
@@ -1871,7 +1905,7 @@ function showMeaning(el,id,key,isNew){ const w=WMAP[key]; const r=rng(newSeed())
   if(!receiptStage(el.querySelector('#mst'),key,r,false,r()<.35)){ const dd=reviewDoodle(key,r,m), txt=dd?(dd.pre?dd.ch+key:key+dd.ch):key; textCanvas(el.querySelector('#mc'),txt,{seed:newSeed(),writer:makeWriter(r,preset,m.tool),size:dd?Math.floor(size*(n*0.95+0.6)/((n+1)*0.95+0.6)):size,vertical:m.v,surface:m.surface,color:m.color,dcolor:dd&&dd.col,pad:0.35}); }
   let tries=0, done=false;
   const finish=ok=>{ done=true; el.querySelectorAll('#mch button').forEach(b=>b.disabled=true);
-    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${hasKanji(key)?esc(w[1]):''}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div><div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+    el.querySelector('#mans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Juste !','Correct!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${hasKanji(key)?esc(w[1]):''}${sayBtn(w[0],w[1])}</div>${roDiv(w)}<div class="mn">${esc(w[2])}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#mans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   el.querySelectorAll('#mch button').forEach(b=>b.onclick=()=>{ if(done) return; tries++; const ok=opts[+b.dataset.i]===w[2];
     if(ok){ b.classList.add('good'); finish(tries===1); } else { b.classList.add('bad'); b.disabled=true; if(tries>=2){ el.querySelector(`#mch button[data-i="${opts.indexOf(w[2])}"]`).classList.add('good'); finish(false); } } }); }
@@ -1926,7 +1960,7 @@ function showHunt(el,id,key){ const w=WMAP[key]; const r=rng(newSeed()); const o
     <div class="stage hunt" id="hst"></div><div id="hans"></div>`;
   const wr=makeWriter(r,pick(r,['kaisho','hurry','gyosho']),pick(r,['brush','brush','chisel'])); const surf=pick(r,['kinari','washi','wood','white']);
   const host=el.querySelector('#hst'); let tries=0, done=false; const n=Math.max(...opts.map(o=>[...o].length)); const size=Math.round(clamp((DESK()&&host.clientHeight>200? host.clientHeight-90 : innerHeight*0.5)/(n*0.95+0.7),30,60));
-  const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div><div class="ro">${esc(toRomaji(w[1]))}</div></div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
+  const finish=ok=>{ el.querySelector('#hans').innerHTML=`<p class="feedback ${ok?'ok':'ko'}" style="margin:0 0 10px">${ok?tr('Trouvé du premier coup !','Found on the first try!'):tr('C’était celui-ci.','It was this one.')}</p><div class="answer"><div class="w">${esc(key)}</div><div class="rd">${esc(w[1])}${sayBtn(w[0],w[1])}</div>${roDiv(w)}</div>${xp(key)}<div style="height:14px"></div>${wordChips(key)}<div style="height:16px"></div>${gradeButtons(id,ok?2:0)}`;
     el.querySelectorAll('#hans .grades button').forEach(b=>b.onclick=()=>grade(id,+b.dataset.g)); toGrades(); };
   opts.forEach((o,i)=>{ const b=document.createElement('button'); b.className='itm'; b.setAttribute('aria-label',tr('Plat ','Dish ')+(i+1)); b.title=String(i+1); const cv=document.createElement('canvas'); b.appendChild(cv); host.appendChild(b);
     textCanvas(cv,o,{seed:newSeed(),writer:wr,size,vertical:true,surface:surf,pad:0.32,valign:'start',minH:size*(n*0.95+0.75)});
@@ -2144,6 +2178,9 @@ function fillSelects(){
   const mt=document.getElementById('mtype'); mt.innerHTML=`<option value="">${tr('Au hasard','Random')}</option>`+Object.entries(TYPES).map(([k,t])=>`<option value="${k}">${t.jp} · ${esc(t.fr)}</option>`).join('');
   const mr=document.getElementById('mreg'); mr.innerHTML=`<option value="">${tr('Tout le Japon','All Japan')}</option>`+Object.entries(REGIONS).map(([k,t])=>`<option value="${k}">${t.jp} · ${esc(t.fr)}</option>`).join('');
 }
+// a dish is sometimes written another way on the wall (old kanji, other okurigana), as on real menus
+const VARIANTS=DATA.variants||{};
+function spelling(r,w){ for(const [v,p] of VARIANTS[w]||[]){ if(WMAP[v]&&r()<p) return v; } return w; }
 function genMenu(){
   const r=rng(newSeed()); const want=mmode!=='explore'&&qpool==='known';
   const F=new Set(window.MENU_FOCUS||[]); window.MENU_FOCUS=null; // words of the day, from the done screen
@@ -2159,9 +2196,9 @@ function genMenu(){
   const writer=makeWriter(r,pick(r,['kaisho','hurry','hurry','gyosho','gyosho']),tool);
   const pstyle = vertical? pick(r,['digits','digits','trad']) : 'arabic';
   const sections=[]; const maxItems = layout==='card'||layout==='slate'? 9 : vertical? 14 : 12; let count=0;
-  if(reg){ const its=pref(reg.items).slice(0,vertical?4:3); sections.push({h:pick(r,['名物',reg.jp+'名物','当店自慢']),items:its.map(w=>({w,price:w==='蟹'&&r()<0.5?'時価':priceOf(r,tk,w,[480,1680])})),accent:true}); count+=its.length; }
+  if(reg){ const its=pref(reg.items).slice(0,vertical?4:3); sections.push({h:pick(r,['名物',reg.jp+'名物','当店自慢']),items:its.map(w=>({w:spelling(r,w),price:w==='蟹'&&r()<0.5?'時価':priceOf(r,tk,w,[480,1680])})),accent:true}); count+=its.length; }
   for(const [h,list,[a,b]] of t.sections){ if(count>=maxItems) break; const n=Math.min(list.length, Math.max(2,Math.round((maxItems-count)/ (t.sections.length>2?2.2:1.4))));
-    const its=pref(list).slice(0,n).filter(w=>WMAP[w]); sections.push({h, items:its.map(w=>({w, price: (tk==='sushi'&&['中とろ','大とろ','雲丹','鮑'].includes(w)&&r()<0.35)?'時価':priceOf(r,tk,w,[a,b])}))}); count+=its.length; }
+    const its=pref(list).slice(0,n).filter(w=>WMAP[w]); sections.push({h, items:its.map(w=>({w:spelling(r,w), price: (tk==='sushi'&&['中とろ','大とろ','雲丹','鮑'].includes(w)&&r()<0.35)?'時価':priceOf(r,tk,w,[a,b])}))}); count+=its.length; }
   MENU={tk,t,rk,reg,layout,vertical,tool,writer,pstyle,sections,shop:shopName(r,t),seed:r()*1e9|0, tax:r()<0.6}; MENU.focus=F; MENU.id=shopIdentity(MENU); MENU.ticket=!TICKET_SKIP.includes(tk)&&r()<.14;
   renderMenu(); newQuest();
 }
@@ -2302,9 +2339,9 @@ function sceneTasks(b,m,vw,ink){ const tasks=[]; if(!PH.signs.length) return tas
     tasks.push(()=>textCanvas(cv,w,{seed:m.seed+500+i*13,writer:nw,size,vertical:vert,surface:surf,color,pad:0.48,after:(x,W,H)=>{ x.save(); x.globalAlpha=.16; x.strokeStyle='#80643c'; x.lineWidth=DPR; x.beginPath(); x.moveTo(W*.08,H*.12); x.lineTo(W*.92,H*.1); x.stroke(); x.restore(); }})); });
   }
   // the exchange
-  const cafe=CAFE_SHOPS.includes(m.tk), kb=m.tk==='konbini', km=['kanmi','chaya'].includes(m.tk), sc=pick(r,kb&&PH.konbini&&r()<.85?PH.konbini:cafe&&PH.cafe&&r()<.7?PH.cafe:km&&PH.kanmi&&r()<.6?PH.kanmi:PH.scenes); const all=MENU.flat.filter(x=>!x.kind&&!x.dup&&x.sec!=='カスタマイズ'&&[...x.w].length<=5), counter=all.filter(x=>['ホットスナック','中華まん','おでん'].includes(x.sec)), dishes=kb&&counter.length?counter:all; const dish=dishes.length? (dishes.find(x=>knownWord(x.w)&&r()<.6)||pick(r,dishes)).w : 'ビール';
+  const cafe=CAFE_SHOPS.includes(m.tk), kb=m.tk==='konbini', km=['kanmi','chaya'].includes(m.tk), ks=['yakitori','izakaya'].includes(m.tk), sc=pick(r,kb&&PH.konbini&&r()<.85?PH.konbini:cafe&&PH.cafe&&r()<.7?PH.cafe:km&&PH.kanmi&&r()<.6?PH.kanmi:ks&&PH.kushi&&r()<.5?PH.kushi:PH.scenes); const all=MENU.flat.filter(x=>!x.kind&&!x.dup&&x.sec!=='カスタマイズ'&&[...x.w].length<=5), counter=all.filter(x=>['ホットスナック','中華まん','おでん'].includes(x.sec)), dishes=kb&&counter.length?counter:all; const kushi=sc.some(([,l])=>l.includes('|二本|')||l.includes('|一本|')), sk=all.filter(x=>x.sec==='串焼'||['焼鳥','焼き鳥','燒鳥','串カツ'].includes(x.w)), pool=kushi&&sk.length?sk:dishes; const dish=pool.length? (pool.find(x=>knownWord(x.w)&&r()<.6)||pick(r,pool)).w : 'ビール';
   const bw=makeWriter(r,pick(r,['kaisho','hurry']),'pen'); const maxW=Math.min(vw*(phone?.8:.72),420);
-  sc.forEach(([who,line],i)=>{ const [pre,w]=line.includes('|')? line.split('|') : ['',line]; const full=pre.replace('{d}',dish)+w; if(!WMAP[w]) return; const n=[...full].length;
+  sc.forEach(([who,line],i)=>{ const [pre,w,post='']=line.includes('|')? line.split('|') : ['',line]; const full=pre.replace('{d}',dish)+w+post; if(!WMAP[w]) return; const n=[...full].length;
     const row=document.createElement('div'); row.className='trow '+who; row.innerHTML=`<span class="who" lang="ja" aria-hidden="true">${who==='s'?'店':'客'}</span>`;
     const btn=document.createElement('button'); btn.className='itm bub'; btn.setAttribute('aria-label',tr('Réplique','Line')); const cv=document.createElement('canvas'); btn.appendChild(cv); row.appendChild(btn); tb.appendChild(row);
     const idx=MENU.flat.length; MENU.flat.push({w,btn,kind:'talk',full:full!==w?full:null}); btn.onclick=()=>clickItem(MENU.flat[idx],btn);
