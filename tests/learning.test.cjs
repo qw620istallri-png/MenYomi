@@ -22,7 +22,7 @@ test('daily report offers only cards missed on their first encounter',()=>{
 test('drawing survives a resize with its undo history',()=>{
   const script=fs.readFileSync('src/template.html','utf8');const a=script.indexOf('class Pad{'),b=script.indexOf('// ---------- kanji dialog',a);
   const noop=()=>{};class Node{constructor(){this.clientWidth=300;this.children=[];}appendChild(x){this.children.push(x);}addEventListener(){}getContext(){return new Proxy({getImageData:()=>({width:this.width,height:this.height})},{get:(o,k)=>o[k]||noop,set:(o,k,v)=>(o[k]=v,true)});}}
-  let disconnected=false;const c={document:{createElement:()=>new Node()},Ambience:{attachInk:()=>({refresh:noop,clear:noop,destroy:noop})},ResizeObserver:class{observe(){}disconnect(){disconnected=true;}},DPR:1,fillSurface:noop,drawRef:noop,clearTimeout:noop,cancelAnimationFrame:noop};
+  let disconnected=false;const c={document:{createElement:()=>new Node()},Ambience:{attachInk:()=>({refresh:noop,clear:noop,undo:noop,destroy:noop})},ResizeObserver:class{observe(){}disconnect(){disconnected=true;}},DPR:1,fillSurface:noop,drawRef:noop,clearTimeout:noop,cancelAnimationFrame:noop};
   vm.createContext(c);const Pad=vm.runInContext(script.slice(a,b)+'\nPad',c);const pad=new Pad(new Node(),'牛');pad.strokes=[[[10,20],[30,40]]];pad.snaps=[{width:300,height:300}];pad.el.clientWidth=600;pad.resize();
   assert.equal(pad.size,600);assert.deepEqual(pad.strokes,[[[10,20],[30,40]]]);assert.equal(pad.snaps.length,1);assert.equal(pad.snaps[0].width,600);pad.destroy();assert.equal(disconnected,true);
 });

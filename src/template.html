@@ -774,7 +774,7 @@ html.night #ground,html[data-theme="dark"] #ground{opacity:1;mix-blend-mode:scre
 .board .itm.note:hover{transform:rotate(var(--rot,0deg))}
 .paper-tape{position:absolute;z-index:4;pointer-events:none;background:var(--tape,linear-gradient(100deg,#d8c9a495,#f0e5c9c9 46%,#ddcda7aa));border-inline:1px solid #f0e3be65;box-shadow:0 1px 2px #35241125}
 .paper-curl{position:absolute;z-index:3;pointer-events:none;background:linear-gradient(135deg,#bbaa87 0%,#f8f1df 24%,#e7d8b9 83%);clip-path:polygon(0 0,100% 0,0 100%);border-top-left-radius:2px;filter:drop-shadow(-1px -1px 1px #553c2238)}
-.pad canvas.ink-sheen{z-index:3;pointer-events:none;mix-blend-mode:normal}.pad canvas.over{z-index:4;pointer-events:none}
+.pad canvas.ink-sheen{z-index:3;pointer-events:none;mix-blend-mode:normal}.pad canvas.ink-bleed{pointer-events:none;mix-blend-mode:multiply}.pad canvas.over{z-index:4;pointer-events:none}
 /* ---------- stamp book (帳) */
 @media (max-width:420px){.hctl .btn{padding:6px 7px}.mast h1{gap:6px}}
 .hctl #stampbtn{position:relative;font-family:var(--f-jp);font-weight:700;color:var(--acc)}
@@ -1459,11 +1459,21 @@ function textCanvas(canvas, text, o){ // o: {writer, size, vertical, surface, tr
   if(!o.anim){ paint(); play(tool,sim.samples,0,sim.samples.length); tool.end(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); return {sim, layout:L}; }
   // animated
   let i=0, t0=performance.now(); const speedup=o.speedup||1; const token={stop:false};
+  // fresh sumi: each brush stroke gets its own wet look and bleed as soon as it is finished (see Ambience.wetInk)
+  const wetOn=o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches, wets=[]; let down=false, spts=[];
+  const prev=wetOn?document.createElement('canvas'):null; if(prev){ prev.width=Wd; prev.height=Hd; }
+  const strokeDone=()=>{ const c=document.createElement('canvas'); c.width=Wd; c.height=Hd; const x=c.getContext('2d'); x.drawImage(layer,0,0); x.globalCompositeOperation='destination-out'; x.drawImage(prev,0,0);
+    const px=prev.getContext('2d'); px.clearRect(0,0,Wd,Hd); px.drawImage(layer,0,0); const w=Ambience.wetInk(c,{pts:spts,R:R*1.4,css:o.size*1.1}); if(w) wets.push(w); spts=[]; };
+  const show=now=>{ paint(); let live=false; wets.forEach(w=>{ if(!w.settled&&w.update(now)) live=true; });
+    if(wets.length){ ctx.save(); ctx.globalCompositeOperation='multiply'; wets.forEach(w=>ctx.drawImage(w.halo,w.x,w.y,w.w,w.h)); ctx.restore(); }
+    compose(ctx,layer,o.writer.tool,o.color); wets.forEach(w=>{ if(!w.settled) ctx.drawImage(w.wet,w.x,w.y,w.w,w.h); }); return live; };
   const frame=now=>{ if(token.stop) return; const tt=(now-t0)/1000*speedup; let j=i; while(j<sim.samples.length && sim.samples[j].t<=tt) j++;
-    play(tool,sim.samples,i,j); i=j; paint(); compose(ctx,layer,o.writer.tool,o.color);
+    for(let k=i;k<j;k++){ const q=sim.samples[k]; if(wetOn&&q.p>0.035) spts.push([q.x,q.y,t0+q.t*1000/speedup]); play(tool,sim.samples,k,k+1); if(wetOn){ if(down&&!tool.down) strokeDone(); down=tool.down; } }
+    i=j; show(now);
     // pen tip
     const s=sim.samples[Math.min(i,sim.samples.length-1)]; if(s && i<sim.samples.length){ ctx.save(); ctx.fillStyle=s.p>0.035?'rgba(255,82,50,.9)':'rgba(58,91,255,.7)'; ctx.beginPath(); ctx.arc(s.x,s.y,Math.max(3,o.size*DPR*0.035),0,7); ctx.fill(); ctx.restore(); }
-    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); paint(); extra(layer); compose(ctx,layer,o.writer.tool,o.color); if(o.writer.tool==='brush'&&!matchMedia('(prefers-reduced-motion: reduce)').matches){ const L=Ambience.wetLayer(layer);const began=performance.now();const dry=now=>{if(token.stop||!canvas.isConnected)return;const wet=Math.pow(Math.max(0,1-(now-began)/3400),1.6);paint();compose(ctx,layer,o.writer.tool,o.color);if(wet>0){ctx.save();ctx.globalAlpha=wet;ctx.drawImage(L.body,0,0);ctx.drawImage(L.gloss,0,0);ctx.restore();requestAnimationFrame(dry);}};requestAnimationFrame(dry);} o.onDone&&o.onDone(); } };
+    if(i<sim.samples.length) requestAnimationFrame(frame); else { tool.end(); if(wetOn&&down) strokeDone(); extra(layer); if(prev) prev.getContext('2d').drawImage(layer,0,0);
+      const dry=now=>{ if(token.stop||!canvas.isConnected) return; if(show(now)) requestAnimationFrame(dry); }; dry(performance.now()); o.onDone&&o.onDone(); } };
   requestAnimationFrame(frame); return {sim, layout:L, token};
 }
 
@@ -1993,14 +2003,20 @@ class Pad{
             P.forEach(q=>{ const d=(q.s-dryFrom)/(st.L-dryFrom+1); const x=q.x+q.nx*q.w*0.5*off, y=q.y+q.ny*q.w*0.5*off;
               if(d>0.25&&rr()<0.93){ ix.globalAlpha=Math.min(0.5,d*0.6); on?ix.lineTo(x,y):ix.moveTo(x,y); on=true; } else on=false; }); ix.stroke(); }
           ix.restore(); } } };
-    const t0=performance.now(); const fr=now=>{ const tt=(now-t0)/1000*0.8; let j=0; while(j<S.length&&S[j].t<=tt) j++; draw(j); if(j<S.length) this._demo=requestAnimationFrame(fr); else this.finish?.refresh(); }; this._demo=requestAnimationFrame(fr); }
+    const t0=performance.now(); let done=0; const prev=document.createElement('canvas'); prev.width=prev.height=s;
+    // each finished stroke is handed over wet, with the time the brush passed each point, so it dries from where it began
+    const fr=now=>{ const tt=(now-t0)/1000*0.8; let j=0; while(j<S.length&&S[j].t<=tt) j++;
+      while(done<strokes.length){ const st=strokes[done], P=st.pts, last=P.length?(P[P.length-1].k2??P[P.length-1].k):st.k0; if(j<=last) break;
+        draw(last+1); const c=document.createElement('canvas'); c.width=c.height=s; const cx=c.getContext('2d'); cx.drawImage(this.ink,0,0); cx.globalCompositeOperation='destination-out'; cx.drawImage(prev,0,0);
+        const px=prev.getContext('2d'); px.clearRect(0,0,s,s); px.drawImage(this.ink,0,0); this.finish?.add?.(c,P.map(q=>[q.x,q.y,t0+q.t/0.8*1000])); done++; }
+      draw(j); if(j<S.length) this._demo=requestAnimationFrame(fr); }; this._demo=requestAnimationFrame(fr); }
   clear(){ this.finish?.clear(); clearTimeout(this._full); this.ink.getContext('2d').clearRect(0,0,this.size,this.size); this.over.getContext('2d').clearRect(0,0,this.size,this.size); this.strokes=[]; this.snaps=[]; }
-  undo(){ if(!this.snaps.length) return; this.finish?.clear(); this.ink.getContext('2d').putImageData(this.snaps.pop(),0,0); this.strokes.pop(); this.over.getContext('2d').clearRect(0,0,this.size,this.size); }
+  undo(){ if(!this.snaps.length) return; this.finish?.undo?.(); this.ink.getContext('2d').putImageData(this.snaps.pop(),0,0); this.strokes.pop(); this.over.getContext('2d').clearRect(0,0,this.size,this.size); }
   xy(e){ const b=this.el.getBoundingClientRect(); return [(e.clientX-b.left)*this.size/b.width,(e.clientY-b.top)*this.size/b.height]; }
   down(e){ e.preventDefault(); this.el.setPointerCapture(e.pointerId); this.over.getContext('2d').clearRect(0,0,this.size,this.size);
     const [x,y]=this.xy(e); this.drawing=true; this.lt=e.timeStamp; this.pos=[x,y]; this.last=[x,y]; this.v=0; this.vx=0; this.vy=0; this.pen=e.pointerType==='pen';
     const wx=this.wet.getContext('2d'); wx.clearRect(0,0,this.size,this.size); wx.fillStyle='#16120d';
-    this.R=this.size*(this.pen?0.062:0.05); this.p=this.pen&&e.pressure>0?0.3+e.pressure*1.1:0.95; this.vq=[]; this.seed=newSeed(); this.raw=[{x,y,p:this.p}]; this.render();
+    this.R=this.size*(this.pen?0.062:0.05); this.p=this.pen&&e.pressure>0?0.3+e.pressure*1.1:0.95; this.vq=[]; this.seed=newSeed(); this.raw=[{x,y,p:this.p,t:performance.now()}]; this.render();
     this.cur=[[x/this.size*109,y/this.size*109]]; }
   move(e){ if(!this.drawing) return; const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
     for(const ev of (evs.length?evs:[e])){ const raw=this.xy(ev);
@@ -2012,7 +2028,7 @@ class Pad{
     // and the brush, held slanted, leaves vertical strokes a little fuller than horizontal ones
     const vn=this.v*300/(this.el.getBoundingClientRect().width||300);     let tp=clamp(1.18-vn*0.6,0.3,1.18); if(this.pen&&pressure>0) tp=(0.3+pressure*1.3)*clamp(1.1-this.v*0.12,0.7,1.1);
     this.vq=(this.vq||[]).concat(vn).slice(-4);
-    this.p+=(tp-this.p)*(this.pen?0.18:0.22); this.raw.push({x,y,p:this.p}); this.last=[x,y]; this.lt=ts; this.cur.push([x/this.size*109,y/this.size*109]); this.render(); }
+    this.p+=(tp-this.p)*(this.pen?0.18:0.22); this.raw.push({x,y,p:this.p,t:performance.now()}); this.last=[x,y]; this.lt=ts; this.cur.push([x/this.size*109,y/this.size*109]); this.render(); }
   render(){ const wx=this.wet.getContext('2d'); wx.clearRect(0,0,this.size,this.size); wx.fillStyle='#16120d'; ribbon(wx,this.raw,this.R,this.seed); }
   up(e){ if(!this.drawing) return; this.drawing=false;
     if(e){ const raw=this.xy(e); for(let i=1;i<=4;i++){ const x=this.pos[0]+(raw[0]-this.pos[0])*i/4, y=this.pos[1]+(raw[1]-this.pos[1])*i/4; this.feedTo(x,y,this.lt+4,e.pressure); } }
@@ -2023,7 +2039,7 @@ class Pad{
       for(let i=1;i<=n;i++){ const t2=i/n; this.raw.push({x:this.last[0]+ux*len*t2,y:this.last[1]+uy*len*t2,p:w0*Math.pow(1-t2,1.3)+0.03}); } }
     this.render();
     const ix=this.ink.getContext('2d'); this.snaps.push(ix.getImageData(0,0,this.size,this.size)); if(this.snaps.length>40) this.snaps.shift();
-    ix.save(); ix.shadowColor='rgba(22,18,13,.3)'; ix.shadowBlur=this.size*0.004; ix.globalAlpha=0.95; ix.drawImage(this.wet,0,0); ix.restore(); this.finish?.add?.(this.wet); this.wet.getContext('2d').clearRect(0,0,this.size,this.size);
+    ix.save(); ix.shadowColor='rgba(22,18,13,.3)'; ix.shadowBlur=this.size*0.004; ix.globalAlpha=0.95; ix.drawImage(this.wet,0,0); ix.restore(); { let lt=0; this.finish?.add?.(this.wet,this.raw.map(q=>[q.x,q.y,lt=q.t??lt])); } this.wet.getContext('2d').clearRect(0,0,this.size,this.size);
     this.strokes.push(this.cur.length>1?this.cur:[this.cur[0],[this.cur[0][0]+0.5,this.cur[0][1]+0.5]]);
     const gl=glyph(this.ch); if(this.onFull&&gl&&this.strokes.length===gl.strokes.length){ clearTimeout(this._full); this._full=setTimeout(()=>{ if(!this.drawing&&gl&&this.strokes.length===gl.strokes.length) this.onFull(); },420); } }
   check(){ const g=glyph(this.ch); const ref=g.strokes.map(st=>st.map(p=>[p[0]*0.9+5.45,p[1]*0.9+5.45]));

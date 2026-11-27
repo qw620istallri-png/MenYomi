@@ -94,41 +94,74 @@ const Ambience=(()=>{
     if(spec.fold!=='none'){const el=document.createElement('span');el.className='paper-curl';el.setAttribute('aria-hidden','true');Object.assign(el.style,{width:s,height:s,left:spec.fold==='bl'?'0':'auto',right:spec.fold==='bl'?'auto':'0',top:spec.fold==='tr'?'0':'auto',bottom:spec.fold==='tr'?'auto':'0',transform:spec.fold==='bl'?'scaleX(-1)':spec.fold==='tr'?'scaleY(-1)':'none'});button.appendChild(el);}
     button.onpointerenter=()=>swing(button,.6);button.addEventListener('pointerdown',()=>swing(button));
   }
-  // fresh sumi: each new stroke stays glossy on its own and dries at its own pace; older strokes are never wetted again.
-  // The gloss is a soft light rim on the side facing the window (upper left) plus a faint darker body, both fading as the ink sinks in.
-  function wetLayer(src){
-    const W=src.width,H=src.height,d=Math.max(1.5,W/260),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-    // light rim: the stroke minus itself nudged towards the light, softened
-    const rim=document.createElement('canvas');rim.width=W;rim.height=H;const r=rim.getContext('2d');
-    r.drawImage(src,0,0);r.globalCompositeOperation='destination-out';r.drawImage(src,d*1.2,d*1.6);r.globalCompositeOperation='source-in';r.fillStyle='rgba(236,240,236,1)';r.fillRect(0,0,W,H);
-    x.filter='blur('+(d*.7).toFixed(1)+'px)';x.globalAlpha=.55;x.drawImage(rim,0,0);x.filter='none';
-    // a few soft specular glints along the body where the ink pools
-    const g=document.createElement('canvas');g.width=W;g.height=H;const gx=g.getContext('2d');gx.drawImage(src,0,0);gx.globalCompositeOperation='destination-in';gx.filter='blur('+(d*3).toFixed(1)+'px)';gx.drawImage(src,-d*1.5,-d*2);gx.filter='none';
-    gx.globalCompositeOperation='source-in';const lg=gx.createLinearGradient(0,0,W,H);lg.addColorStop(0,'rgba(240,244,240,.20)');lg.addColorStop(.5,'rgba(240,244,240,.06)');lg.addColorStop(1,'rgba(240,244,240,.14)');gx.fillStyle=lg;gx.fillRect(0,0,W,H);
-    x.globalAlpha=1;x.drawImage(g,0,0);
-    // wet body: the ink is a touch deeper while it lies on the surface
-    const body=document.createElement('canvas');body.width=W;body.height=H;const b=body.getContext('2d');b.drawImage(src,0,0);b.globalCompositeOperation='source-in';b.fillStyle='rgba(8,6,4,.22)';b.fillRect(0,0,W,H);
-    return {gloss:c,body};
+  // fresh sumi (see MoXi, Chu & Tai 2005, and Curtis 1997 for the behaviour), worked per stroke at half resolution:
+  // the ink dries from the thin parts and edges towards the pools, in patches set by the paper's sizing; a faint sheen stays only
+  // on the thick bead facing the window while it is wet; and a fibrous bleed (nijimi) creeps into the paper during the first second
+  // and stays, wider on a big kanji and finer on a small one so the gaps between strokes stay open.
+  const sm=(a,b,x)=>{x=Math.min(1,Math.max(0,(x-a)/(b-a)));return x*x*(3-2*x);};
+  const mk=(w,h)=>{const c=document.createElement('canvas');c.width=w;c.height=h;return c;};
+  let PAPER=null; // fibre and blotch fields on a 512 tile, made once
+  function paperFields(){ if(PAPER) return PAPER; const T=512; let s=11; const rnd=()=>((s=(s*16807)%2147483647)/2147483647);
+    const fc=mk(T,T),fx=fc.getContext('2d');fx.lineCap='round';
+    for(let i=0;i<7000;i++){const px=rnd()*T,py=rnd()*T,an=rnd()*Math.PI,L=4+rnd()*16;fx.strokeStyle='rgba(0,0,0,'+(0.15+rnd()*0.5).toFixed(2)+')';fx.lineWidth=0.5+rnd()*0.9;fx.beginPath();fx.moveTo(px,py);fx.quadraticCurveTo(px+Math.cos(an)*L*.5+rnd()*3,py+Math.sin(an)*L*.5+rnd()*3,px+Math.cos(an)*L,py+Math.sin(an)*L);fx.stroke();}
+    const bc=mk(T,T),bx=bc.getContext('2d');for(let i=0;i<2900;i++){bx.fillStyle='rgba(0,0,0,'+(rnd()*0.45).toFixed(2)+')';bx.beginPath();bx.arc(rnd()*T,rnd()*T,1+rnd()*6,0,7);bx.fill();}
+    const b2=mk(T,T),b2x=b2.getContext('2d');b2x.filter='blur(1.5px)';b2x.drawImage(bc,0,0);
+    const fd=fx.getImageData(0,0,T,T).data,bd=b2x.getImageData(0,0,T,T).data,FIB=new Float32Array(T*T),BLOT=new Float32Array(T*T);
+    for(let i=0;i<T*T;i++){FIB[i]=fd[i*4+3]/255;BLOT[i]=Math.min(1,bd[i*4+3]/255*1.6);}
+    return PAPER={T,FIB,BLOT}; }
+  // src: a canvas holding one stroke (only its alpha is used). o.at: when it was laid (ms), o.pts: [[x,y,ms],...] the brush path in src pixels,
+  // o.R: the stroke's width in src pixels, o.css: how big the kanji is on screen (px)
+  function wetInk(src,o={}){
+    const W=src.width,H=src.height,w=Math.ceil(W/2),h=Math.ceil(H/2),Rf=o.R||Math.min(W,H)*0.064,at=o.at??performance.now(),pts=o.pts||[],{T:PT,FIB,BLOT}=paperFields();
+    const f=0.08+0.08*sm(140,420,o.css||300);
+    const grab=blur=>{const c=mk(w,h),x=c.getContext('2d');if(blur)x.filter='blur('+blur.toFixed(1)+'px)';x.drawImage(src,0,0,w,h);return x.getImageData(0,0,w,h).data;};
+    const dA=grab(0),dH=grab(Rf*0.18),dB=grab(Rf*f);
+    let x0=w,y0=h,x1=-1,y1=-1;for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(dA[(y*w+x)*4+3]>3){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y;}
+    if(x1<0)return null;const m=Math.ceil(Rf*0.5);x0=Math.max(0,x0-m);y0=Math.max(0,y0-m);x1=Math.min(w-1,x1+m);y1=Math.min(h-1,y1+m);
+    const bw=x1-x0+1,bh=y1-y0+1,n=bw*bh,A=new Float32Array(n),HH=new Float32Array(n),TT=new Float32Array(n).fill(pts.length?pts[pts.length-1][2]:at),DRY=new Float32Array(n),G=new Float32Array(n),HL=new Float32Array(n);
+    for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const i=y*bw+x,j=((y+y0)*w+x+x0)*4+3;A[i]=dA[j]/255;HH[i]=dH[j]/255;HL[i]=dB[j]/255;}
+    // when the brush passed over each pixel: drying and bleeding start there
+    const rr=Math.ceil(Rf*0.9);for(const [px,py,t] of pts){const cx=px/2-x0,cy=py/2-y0;for(let y=Math.max(0,Math.floor(cy-rr));y<=Math.min(bh-1,cy+rr);y++)for(let x=Math.max(0,Math.floor(cx-rr));x<=Math.min(bw-1,cx+rr);x++){if((x-cx)**2+(y-cy)**2>rr*rr)continue;const i=y*bw+x;if(TT[i]>t)TT[i]=t;}}
+    const lx=-0.55,ly=-0.83;let tEnd=0;
+    for(let y=0;y<bh;y++)for(let x=0;x<bw;x++){const i=y*bw+x,gx0=x+x0,gy0=y+y0,p=(gy0%PT)*PT+(gx0%PT),hh=HH[i];
+      // thick, pooled ink stays wet the longest (ms); thin hairlines and dry streaks sink in almost at once
+      DRY[i]=(300+3600*Math.pow(hh,1.8))*(0.75+0.5*BLOT[p]);if(A[i]>0.02)tEnd=Math.max(tEnd,TT[i]+DRY[i]);
+      if(A[i]>0.02&&x>0&&y>0&&x<bw-1&&y<bh-1){const gx=HH[i+1]-HH[i-1],gy=HH[i+bw]-HH[i-bw],s2=(-gx*lx-gy*ly)*9,e=sm(0.40,0.56,gx0/w)*(1-sm(0.36,0.52,gy0/h));
+        G[i]=(0.04*hh+sm(0.08,0.8,s2)*Math.pow(hh,1.6)*(0.55+0.6*BLOT[p]))*(0.45+1.1*e);}
+      const out=Math.max(0,HL[i]-A[i]*0.9);HL[i]=out*1.35*(0.22+1.5*Math.pow(FIB[p],1.3))*(0.5+0.9*hh);}
+    const wet=mk(bw,bh),halo=mk(bw,bh),iw=new ImageData(bw,bh),ih=new ImageData(bw,bh);let settled=false;
+    // draws this stroke's wet look and its bleed as they are at `now`; false once it is dry and the bleed has settled
+    function update(now){const D=iw.data,Hd=ih.data;D.fill(0);let live=false;
+      for(let i=0;i<n;i++){const tr=TT[i];if(tr>now){live=true;continue;}const age=now-tr,q=i*4;
+        const hv=HL[i];if(hv>0){Hd[q]=22;Hd[q+1]=18;Hd[q+2]=16;Hd[q+3]=Math.min(255,hv*sm(0,900,age)*0.5*255);if(age<900)live=true;}
+        const a0=A[i];if(a0<0.02)continue;const wv=1-sm(DRY[i]-800,DRY[i],age);if(wv<=0)continue;live=true;
+        const ga=Math.min(1,G[i]*wv*a0)*0.8,da=0.16*wv*a0,al=ga+da*(1-ga);if(al<=0.004)continue;
+        // a darker wet body under a cool sheen, as one colour
+        D[q]=Math.round(214*ga/al);D[q+1]=Math.round(224*ga/al);D[q+2]=Math.round(232*ga/al);D[q+3]=al*255;}
+      wet.getContext('2d').putImageData(iw,0,0);halo.getContext('2d').putImageData(ih,0,0);if(!live)settled=true;return live;}
+    return {x:x0*2,y:y0*2,w:bw*2,h:bh*2,wet,halo,update,get settled(){return settled;},end:tEnd};
   }
-  function paintInk(overlay,list,now){
-    const x=overlay.getContext('2d');x.clearRect(0,0,overlay.width,overlay.height);let live=false;
-    for(const w of list){const age=(now-w.at)/w.dry;if(age>=1)continue;live=true;const wet=Math.pow(1-age,1.6);
-      x.globalAlpha=wet;x.drawImage(w.layer.body,0,0);x.globalAlpha=wet*(.85+.15*Math.sin(now*.002+w.ph));x.drawImage(w.layer.gloss,0,0);}
-    x.globalAlpha=1;return live;
-  }
+  // a pad's fresh ink: the wet look floats above the ink, the bleed sits under it and stays until the pad is cleared
   function attachInk(host,sources){
-    const overlay=document.createElement('canvas');overlay.className='ink-sheen';overlay.setAttribute('aria-hidden','true');host.appendChild(overlay);
-    let frame=0,disposed=false,list=[];const reduce=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const loop=now=>{if(disposed||!host.isConnected)return;if(document.hidden){frame=requestAnimationFrame(loop);return;}list=list.filter(w=>now-w.at<w.dry);if(!paintInk(overlay,list,now)){frame=0;return;}frame=requestAnimationFrame(loop);};
-    function add(src){
-      if(disposed||reduce()||!src||!src.width)return;if(overlay.width!==src.width||overlay.height!==src.height){overlay.width=src.width;overlay.height=src.height;list=[];}
-      list.push({layer:wetLayer(src),at:performance.now(),dry:3200+Math.random()*900,ph:Math.random()*6});if(list.length>6)list.shift();if(!frame)frame=requestAnimationFrame(loop);
-    }
-    // a whole drawing appears at once (the simulated hand): it is wet all over, once
+    const ink=sources[0],sheen=mk(1,1),bleed=mk(1,1);sheen.className='ink-sheen';bleed.className='ink-bleed';[sheen,bleed].forEach(c=>c.setAttribute('aria-hidden','true'));
+    host.appendChild(sheen);host.insertBefore(bleed,ink);
+    let frame=0,disposed=false,live=[],kept=[];const reduce=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const size=()=>{if(bleed.width!==ink.width||bleed.height!==ink.height){bleed.width=sheen.width=ink.width;bleed.height=sheen.height=ink.height;live=[];kept=[];}};
+    const redrawKept=()=>{const b=bleed.getContext('2d');b.clearRect(0,0,bleed.width,bleed.height);kept.forEach(s=>b.drawImage(s.halo,s.x,s.y,s.w,s.h));};
+    const loop=now=>{if(disposed||!host.isConnected){frame=0;return;}if(document.hidden){frame=requestAnimationFrame(loop);return;}
+      const sx=sheen.getContext('2d');sx.clearRect(0,0,sheen.width,sheen.height);redrawKept();const b=bleed.getContext('2d');
+      live=live.filter(s=>{const on=s.update(now);b.drawImage(s.halo,s.x,s.y,s.w,s.h);sx.drawImage(s.wet,s.x,s.y,s.w,s.h);if(!on)kept.push(s);return on;});
+      frame=live.length?requestAnimationFrame(loop):0;};
+    function add(src,pts){if(disposed||!src||!src.width)return;size();
+      const s=wetInk(src,{pts,R:o_R(src),css:host.clientWidth});if(!s)return;
+      if(reduce()){s.update(Infinity);kept.push(s);redrawKept();return;}
+      live.push(s);if(!frame)frame=requestAnimationFrame(loop);}
+    const o_R=src=>Math.min(src.width,src.height)*0.064;
     function refresh(){const src=sources[0];if(src&&src.width)add(src);}
-    function clear(){cancelAnimationFrame(frame);frame=0;list=[];overlay.getContext('2d').clearRect(0,0,overlay.width,overlay.height);}
-    return {add,refresh,clear,destroy(){disposed=true;clear();overlay.remove();}};
+    function undo(){if(live.length)live.pop();else kept.pop();redrawKept();sheen.getContext('2d').clearRect(0,0,sheen.width,sheen.height);}
+    function clear(){cancelAnimationFrame(frame);frame=0;live=[];kept=[];[sheen,bleed].forEach(c=>c.getContext('2d').clearRect(0,0,c.width,c.height));}
+    return {add,refresh,undo,clear,destroy(){disposed=true;clear();sheen.remove();bleed.remove();}};
   }
-  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,paintInk,wetLayer,attachInk,get view(){return currentView;}};
+  return {views,backgrounds,shadows,dayNumber,selection,paperSpec,apply,background,wood,paper,swing,wetInk,attachInk,get view(){return currentView;}};
 })();
 if(typeof module!=='undefined')module.exports=Ambience;
