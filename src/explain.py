@@ -249,7 +249,7 @@ add("""
 オレンジジュース|Jus d’orange.|Orange juice.
 テイクアウト|À emporter, de l’anglais take out. Plus courant que お持ち帰り dans les chaînes.|Takeaway, from English take out. More common than お持ち帰り in chains.
 イートイン|Sur place, de l’anglais eat in.|Eat in, from English.
-店内でお召し上がりですか|Question au comptoir : « Vous consommez sur place ? ». お召し上がり est la forme polie de manger.|Asked at the counter: “For here?”. お召し上がり is the polite verb for eating.
+店内でお召し上がりですか|Question au comptoir : « Vous consommez sur place ? ». お召し上がり est le verbe manger en langage respectueux (sonkeigo) : le personnel l’emploie pour le client, mais le client n’a jamais à le dire, seulement à le reconnaître.|Asked at the counter: “For here?”. お召し上がり is the respectful (sonkeigo) verb for eating: staff use it about the customer, who never needs to say it, only to recognise it.
 こちらでお召し上がりですか|« Vous mangez ici ? » La question classique au comptoir, souvent suivie de お持ち帰りですか.|“Will you eat here?” The classic counter question, often followed by お持ち帰りですか.
 お持ち帰りですか|« Ou c’est à emporter ? » La deuxième moitié de la question du comptoir.|“Or is it to take away?” The second half of the counter question.
 テイクアウトで|Réponse : « À emporter ».|Answer: “To go”.
@@ -319,7 +319,7 @@ add("""
 全品|« Tous les articles » : 全品70円 veut dire que tout est à 70 yens.|“All items”: 全品70円 means everything is 70 yen.
 割引|Réduction, souvent en pourcentage : 10%割引.|A discount, often in percent: 10%割引.
 半額|Moitié prix : l’étiquette collée le soir sur les bentō et plats du jour.|Half price: the sticker put on bento and daily dishes in the evening.
-はじめました|« On a commencé » : annonce le retour d’un produit de saison, comme 冷やし中華はじめました en été.|“We’ve started”: announces a seasonal item is back, like 冷やし中華はじめました in summer.
+はじめました|« On a commencé » : annonce qu’un produit de saison est de nouveau servi, comme 冷やし中華はじめました en été.|“We’ve started”: announces a seasonal item is being served again, like 冷やし中華はじめました in summer.
 温めますか|« Je vous le réchauffe ? » : on vous le demande pour les bentō et les plats.|“Shall I heat it up?”: asked for bento and ready meals.
 お願いします|« S’il vous plaît » : pour dire oui à une proposition.|“Please”: to say yes to an offer.
 大丈夫です|« Ça ira » : la façon polie de dire non merci.|“I’m fine”: the polite way to say no thanks.
@@ -481,9 +481,9 @@ add("""
 メロン味|Sirop au melon, d’un vert éclatant.|Melon syrup, a vivid green.
 抹茶味|Sirop au matcha, plus amer et moins sucré. Avec des haricots rouges, cela devient un 宇治金時.|Matcha syrup, more bitter and less sweet. With red beans it becomes 宇治金時.
 練乳|Lait concentré sucré versé par-dessus, en supplément ou déjà compris.|Sweetened condensed milk poured on top, as an extra or included.
-売り切れました|« C’est épuisé ». 売り切れる : être vendu jusqu’au dernier. Souvent précédé d’un すみません.|“It’s sold out”. 売り切れる: to sell out. Usually after a すみません.
+売り切れなんです|« C’est épuisé, désolé ». 売り切れ : vendu jusqu’au dernier ; 〜なんです adoucit en expliquant. Souvent précédé d’un すみません. Plus formel : 申し訳ございません、売り切れてしまいました.|“It’s sold out, sorry”. 売り切れ: sold to the last one; 〜なんです softens it as an explanation. Usually after a すみません. More formal: 申し訳ございません、売り切れてしまいました.
 じゃあ|« Alors, dans ce cas » : pour changer d’avis ou se rabattre sur autre chose.|“Well then”: to change your mind or settle for something else.
-冷たいうちにどうぞ|« Prenez-le tant que c’est froid ». 〜うちに : pendant que, avant que ça change.|“Have it while it’s cold”. 〜うちに: while, before it changes.
+溶けないうちにどうぞ|« À déguster avant que ça fonde », en servant une glace pilée. 〜ないうちに : avant que… ne.|“Enjoy it before it melts”, said when serving shaved ice. 〜ないうちに: before it starts to….
 温かいうちにどうぞ|« Prenez-le tant que c’est chaud », en servant un plat qui sort du feu.|“Have it while it’s hot”, said when serving a dish fresh from the stove.
 """)
 
@@ -598,3 +598,21 @@ for line in """
 まんぷく|« Ventre plein ».|“Full belly”.
 """.strip().splitlines():
     w,f,e=[x.strip() for x in line.split('|')]; NX[w]=(f,e)
+
+add("""
+天ぷら|Poissons, crevettes et légumes enrobés d’une pâte très légère et frits. Sur les menus, 天 seul veut souvent dire tempura : 天丼, 天ざる.|Fish, prawns and vegetables in a very light batter, deep-fried. On menus 天 alone often means tempura: 天丼, 天ざる.
+もも|Morceaux de cuisse de poulet sur la brochette, le classique. Sur beaucoup de menus, c’est l’étiquette de 正肉.|Chicken thigh pieces on a skewer, the classic. Many menus label 正肉 this way.
+ささみ|Filet de poulet, très maigre, souvent servi rosé avec du wasabi ou de la prune.|Chicken tenderloin, very lean, often served pink with wasabi or plum.
+せせり|Cou de poulet : petits morceaux fermes et juteux, un favori des habitués.|Chicken neck: small, firm, juicy pieces, a regulars’ favourite.
+現金で|« En espèces » : 現金 argent liquide, で par.|“In cash”: 現金 cash, で by.
+お会計ご一緒でよろしいですか|« Vous payez ensemble ? » ご一緒 : ensemble, en version polie. On répond 一緒で ou 別々で.|“Paying together?” ご一緒: together, the polite way. Answer 一緒で or 別々で.
+お支払いはどうなさいますか|« Comment souhaitez-vous payer ? » なさる est le verbe faire en langage respectueux : on répond カードで ou 現金で.|“How would you like to pay?” なさる is the respectful verb for do: answer カードで or 現金で.
+かしこまりました|« Bien noté » : la réponse du personnel à une commande, plus respectueuse que わかりました.|“Certainly”: the staff’s reply to an order, more deferential than わかりました.
+どちらになさいますか|« Lequel choisissez-vous ? » どちら : lequel des deux ; なさいます : faire, choisir (respectueux).|“Which would you like?” どちら: which of the two; なさいます: do, choose (respectful).
+一つ|« Un » pour commander n’importe quel objet ou plat : 一つ, 二つ, 三つ… On le place après le plat : 餃子を一つください.|“One” for ordering any item or dish: 一つ, 二つ, 三つ… It comes after the dish: 餃子を一つください.
+二つ|« Deux » objets ou plats. 〜つ marche jusqu’à dix sans réfléchir au compteur.|“Two” items or dishes. 〜つ works up to ten without picking a counter.
+一本|« Un » pour les choses longues : brochette, bouteille. Attention à la lecture : いっぽん.|“One” for long things: a skewer, a bottle. Note the reading: いっぽん.
+二本|« Deux » brochettes ou bouteilles. Au yakitori, on commande souvent par deux : ねぎま二本.|“Two” skewers or bottles. At yakitori people often order in twos: ねぎま二本.
+一杯|« Un » verre ou bol : bière, saké, ramen. Lecture いっぱい, comme « plein ».|“One” glass or bowl: beer, sake, ramen. Read いっぱい, like “full”.
+一個|« Une » pièce : un gyoza, une croquette, un onigiri. 〜個 compte les petites choses rondes.|“One” piece: a gyoza, a croquette, an onigiri. 〜個 counts small round things.
+""")

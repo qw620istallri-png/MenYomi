@@ -91,6 +91,9 @@ add("""
 水割り|みずわり|allongé à l’eau
 # --- yakitori
 正肉|しょうにく|cuisse de poulet
+もも|もも|cuisse de poulet
+ささみ|ささみ|filet de poulet (blanc)
+せせり|せせり|cou de poulet
 ねぎま|ねぎま|poulet et poireau
 つくね|つくね|boulette de poulet
 皮|かわ|peau de poulet
@@ -277,7 +280,7 @@ T = {
              ('飲物',['生ビール','生中','瓶ビール','日本酒','熱燗','冷酒','焼酎','梅酒','酎ハイ','レモンサワー','ハイボール','烏龍茶'],(300,750))]),
  'yakitori': dict(jp='焼鳥屋', fr='Yakitori', layouts=['wood','tanzaku'],
    names=['焼鳥 {n}','炭火焼鳥 {n}','鳥{n}'],
-   sections=[('串焼',['正肉','ねぎま','つくね','皮','砂肝','レバー','手羽先','ハツ','ぼんじり','軟骨','銀杏','椎茸','葱'],(150,330)),
+   sections=[('串焼',['もも','正肉','ねぎま','ささみ','せせり','つくね','皮','砂肝','レバー','手羽先','ハツ','ぼんじり','軟骨','銀杏','椎茸','葱'],(150,330)),
              ('一品料理',['鶏刺','冷奴','枝豆','漬物盛合せ'],(300,680)),
              ('〆',['鶏雑炊','親子丼','焼おにぎり'],(450,850)),
              ('飲物',['生ビール','日本酒','焼酎','梅酒','ハイボール','烏龍茶'],(300,700))]),
@@ -465,7 +468,7 @@ TALK_W = [
  ('いらっしゃいませ','いらっしゃいませ','bienvenue (accueil du personnel)','welcome (staff greeting)'),
  ('何名様ですか','なんめいさまですか','combien de personnes ?','how many people?'),
  ('二人です','ふたりです','nous sommes deux','two of us'),
- ('一人です','ひとりです','je suis seul','just me'),
+ ('一人です','ひとりです','je suis seul·e','just me'),
  ('こちらへどうぞ','こちらへどうぞ','par ici, je vous prie','this way, please'),
  ('お決まりですか','おきまりですか','vous avez choisi ?','ready to order?'),
  ('すみません','すみません','excusez-moi (pour appeler)','excuse me (to call staff)'),
@@ -483,6 +486,10 @@ TALK_W = [
  ('お会計お願いします','おかいけいおねがいします','l’addition, s’il vous plaît','the bill, please'),
  ('別々で','べつべつで','séparément (pour payer)','separately (to pay)'),
  ('カードで','カードで','par carte','by card'),
+ ('現金で','げんきんで','en espèces (pour payer)','in cash (to pay)'),
+ ('お会計ご一緒でよろしいですか','おかいけいごいっしょでよろしいですか','vous payez ensemble ?','paying together?'),
+ ('お支払いはどうなさいますか','おしはらいはどうなさいますか','comment souhaitez-vous payer ?','how would you like to pay?'),
+ ('かしこまりました','かしこまりました','bien noté, entendu (personnel)','certainly, noted (staff)'),
  ('ごちそうさまでした','ごちそうさまでした','formule après le repas, merci','said after eating, thanks'),
  ('ありがとうございました','ありがとうございました','merci beaucoup (au départ du client)','thank you very much'),
  ('またお越しください','またおこしください','revenez nous voir','please come again'),
@@ -701,7 +708,7 @@ KONBINI_W = [
  ('全品','ぜんぴん','tous les articles','all items'),
  ('割引','わりびき','réduction','discount'),
  ('半額','はんがく','moitié prix','half price'),
- ('はじめました','はじめました','c’est reparti, on en a de nouveau','now serving again'),
+ ('はじめました','はじめました','on a commencé (un produit de saison)','now serving (seasonal item)'),
 ]
 KONBINI_TALK = [
  ('温めますか','あたためますか','je vous le réchauffe ?','shall I heat it up?'),
@@ -769,7 +776,8 @@ SCENES = [
  [('c','すみません'),('c','これは何ですか'),('c','お水ください'),('s','少々お待ちください')],
  [('s','お待たせしました'),('s','ごゆっくりどうぞ'),('c','いただきます'),('c','美味しい')],
  [('c','{d}を|ください'),('c','持ち帰りで'),('s','少々お待ちください'),('s','ありがとうございました')],
- [('c','お会計お願いします'),('c','別々で'),('c','カードで'),('c','ごちそうさまでした'),('s','ありがとうございました')],
+ [('c','お会計お願いします'),('s','お会計ご一緒でよろしいですか'),('c','別々で'),('s','お支払いはどうなさいますか'),('c','カードで')],
+ [('c','すみません'),('c','お会計お願いします'),('s','お支払いはどうなさいますか'),('c','現金で'),('s','ありがとうございました')],
  [('c','ごちそうさまでした'),('s','ありがとうございました'),('s','またお越しください')],
  [('c','{d}を|ください'),('s','こちらでお召し上がりですか'),('s','お持ち帰りですか'),('c','持ち帰りで')],
 ]
@@ -886,9 +894,9 @@ KAKI_W = [
  ('練乳','れんにゅう','lait concentré sucré','sweetened condensed milk'),
 ]
 KAKI_TALK = [
- ('売り切れました','うりきれました','c’est épuisé (dit le personnel)','it’s sold out (staff)'),
+ ('売り切れなんです','うりきれなんです','c’est épuisé, désolé (dit le personnel)','it’s sold out, sorry (staff)'),
  ('じゃあ','じゃあ','alors, dans ce cas…','well then…'),
- ('冷たいうちにどうぞ','つめたいうちにどうぞ','à déguster tant que c’est froid','enjoy it while it’s cold'),
+ ('溶けないうちにどうぞ','とけないうちにどうぞ','à déguster avant que ça fonde','enjoy it before it melts'),
  ('温かいうちにどうぞ','あたたかいうちにどうぞ','à déguster tant que c’est chaud','enjoy it while it’s hot'),
 ]
 for w,r,f,e in KAKI_W+KAKI_TALK: W[w]=(r,f)
@@ -897,9 +905,61 @@ T['kanmi']['sections'].insert(1,('かき氷',['レモン味','いちご味','メ
 PHRASES['talk'].extend(x[0] for x in KAKI_TALK)
 # sweet shops and tea houses: the flavour someone wanted has run out, or the dish is served right away
 PHRASES['kanmi'] = [
- [('c','すみません'),('c','{d}を|ください'),('s','すみません、|売り切れました'),('c','じゃあ、これを|ください')],
- [('c','{d}を|ください'),('s','少々お待ちください'),('s','お待たせしました'),('s','冷たいうちにどうぞ')],
- [('s','お決まりですか'),('c','{d}を|ください'),('s','すみません、|売り切れました'),('c','じゃあ'),('c','これを|ください')],
+ [('c','すみません'),('c','{d}を|ください'),('s','すみません、|売り切れなんです'),('c','じゃあ、これを|ください')],
+ [('c','{d}を|ください'),('s','少々お待ちください'),('s','お待たせしました'),('s','溶けないうちにどうぞ')],
+ [('s','お決まりですか'),('c','{d}を|ください'),('s','すみません、|売り切れなんです'),('c','じゃあ'),('c','これを|ください')],
 ]
 SCENES.append([('s','お待たせしました'),('s','温かいうちにどうぞ'),('c','いただきます')])
 PRICES.update({'かき氷':(500,900),'レモン味':(500,800),'いちご味':(500,800),'メロン味':(500,800),'抹茶味':(600,950),'練乳':(100,200)})
+
+# ---------- ordering with a quantity: counters heard at every counter, and lines that use them
+COUNT_W = [
+ ('一つ','ひとつ','un, une (objet, plat)','one (item, dish)'),
+ ('二つ','ふたつ','deux (objets, plats)','two (items, dishes)'),
+ ('一本','いっぽん','une (brochette, bouteille)','one (skewer, bottle)'),
+ ('二本','にほん','deux (brochettes, bouteilles)','two (skewers, bottles)'),
+ ('一杯','いっぱい','un verre, un bol','one glass, one bowl'),
+ ('一個','いっこ','une pièce, un morceau','one piece'),
+]
+for w,r,f,e in COUNT_W: W[w]=(r,f)
+NEW_W.extend(COUNT_W)
+# a line is 'before|word|after': the middle word is the one the line teaches, {d} is a dish from the menu
+SCENES.extend([
+ [('s','お決まりですか'),('c','{d}を|一つ|ください'),('s','かしこまりました')],
+ [('c','すみません'),('c','{d}|お願いします'),('s','かしこまりました'),('s','少々お待ちください')],
+ [('s','お決まりですか'),('c','{d}を|二つ|ください'),('c','以上です'),('s','かしこまりました')],
+])
+PHRASES['kushi'] = [
+ [('s','お決まりですか'),('c','{d}を|二本|ください'),('c','生ビールを|一杯|ください'),('s','かしこまりました')],
+ [('c','すみません'),('c','{d}を|一本|ください'),('s','塩とタレ、|どちらになさいますか'),('c','|塩|で')],
+ [('c','{d}を|二本|ください'),('s','かしこまりました'),('c','それと、ビールを|一本|ください')],
+]
+W['どちらになさいますか']=('どちらになさいますか','lequel choisissez-vous ? (poli)'); NEW_W.append(('どちらになさいますか','どちらになさいますか','lequel choisissez-vous ? (poli)','which would you like? (polite)'))
+PHRASES['talk'].append('どちらになさいますか')
+PHRASES['konbini'].append([('c','{d}を|一個|ください'),('s','温めますか'),('c','お願いします'),('s','かしこまりました')])
+
+# ---------- spellings as they show up on real menus: the common form is the word to learn,
+# the rarer forms (old kanji, other okurigana) stand in on a menu now and then, with this probability
+CANON = {  # common form -> older or rarer form it replaces in the menus (explanations and English are shared)
+ 'うどん':'饂飩','焼きそば':'焼蕎麦','たこ焼き':'蛸焼','ジンギスカン':'成吉思汗','ひつまぶし':'櫃まぶし',
+ '海ぶどう':'海葡萄','ごまさば':'胡麻鯖','きつねうどん':'きつね饂飩','肉うどん':'肉饂飩',
+ '味噌煮込みうどん':'味噌煮込み饂飩','讃岐うどん':'讃岐饂飩','天ぷら':'天麩羅',
+}
+for new,old in CANON.items(): W[new]=(W[old][0],W[old][1])
+def _swap(lst):
+  for i,w in enumerate(lst):
+    for new,old in CANON.items():
+      if w==old: lst[i]=new
+for t in T.values():
+  for sec in t['sections']: _swap(sec[1])
+for reg in R.values(): _swap(reg['items'])
+for new,old in CANON.items():
+  if old in PRICES and new not in PRICES: PRICES[new]=PRICES[old]
+  for k in list(PRICES):
+    if k.endswith(':'+old): PRICES[k[:-len(old)]+new]=PRICES[k]
+VARIANTS = {w:[(old,.12)] for w,old in CANON.items()}
+for w,v in {'焼き鳥':('やきとり','brochettes de poulet grillé','grilled chicken skewers'),'から揚げ':('からあげ','poulet frit à la japonaise','Japanese fried chicken'),
+            'お好み焼き':('おこのみやき','crêpe japonaise garnie','savoury Japanese pancake')}.items():
+  W[w]=(v[0],v[1]); NEW_W.append((w,v[0],v[1],v[2]))
+VARIANTS.update({'焼鳥':[('焼き鳥',.3),('燒鳥',.04)],'唐揚げ':[('から揚げ',.2),('唐揚',.15)],'お好み焼':[('お好み焼き',.35)]})
+MENTIONS.extend(['焼き鳥','から揚げ','お好み焼き'])

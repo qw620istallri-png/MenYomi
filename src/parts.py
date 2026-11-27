@@ -232,6 +232,33 @@ _SRC = """
 はじめました
 - はじめ|はじめ|commencer (verbe 始める)|start (verb 始める)
 - ました|ました|terminaison polie au passé|polite past ending
+現金で
+- 現金|げんきん|espèces, argent liquide|cash
+- で|で|par, avec : « en espèces »|by, with: “in cash”
+お会計ご一緒でよろしいですか
+- お会計|おかいけい|l’addition|the bill
+- ご一緒|ごいっしょ|ensemble (poli)|together (polite)
+- で|で|en, de cette façon|as, in this way
+- よろしい|よろしい|bien, convenable (poli)|all right (polite)
+- ですか|ですか|est-ce ? (question polie)|is it? (polite question)
+お支払いはどうなさいますか
+- お支払い|おしはらい|le paiement (poli)|payment (polite)
+- は|は|quant à (thème)|as for (topic)
+- どう|どう|comment|how
+- なさいます|なさいます|faire (verbe respectueux)|do (respectful verb)
+- か|か|? (question)|? (question)
+どちらになさいますか
+- どちら|どちら|lequel des deux|which of the two
+- に|に|pour, comme choix|as the choice
+- なさいます|なさいます|faire, choisir (verbe respectueux)|do, choose (respectful verb)
+- か|か|? (question)|? (question)
+売り切れなんです
+- 売り切れ|うりきれ|épuisé, vendu jusqu’au dernier|sold out
+- なんです|なんです|c’est que… (explication adoucie)|it’s that… (soft explanation)
+溶けないうちにどうぞ
+- 溶けない|とけない|ne pas fondre|not melt
+- うちに|うちに|avant que, tant que|before, while
+- どうぞ|どうぞ|je vous en prie|please, go ahead
 """
 _cur = None
 for _line in _SRC.strip().splitlines():

@@ -16,6 +16,16 @@ def render():
     data.update(words=[[w, *v] for w, v in menu['W'].items()], types=menu['T'], regions=menu['R'], names=menu['NAMES'], namepat=menu['NAMEPAT_R'], mentions=menu['MENTIONS'], phrases=menu['PHRASES'], prices=menu['PRICES'])
     en = runpy.run_path(str(HERE / 'en.py'))
     explanations = runpy.run_path(str(HERE / 'explain.py'))
+    import sys; sys.path.insert(0, str(HERE)); from order import order
+    data.update(order=order(menu, data['kd']), variants=menu['VARIANTS'])
+    # the common spelling shares the explanation and English gloss of the older form it replaces
+    for new, old in menu['CANON'].items():
+        en['W_EN'].setdefault(new, en['W_EN'].get(old, ''))
+        if old in explanations['X']:
+            fr, en_ = explanations['X'][old]; explanations['X'].setdefault(new, (fr, en_))
+            if new not in fr: explanations['X'][old] = (fr + f' Graphie rare : on voit surtout {new}.', en_ + f' A rare spelling: menus mostly write {new}.')
+    for new, old in [('焼き鳥', '焼鳥'), ('から揚げ', '唐揚げ'), ('お好み焼き', 'お好み焼')]:
+        if old in explanations['X']: explanations['X'].setdefault(new, explanations['X'][old])
     def seasons(data):
         sz = runpy.run_path(str(HERE / 'seasons.py')); known = {w[0] for w in data['words']}
         return {'sekki': sz['SEKKI'], 'ko': sz['KO'], 'shun': {m: [w for w in ws if w in known] for m, ws in sz['SHUN'].items()}, 'hol': sz['HOLIDAYS']}
